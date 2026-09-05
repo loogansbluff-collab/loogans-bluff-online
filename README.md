@@ -31,3 +31,6 @@ Step 6 note:
 
 Step 7 note:
 - Property ownership now reads from a local coming-soon stub; every property remains Unowned and no wallet or live purchase exists.
+
+Step 8 note:
+- The aerial Town Directory lists every building and lot; selecting an entry opens its panel and recenters the aerial map on that property.
