@@ -25,3 +25,6 @@ Step 5 notes:
 - The compact controls legend changes between aerial and street modes.
 - Street mode shows the nearest building or lot name when the player comes within 4.5 units.
 - Proximity names are display-only and do not change property selection or add interactions.
+
+Step 6 note:
+- In street mode, press E near a property to open or close its existing information panel.

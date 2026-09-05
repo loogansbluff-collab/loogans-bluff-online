@@ -26,6 +26,7 @@ export default function ProximityPrompt() {
     <div className="pointer-events-none fixed bottom-4 left-1/2 z-20 -translate-x-1/2 rounded bg-black/75 px-4 py-2 text-center text-sm text-white shadow-lg backdrop-blur-sm">
       <div className="font-semibold">{nearest.name}</div>
       {isLot ? <div className="text-xs text-slate-300">Coming soon</div> : null}
+      <div className="mt-1 text-xs text-slate-200">Press E for info</div>
     </div>
   );
 }
