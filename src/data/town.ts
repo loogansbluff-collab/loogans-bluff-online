@@ -27,10 +27,17 @@ export type LotData = {
   color: string;
 };
 
+export type RoadData = {
+  id: string;
+  position: Vec3;
+  size: Vec3;
+};
+
 export type TownData = {
   townName: string;
   groundSize: number;
   streetSpawn: Vec3;
+  roads: RoadData[];
   buildings: BuildingData[];
   lots: LotData[];
 };

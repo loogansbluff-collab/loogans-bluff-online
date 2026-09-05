@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import BuildingPanel from "@/components/ui/BuildingPanel";
 import TopHud from "@/components/ui/TopHud";
+import ModeFade from "@/components/ui/ModeFade";
 
 const TownCanvas = dynamic(() => import("@/components/scene/TownCanvas"), {
   ssr: false,
@@ -14,6 +15,7 @@ export default function HomePage() {
       <TownCanvas />
       <TopHud />
       <BuildingPanel />
+      <ModeFade />
     </main>
   );
 }

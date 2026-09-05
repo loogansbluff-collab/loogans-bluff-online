@@ -8,7 +8,9 @@ import { useGameStore } from "@/state/gameStore";
 
 export default function Lot({ lot }: { lot: LotData }) {
   const start = useRef<[number, number] | null>(null);
+  const selectedId = useGameStore((state) => state.selectedId);
   const setSelectedId = useGameStore((state) => state.setSelectedId);
+  const isSelected = selectedId === lot.id;
   const [x, , z] = lot.position;
   const [width, height, depth] = lot.size;
 
@@ -29,7 +31,11 @@ export default function Lot({ lot }: { lot: LotData }) {
     <group>
       <mesh position={[x, height / 2, z]} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
         <boxGeometry args={[width, height, depth]} />
-        <meshStandardMaterial color={lot.color} />
+        <meshStandardMaterial
+          color={lot.color}
+          emissive={isSelected ? "#facc15" : "#000000"}
+          emissiveIntensity={isSelected ? 0.55 : 0}
+        />
       </mesh>
       <Html position={[x, 0.9, z]} center style={{ pointerEvents: "none" }}>
         <div className="whitespace-nowrap rounded bg-black/70 px-2 py-1 text-xs text-white">PROPERTY FOR SALE — COMING SOON</div>

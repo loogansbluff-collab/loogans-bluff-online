@@ -8,6 +8,8 @@ import { useGameStore } from "@/state/gameStore";
 import Ground from "@/components/scene/Ground";
 import Building from "@/components/scene/Building";
 import Lot from "@/components/scene/Lot";
+import Roads from "@/components/scene/Roads";
+import SpawnMarker from "@/components/scene/SpawnMarker";
 import AerialControls from "@/components/scene/AerialControls";
 import StreetControls from "@/components/scene/StreetControls";
 
@@ -39,6 +41,8 @@ function TownScene() {
       <directionalLight position={[20, 30, 10]} intensity={1} />
 
       <Ground size={townData.groundSize} />
+      <Roads />
+      <SpawnMarker />
       {townData.buildings.map((building) => (
         <Building key={building.id} building={building} />
       ))}

@@ -13,3 +13,9 @@ Step 3 controls:
 - Use WASD to walk on the ground; there is no jump or flying.
 - Building grayboxes block movement; lots and open ground remain walkable.
 - Use RETURN TO TOWN VIEW to exit pointer lock and restore the aerial map.
+
+Step 4 notes:
+- Street movement is contained within the 80×80 town boundary.
+- Selected buildings and lots are highlighted in aerial mode.
+- Two simple dirt roads and a visible street spawn marker help orient the graybox town.
+- A short dark fade covers the hard camera swap between aerial and street modes.
