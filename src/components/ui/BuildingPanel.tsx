@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { townData } from "@/data/town";
+import { getOwnership } from "@/lib/ownership";
 import { useGameStore } from "@/state/gameStore";
 
 export default function BuildingPanel() {
@@ -27,6 +28,7 @@ export default function BuildingPanel() {
   const description = building
     ? building.description
     : "Marked for future sale through the Loogans Bluff Government.";
+  const ownership = getOwnership(item.id);
 
   return (
     <aside className="fixed bottom-4 right-4 z-10 w-[min(22rem,calc(100vw-2rem))] rounded-xl border border-white/10 bg-slate-900/95 p-4 text-white shadow-2xl backdrop-blur">
@@ -47,7 +49,11 @@ export default function BuildingPanel() {
       <dl className="mt-4 space-y-2 text-sm">
         <div><dt className="text-slate-400">Type</dt><dd className="capitalize">{item.type}</dd></div>
         <div><dt className="text-slate-400">Status</dt><dd>{status}</dd></div>
-        <div><dt className="text-slate-400">Owner</dt><dd>Unowned</dd></div>
+        <div>
+          <dt className="text-slate-400">Owner</dt>
+          <dd>{ownership.label}</dd>
+          <dd className="mt-1 text-xs text-slate-400">{ownership.detail}</dd>
+        </div>
         <div><dt className="text-slate-400">Description</dt><dd>{description}</dd></div>
       </dl>
     </aside>

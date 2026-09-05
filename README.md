@@ -28,3 +28,6 @@ Step 5 notes:
 
 Step 6 note:
 - In street mode, press E near a property to open or close its existing information panel.
+
+Step 7 note:
+- Property ownership now reads from a local coming-soon stub; every property remains Unowned and no wallet or live purchase exists.
