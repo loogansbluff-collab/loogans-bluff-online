@@ -5,6 +5,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import { PerspectiveCamera, Vector3 } from "three";
 import { townData } from "@/data/town";
+import { useGameStore } from "@/state/gameStore";
 
 const SPEED = 8;
 const PLAYER_RADIUS = 0.4;
@@ -21,6 +22,7 @@ function isBlocked(x: number, z: number) {
 
 export default function StreetControls() {
   const { camera } = useThree();
+  const setPlayerPosition = useGameStore((state) => state.setPlayerPosition);
   const pressedKeys = useRef(new Set<string>());
   const forward = useRef(new Vector3());
   const right = useRef(new Vector3());
@@ -31,6 +33,7 @@ export default function StreetControls() {
     const [x, y, z] = townData.streetSpawn;
     camera.position.set(x, y, z);
     camera.rotation.set(0, 0, 0);
+    setPlayerPosition([x, y, z]);
 
     if (camera instanceof PerspectiveCamera) {
       camera.fov = 70;
@@ -53,32 +56,35 @@ export default function StreetControls() {
       window.removeEventListener("keyup", onKeyUp);
       pressedKeys.current.clear();
     };
-  }, [camera]);
+  }, [camera, setPlayerPosition]);
 
   useFrame((_, delta) => {
     camera.getWorldDirection(forward.current);
     forward.current.y = 0;
-    if (forward.current.lengthSq() === 0) return;
 
-    forward.current.normalize();
-    right.current.set(-forward.current.z, 0, forward.current.x);
-    movement.current.set(0, 0, 0);
+    if (forward.current.lengthSq() > 0) {
+      forward.current.normalize();
+      right.current.set(-forward.current.z, 0, forward.current.x);
+      movement.current.set(0, 0, 0);
 
-    if (pressedKeys.current.has("KeyW")) movement.current.add(forward.current);
-    if (pressedKeys.current.has("KeyS")) movement.current.sub(forward.current);
-    if (pressedKeys.current.has("KeyD")) movement.current.add(right.current);
-    if (pressedKeys.current.has("KeyA")) movement.current.sub(right.current);
-    if (movement.current.lengthSq() === 0) return;
+      if (pressedKeys.current.has("KeyW")) movement.current.add(forward.current);
+      if (pressedKeys.current.has("KeyS")) movement.current.sub(forward.current);
+      if (pressedKeys.current.has("KeyD")) movement.current.add(right.current);
+      if (pressedKeys.current.has("KeyA")) movement.current.sub(right.current);
 
-    movement.current.normalize().multiplyScalar(SPEED * delta);
+      if (movement.current.lengthSq() > 0) {
+        movement.current.normalize().multiplyScalar(SPEED * delta);
 
-    const proposedX = Math.max(-limit, Math.min(limit, camera.position.x + movement.current.x));
-    if (!isBlocked(proposedX, camera.position.z)) camera.position.x = proposedX;
+        const proposedX = Math.max(-limit, Math.min(limit, camera.position.x + movement.current.x));
+        if (!isBlocked(proposedX, camera.position.z)) camera.position.x = proposedX;
 
-    const proposedZ = Math.max(-limit, Math.min(limit, camera.position.z + movement.current.z));
-    if (!isBlocked(camera.position.x, proposedZ)) camera.position.z = proposedZ;
+        const proposedZ = Math.max(-limit, Math.min(limit, camera.position.z + movement.current.z));
+        if (!isBlocked(camera.position.x, proposedZ)) camera.position.z = proposedZ;
+      }
+    }
 
     camera.position.y = townData.streetSpawn[1];
+    setPlayerPosition([camera.position.x, camera.position.y, camera.position.z]);
   });
 
   return <PointerLockControls />;

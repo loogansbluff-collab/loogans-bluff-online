@@ -19,3 +19,9 @@ Step 4 notes:
 - Selected buildings and lots are highlighted in aerial mode.
 - Two simple dirt roads and a visible street spawn marker help orient the graybox town.
 - A short dark fade covers the hard camera swap between aerial and street modes.
+
+Step 5 notes:
+- Persistent LOOGANS BLUFF ONLINE title chrome and subtitle appear over the game.
+- The compact controls legend changes between aerial and street modes.
+- Street mode shows the nearest building or lot name when the player comes within 4.5 units.
+- Proximity names are display-only and do not change property selection or add interactions.
