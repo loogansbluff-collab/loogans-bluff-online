@@ -1,6 +1,7 @@
 {
   "townName": "Loogans Bluff",
   "groundSize": 80,
+  "streetSpawn": [0, 1.7, 12],
   "buildings": [
     {"id":"LB-COPSHOP-001","name":"Cop Shop","type":"government","status":"coming_soon","owner":null,"position":[-18,0,-14],"size":[7,3,6],"color":"#64748b","description":"The local law office keeping an eye on Loogans Bluff."},
     {"id":"LB-JAIL-001","name":"Jail","type":"government","status":"coming_soon","owner":null,"position":[-8,0,-14],"size":[7,3.5,6],"color":"#52525b","description":"A small town jail for unusually large mistakes."},

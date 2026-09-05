@@ -30,6 +30,7 @@ export type LotData = {
 export type TownData = {
   townName: string;
   groundSize: number;
+  streetSpawn: Vec3;
   buildings: BuildingData[];
   lots: LotData[];
 };
