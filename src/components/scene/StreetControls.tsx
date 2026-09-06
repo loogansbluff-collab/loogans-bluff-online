@@ -3,7 +3,6 @@
 import { PointerLockControls } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
-import type { ElementRef } from "react";
 import { PerspectiveCamera, Vector3 } from "three";
 import { townData } from "@/data/town";
 import { useGameStore } from "@/state/gameStore";
@@ -28,7 +27,6 @@ function isBlocked(x: number, z: number) {
 export default function StreetControls() {
   const { camera } = useThree();
   const setPlayerPosition = useGameStore((state) => state.setPlayerPosition);
-  const controlsRef = useRef<ElementRef<typeof PointerLockControls>>(null);
   const pressedKeys = useRef(new Set<string>());
   const forward = useRef(new Vector3());
   const right = useRef(new Vector3());
@@ -93,15 +91,8 @@ export default function StreetControls() {
     camera.position.z = clampToLimit(camera.position.z, limit);
     camera.position.y = townData.streetSpawn[1];
 
-    const controlsObject = controlsRef.current?.object;
-    if (controlsObject && controlsObject !== camera) {
-      controlsObject.position.x = clampToLimit(controlsObject.position.x, limit);
-      controlsObject.position.z = clampToLimit(controlsObject.position.z, limit);
-      controlsObject.position.y = townData.streetSpawn[1];
-    }
-
     setPlayerPosition([camera.position.x, camera.position.y, camera.position.z]);
   });
 
-  return <PointerLockControls ref={controlsRef} />;
+  return <PointerLockControls />;
 }
