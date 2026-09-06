@@ -8,9 +8,11 @@ import { townData } from "@/data/town";
 import { useGameStore } from "@/state/gameStore";
 
 const ORIGIN: [number, number, number] = [0, 0, 0];
-const PAN_LIMIT = 20;
-const CAMERA_XZ_LIMIT = 54;
-const STREET_ENTER_DISTANCE = 14;
+const PAN_LIMIT = townData.groundSize * 0.2;
+const CAMERA_XZ_LIMIT = townData.groundSize * 0.85;
+const START_HEIGHT = 140;
+const RETURN_HEIGHT = 55;
+const STREET_ENTER_DISTANCE = 12;
 const PLAYER_RADIUS = 0.4;
 
 function clamp(value: number, limit: number) {
@@ -93,7 +95,7 @@ export default function AerialControls() {
   useEffect(() => {
     if (resetNonce === 0) return;
     returnFramePending.current = false;
-    camera.position.set(0, 45, 45);
+    camera.position.set(0, START_HEIGHT, START_HEIGHT);
     camera.lookAt(0, 0, 0);
   }, [camera, resetNonce]);
 
@@ -106,7 +108,7 @@ export default function AerialControls() {
     const targetX = clamp(playerPosition[0], PAN_LIMIT);
     const targetZ = clamp(playerPosition[2], PAN_LIMIT);
     controls.target.set(targetX, 0, targetZ);
-    camera.position.set(targetX, 45, clamp(targetZ + 45, CAMERA_XZ_LIMIT));
+    camera.position.set(targetX, RETURN_HEIGHT, clamp(targetZ + RETURN_HEIGHT, CAMERA_XZ_LIMIT));
     camera.lookAt(targetX, 0, targetZ);
     controls.update();
     returnFramePending.current = false;
@@ -149,8 +151,8 @@ export default function AerialControls() {
       ref={controlsRef}
       key={`${focusNonce}-${resetNonce}`}
       enableRotate={false}
-      minDistance={10}
-      maxDistance={90}
+      minDistance={8}
+      maxDistance={280}
       target={target}
       screenSpacePanning
       onChange={clampAndMaybeEnterStreet}

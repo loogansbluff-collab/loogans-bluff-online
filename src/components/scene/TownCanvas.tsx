@@ -14,11 +14,13 @@ import SpawnMarker from "@/components/scene/SpawnMarker";
 import AerialControls from "@/components/scene/AerialControls";
 import StreetControls from "@/components/scene/StreetControls";
 
+const AERIAL_START: [number, number, number] = [0, 140, 140];
+
 function AerialMode() {
   const { camera } = useThree();
 
   useEffect(() => {
-    camera.position.set(0, 45, 45);
+    camera.position.set(...AERIAL_START);
     camera.lookAt(0, 0, 0);
 
     if (camera instanceof PerspectiveCamera) {
@@ -60,7 +62,7 @@ function TownScene() {
 export default function TownCanvas() {
   return (
     <Canvas
-      camera={{ position: [0, 45, 45], fov: 50, near: 0.1, far: 1000 }}
+      camera={{ position: AERIAL_START, fov: 50, near: 0.1, far: 1000 }}
       style={{ width: "100%", height: "100%" }}
     >
       <TownScene />

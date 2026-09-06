@@ -57,6 +57,9 @@ Step 14 note:
 Stage A note:
 - The game now lands in aerial view; zooming inside 14 units drops to street mode at the current target or nearest open road, while wheel-out, Esc twice, and Return To Town View restore an aerial view centered above the player.
 
+Stage A2 note:
+- The town board now spans 220 units with a three-line road grid in each direction, smaller existing properties, and 40 total vacant parcel pads while preserving Stage A wheel-to-street controls.
+
 ## V1 status
 Explore V1 preview is complete. Freeze new economy and ownership systems until the V1 playtest below passes on a normal machine.
 
