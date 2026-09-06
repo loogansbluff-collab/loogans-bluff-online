@@ -6,13 +6,9 @@ type TrailPoint = [number, number];
 
 const SOUTH_PATH_POINTS: TrailPoint[] = [
   [0, 39],
-  [0.3, 42],
-  [-0.35, 45],
-  [0.45, 48],
-  [-0.4, 51],
-  [0.35, 54],
-  [-0.25, 57],
-  [0.2, 60],
+  [0.25, 41.5],
+  [-0.25, 44],
+  [0.2, 46.5],
 ];
 
 const SOUTH_PATH_SEGMENTS = SOUTH_PATH_POINTS.slice(0, -1).map(([x1, z1], index) => {
