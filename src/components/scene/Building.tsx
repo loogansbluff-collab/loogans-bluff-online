@@ -27,13 +27,19 @@ export default function Building({ building }: { building: BuildingData }) {
   };
 
   return (
-    <mesh position={[x, height / 2, z]} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
-      <boxGeometry args={[width, height, depth]} />
-      <meshStandardMaterial
-        color={building.color}
-        emissive={isSelected ? "#facc15" : "#000000"}
-        emissiveIntensity={isSelected ? 0.55 : 0}
-      />
-    </mesh>
+    <group>
+      <mesh position={[x, 0.075, z]}>
+        <boxGeometry args={[width + 0.6, 0.15, depth + 0.6]} />
+        <meshStandardMaterial color="#262626" />
+      </mesh>
+      <mesh position={[x, height / 2, z]} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
+        <boxGeometry args={[width, height, depth]} />
+        <meshStandardMaterial
+          color={building.color}
+          emissive={isSelected ? "#facc15" : "#000000"}
+          emissiveIntensity={isSelected ? 0.55 : 0}
+        />
+      </mesh>
+    </group>
   );
 }

@@ -1,38 +1,38 @@
 {
   "townName": "Loogans Bluff",
   "groundSize": 80,
-  "streetSpawn": [0, 1.7, 12],
+  "streetSpawn": [0, 1.7, 0],
   "roads": [
-    { "id": "LB-ROAD-NS-001", "position": [0, 0.02, 0], "size": [6, 0.04, 64] },
-    { "id": "LB-ROAD-EW-001", "position": [0, 0.02, 3], "size": [64, 0.04, 6] }
+    { "id": "LB-ROAD-NS-001", "position": [0, 0.02, 0], "size": [8, 0.04, 72] },
+    { "id": "LB-ROAD-EW-001", "position": [0, 0.02, 0], "size": [72, 0.04, 8] }
   ],
   "buildings": [
-    {"id":"LB-COPSHOP-001","name":"Cop Shop","type":"government","status":"coming_soon","owner":null,"position":[-18,0,-14],"size":[7,3,6],"color":"#64748b","description":"The local law office keeping an eye on Loogans Bluff."},
-    {"id":"LB-JAIL-001","name":"Jail","type":"government","status":"coming_soon","owner":null,"position":[-8,0,-14],"size":[7,3.5,6],"color":"#52525b","description":"A small town jail for unusually large mistakes."},
-    {"id":"LB-MEDICAL-001","name":"Medical Center","type":"government","status":"coming_soon","owner":null,"position":[4,0,-14],"size":[8,3,6],"color":"#94a3b8","description":"Loogans Bluff's future medical center."},
-    {"id":"LB-BARBER-001","name":"Barbershop","type":"business","status":"coming_soon","owner":null,"position":[16,0,-14],"size":[7,3,6],"color":"#a16207","description":"A future barbershop for the town's questionable haircuts."},
-    {"id":"LB-LIQUOR-001","name":"Liquor Store","type":"business","status":"coming_soon","owner":null,"position":[-18,0,-3],"size":[7,3,6],"color":"#7c3aed","description":"The future neighborhood liquor store."},
-    {"id":"LB-HARDWARE-001","name":"Hardware Store","type":"business","status":"coming_soon","owner":null,"position":[-7,0,-3],"size":[8,3,6],"color":"#b45309","description":"Tools and supplies will eventually live here."},
-    {"id":"LB-GAS-001","name":"Gas Station","type":"business","status":"coming_soon","owner":null,"position":[5,0,-3],"size":[8,3,6],"color":"#0f766e","description":"The future fuel stop for Loogans Bluff."},
-    {"id":"LB-TAVERN-001","name":"Tavern","type":"business","status":"coming_soon","owner":null,"position":[17,0,-3],"size":[8,3.5,7],"color":"#8b5a3c","description":"A future tavern for locals and bad decisions."},
-    {"id":"LB-REPAIR-001","name":"Barry's Repair Shop","type":"business","status":"coming_soon","owner":null,"position":[-17,0,9],"size":[9,4,7],"color":"#475569","description":"Barry's future headquarters for repairs and sarcasm."},
-    {"id":"LB-DUMPHOUSE-001","name":"Dump House","type":"home","status":"coming_soon","owner":null,"position":[-5,0,9],"size":[8,3,7],"color":"#78716c","description":"The notorious rundown home at the heart of the story."},
-    {"id":"LB-TOWNHALL-001","name":"Town Hall / Loogans Bluff Government","type":"government","status":"coming_soon","owner":null,"position":[9,0,9],"size":[11,4,8],"color":"#9a6b3f","description":"The future seat of Loogans Bluff government."},
-    {"id":"LB-HOME-001","name":"Home 1","type":"home","status":"coming_soon","owner":null,"position":[22,0,9],"size":[7,3,7],"color":"#a78bfa","description":"A future Loogans Bluff residence."},
-    {"id":"LB-HOME-002","name":"Home 2","type":"home","status":"coming_soon","owner":null,"position":[-17,0,20],"size":[7,3,7],"color":"#60a5fa","description":"A future Loogans Bluff residence."},
-    {"id":"LB-HOME-003","name":"Home 3","type":"home","status":"coming_soon","owner":null,"position":[-6,0,20],"size":[7,3,7],"color":"#f59e0b","description":"A future Loogans Bluff residence."},
-    {"id":"LB-HOME-004","name":"Home 4","type":"home","status":"coming_soon","owner":null,"position":[5,0,20],"size":[7,3,7],"color":"#f87171","description":"A future Loogans Bluff residence."},
-    {"id":"LB-BARN-001","name":"Barn 1","type":"barn","status":"coming_soon","owner":null,"position":[18,0,21],"size":[9,4,8],"color":"#991b1b","description":"A future barn on the edge of town."},
-    {"id":"LB-BARN-002","name":"Barn 2","type":"barn","status":"coming_soon","owner":null,"position":[7,0,31],"size":[9,4,8],"color":"#7f1d1d","description":"Another future barn overlooking Loogans Bluff."}
+    {"id":"LB-COPSHOP-001","name":"Cop Shop","type":"government","status":"coming_soon","owner":null,"position":[-17,0,-16],"size":[8,5,8],"color":"#64748b","description":"The local law office keeping an eye on Loogans Bluff."},
+    {"id":"LB-JAIL-001","name":"Jail","type":"government","status":"coming_soon","owner":null,"position":[-29,0,-16],"size":[7,4,8],"color":"#52525b","description":"A small town jail for unusually large mistakes."},
+    {"id":"LB-MEDICAL-001","name":"Medical Center","type":"government","status":"coming_soon","owner":null,"position":[16,0,-16],"size":[8,5,8],"color":"#94a3b8","description":"Loogans Bluff's future medical center."},
+    {"id":"LB-BARBER-001","name":"Barbershop","type":"business","status":"coming_soon","owner":null,"position":[-34,0,14],"size":[6,4,8],"color":"#a16207","description":"A future barbershop for the town's questionable haircuts."},
+    {"id":"LB-LIQUOR-001","name":"Liquor Store","type":"business","status":"coming_soon","owner":null,"position":[-24,0,14],"size":[7,4,8],"color":"#7c3aed","description":"The future neighborhood liquor store."},
+    {"id":"LB-HARDWARE-001","name":"Hardware Store","type":"business","status":"coming_soon","owner":null,"position":[-13,0,14],"size":[8,5,8],"color":"#b45309","description":"Tools and supplies will eventually live here."},
+    {"id":"LB-GAS-001","name":"Gas Station","type":"business","status":"coming_soon","owner":null,"position":[13,0,14],"size":[8,4,8],"color":"#0f766e","description":"The future fuel stop for Loogans Bluff."},
+    {"id":"LB-TAVERN-001","name":"Tavern","type":"business","status":"coming_soon","owner":null,"position":[24,0,14],"size":[8,5,8],"color":"#8b5a3c","description":"A future tavern for locals and bad decisions."},
+    {"id":"LB-REPAIR-001","name":"Barry's Repair Shop","type":"business","status":"coming_soon","owner":null,"position":[35,0,14],"size":[8,5,8],"color":"#475569","description":"Barry's future headquarters for repairs and sarcasm."},
+    {"id":"LB-DUMPHOUSE-001","name":"Dump House","type":"home","status":"coming_soon","owner":null,"position":[-33,0,24],"size":[7,4,6],"color":"#78716c","description":"The notorious rundown home at the heart of the story."},
+    {"id":"LB-TOWNHALL-001","name":"Town Hall / Loogans Bluff Government","type":"government","status":"coming_soon","owner":null,"position":[29,0,-16],"size":[10,7,10],"color":"#9a6b3f","description":"The future seat of Loogans Bluff government."},
+    {"id":"LB-HOME-001","name":"Home 1","type":"home","status":"coming_soon","owner":null,"position":[9,0,24],"size":[6,4,6],"color":"#a78bfa","description":"A future Loogans Bluff residence."},
+    {"id":"LB-HOME-002","name":"Home 2","type":"home","status":"coming_soon","owner":null,"position":[18,0,24],"size":[6,4,6],"color":"#60a5fa","description":"A future Loogans Bluff residence."},
+    {"id":"LB-HOME-003","name":"Home 3","type":"home","status":"coming_soon","owner":null,"position":[27,0,24],"size":[6,4,6],"color":"#f59e0b","description":"A future Loogans Bluff residence."},
+    {"id":"LB-HOME-004","name":"Home 4","type":"home","status":"coming_soon","owner":null,"position":[36,0,24],"size":[6,4,6],"color":"#f87171","description":"A future Loogans Bluff residence."},
+    {"id":"LB-BARN-001","name":"Barn 1","type":"barn","status":"coming_soon","owner":null,"position":[-22,0,24],"size":[8,5,6],"color":"#991b1b","description":"A future barn on the edge of town."},
+    {"id":"LB-BARN-002","name":"Barn 2","type":"barn","status":"coming_soon","owner":null,"position":[-10,0,24],"size":[8,5,6],"color":"#7f1d1d","description":"Another future barn overlooking Loogans Bluff."}
   ],
   "lots": [
-    {"id":"LB-LOT-001","name":"Vacant Lot 1","type":"lot","status":"for_sale_coming_soon","owner":null,"position":[-32,0,-30],"size":[8,0.08,8],"color":"#6b7280"},
-    {"id":"LB-LOT-002","name":"Vacant Lot 2","type":"lot","status":"for_sale_coming_soon","owner":null,"position":[-20,0,-30],"size":[8,0.08,8],"color":"#6b7280"},
-    {"id":"LB-LOT-003","name":"Vacant Lot 3","type":"lot","status":"for_sale_coming_soon","owner":null,"position":[20,0,-30],"size":[8,0.08,8],"color":"#6b7280"},
-    {"id":"LB-LOT-004","name":"Vacant Lot 4","type":"lot","status":"for_sale_coming_soon","owner":null,"position":[32,0,-30],"size":[8,0.08,8],"color":"#6b7280"},
-    {"id":"LB-LOT-005","name":"Vacant Lot 5","type":"lot","status":"for_sale_coming_soon","owner":null,"position":[-32,0,31],"size":[8,0.08,8],"color":"#6b7280"},
-    {"id":"LB-LOT-006","name":"Vacant Lot 6","type":"lot","status":"for_sale_coming_soon","owner":null,"position":[-20,0,31],"size":[8,0.08,8],"color":"#6b7280"},
-    {"id":"LB-LOT-007","name":"Vacant Lot 7","type":"lot","status":"for_sale_coming_soon","owner":null,"position":[20,0,32],"size":[8,0.08,8],"color":"#6b7280"},
-    {"id":"LB-LOT-008","name":"Vacant Lot 8","type":"lot","status":"for_sale_coming_soon","owner":null,"position":[32,0,32],"size":[8,0.08,8],"color":"#6b7280"}
+    {"id":"LB-LOT-001","name":"Vacant Lot 1","type":"lot","status":"for_sale_coming_soon","owner":null,"position":[-33,0,-35],"size":[10,0.16,10],"color":"#6b7280"},
+    {"id":"LB-LOT-002","name":"Vacant Lot 2","type":"lot","status":"for_sale_coming_soon","owner":null,"position":[-20,0,-35],"size":[10,0.16,10],"color":"#6b7280"},
+    {"id":"LB-LOT-003","name":"Vacant Lot 3","type":"lot","status":"for_sale_coming_soon","owner":null,"position":[20,0,-35],"size":[10,0.16,10],"color":"#6b7280"},
+    {"id":"LB-LOT-004","name":"Vacant Lot 4","type":"lot","status":"for_sale_coming_soon","owner":null,"position":[33,0,-35],"size":[10,0.16,10],"color":"#6b7280"},
+    {"id":"LB-LOT-005","name":"Vacant Lot 5","type":"lot","status":"for_sale_coming_soon","owner":null,"position":[-33,0,35],"size":[10,0.16,10],"color":"#6b7280"},
+    {"id":"LB-LOT-006","name":"Vacant Lot 6","type":"lot","status":"for_sale_coming_soon","owner":null,"position":[-20,0,35],"size":[10,0.16,10],"color":"#6b7280"},
+    {"id":"LB-LOT-007","name":"Vacant Lot 7","type":"lot","status":"for_sale_coming_soon","owner":null,"position":[20,0,35],"size":[10,0.16,10],"color":"#6b7280"},
+    {"id":"LB-LOT-008","name":"Vacant Lot 8","type":"lot","status":"for_sale_coming_soon","owner":null,"position":[33,0,35],"size":[10,0.16,10],"color":"#6b7280"}
   ]
 }

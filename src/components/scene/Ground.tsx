@@ -22,7 +22,7 @@ export default function Ground({ size }: { size: number }) {
   return (
     <mesh rotation={[-Math.PI / 2, 0, 0]} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
       <planeGeometry args={[size, size]} />
-      <meshStandardMaterial color="#3d5a3d" />
+      <meshStandardMaterial color="#314a35" />
     </mesh>
   );
 }

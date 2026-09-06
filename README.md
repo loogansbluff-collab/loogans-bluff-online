@@ -44,6 +44,9 @@ Step 8 note:
 Step 11 note:
 - Street and aerial movement are clamped to the town, and floating world property labels are removed while click, directory, and E inspection remain.
 
+Step 12 note:
+- The graybox town now has an 8-unit road cross, sidewalks, human-scale districts, building bases, and 10x10 parcel pads while preserving all existing property IDs and interactions.
+
 ## V1 status
 Explore V1 preview is complete. Freeze new economy and ownership systems until the V1 playtest below passes on a normal machine.
 
