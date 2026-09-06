@@ -2,13 +2,12 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { townData } from "@/data/town";
+import { enterStreetInFront } from "@/lib/enterBuildingStreet";
 import { isSouthTreeLotId } from "@/lib/southDecor";
 import { useGameStore } from "@/state/gameStore";
 
 export default function TownDirectory() {
   const mode = useGameStore((state) => state.mode);
-  const setSelectedId = useGameStore((state) => state.setSelectedId);
-  const requestFocus = useGameStore((state) => state.requestFocus);
   const [expanded, setExpanded] = useState(mode === "aerial");
   const [filter, setFilter] = useState("");
 
@@ -38,12 +37,6 @@ export default function TownDirectory() {
       ),
     [normalizedFilter],
   );
-
-  const selectProperty = (id: string, position: [number, number, number]) => {
-    const [x, , z] = position;
-    setSelectedId(id);
-    requestFocus([x, 0, z]);
-  };
 
   return (
     <aside className="fixed right-4 top-20 z-20 w-[min(19rem,calc(100vw-2rem))] rounded-xl border border-white/10 bg-slate-950/90 text-white shadow-2xl backdrop-blur-sm">
@@ -75,7 +68,7 @@ export default function TownDirectory() {
                   <button
                     key={building.id}
                     type="button"
-                    onClick={() => selectProperty(building.id, building.position)}
+                    onClick={() => enterStreetInFront(building.id)}
                     className="block w-full rounded px-2 py-2 text-left hover:bg-white/10"
                   >
                     <div className="text-xs font-medium">{building.name}</div>
@@ -92,7 +85,7 @@ export default function TownDirectory() {
                   <button
                     key={lot.id}
                     type="button"
-                    onClick={() => selectProperty(lot.id, lot.position)}
+                    onClick={() => enterStreetInFront(lot.id)}
                     className="block w-full rounded px-2 py-2 text-left hover:bg-white/10"
                   >
                     <div className="flex items-center gap-2 text-xs font-medium">

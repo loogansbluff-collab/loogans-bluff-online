@@ -72,6 +72,9 @@ Aerial travel hotfix note:
 South-front hotfix note:
 - The six front-row shops are rotated toward the south landing view, LB-LOT-001 through LB-LOT-008 render as non-property trees instead of clickable lots, and the full-width south road stub becomes a thin winding dirt path.
 
+Click-to-street mechanics note:
+- Aerial building/lot clicks and Town Directory rows now enter street mode in front of that property, face north toward its south facade, and open the existing property panel with no selection glow; one Esc returns to the aerial map.
+
 ## V1 status
 Explore V1 preview is complete. Freeze new economy and ownership systems until the V1 playtest below passes on a normal machine.
 

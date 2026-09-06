@@ -6,7 +6,6 @@ import StorefrontSign from "@/components/scene/buildings/StorefrontSign";
 
 type MainStreetBuildingProps = {
   building: BuildingData;
-  isSelected: boolean;
   onPointerDown: (event: ThreeEvent<PointerEvent>) => void;
   onPointerUp: (event: ThreeEvent<PointerEvent>) => void;
 };
@@ -35,12 +34,7 @@ function BarberPole({ x, z }: { x: number; z: number }) {
   );
 }
 
-export default function MainStreetBuilding({
-  building,
-  isSelected,
-  onPointerDown,
-  onPointerUp,
-}: MainStreetBuildingProps) {
+export default function MainStreetBuilding({ building, onPointerDown, onPointerUp }: MainStreetBuildingProps) {
   const [x, , z] = building.position;
   const [width, height, depth] = building.size;
   const frontZ = -depth / 2 - 0.06;
@@ -86,11 +80,7 @@ export default function MainStreetBuilding({
     <group position={[x, 0, z]} rotation={[0, Math.PI, 0]} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
       <mesh position={[0, height / 2, 0]}>
         <boxGeometry args={[width, height, depth]} />
-        <meshStandardMaterial
-          color={bodyColor}
-          emissive={isSelected ? "#facc15" : "#000000"}
-          emissiveIntensity={isSelected ? 0.55 : 0}
-        />
+        <meshStandardMaterial color={bodyColor} />
       </mesh>
 
       <FacadeBox position={[0, height + 0.2, 0]} size={[width + 0.8, 0.4, depth + 0.8]} color={roofColor} />

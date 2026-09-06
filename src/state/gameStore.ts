@@ -20,11 +20,7 @@ type GameState = {
 
 export const useGameStore = create<GameState>((set) => ({
   mode: "aerial",
-  setMode: (mode) =>
-    set((state) => ({
-      mode,
-      selectedId: mode === "street" ? null : state.selectedId,
-    })),
+  setMode: (mode) => set({ mode }),
   selectedId: null,
   setSelectedId: (id) => set({ selectedId: id }),
   playerPosition: [0, 0, 0],
