@@ -5,6 +5,7 @@ import { useRef } from "react";
 import type { BuildingData } from "@/data/town";
 import { enterStreetInFront } from "@/lib/enterBuildingStreet";
 import { useGameStore } from "@/state/gameStore";
+import DoorWalkway from "@/components/scene/DoorWalkway";
 import MainStreetBuilding from "@/components/scene/buildings/MainStreetBuilding";
 
 const MAIN_STREET_IDS = new Set([
@@ -21,6 +22,7 @@ export default function Building({ building }: { building: BuildingData }) {
   const mode = useGameStore((state) => state.mode);
   const [x, , z] = building.position;
   const [width, height, depth] = building.size;
+  const isMainStreet = MAIN_STREET_IDS.has(building.id);
 
   const onPointerDown = (event: ThreeEvent<PointerEvent>) => {
     event.stopPropagation();
@@ -42,7 +44,9 @@ export default function Building({ building }: { building: BuildingData }) {
         <meshStandardMaterial color="#262626" />
       </mesh>
 
-      {MAIN_STREET_IDS.has(building.id) ? (
+      {isMainStreet ? <DoorWalkway building={building} /> : null}
+
+      {isMainStreet ? (
         <MainStreetBuilding building={building} onPointerDown={onPointerDown} onPointerUp={onPointerUp} />
       ) : (
         <mesh position={[x, height / 2, z]} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
