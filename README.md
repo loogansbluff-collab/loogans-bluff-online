@@ -41,6 +41,9 @@ Step 7 note:
 Step 8 note:
 - The aerial Town Directory lists every building and lot; selecting an entry opens its panel and recenters the aerial map on that property.
 
+Step 11 note:
+- Street and aerial movement are clamped to the town, and floating world property labels are removed while click, directory, and E inspection remain.
+
 ## V1 status
 Explore V1 preview is complete. Freeze new economy and ownership systems until the V1 playtest below passes on a normal machine.
 

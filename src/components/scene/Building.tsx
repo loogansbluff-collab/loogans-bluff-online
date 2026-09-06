@@ -1,6 +1,5 @@
 "use client";
 
-import { Html } from "@react-three/drei";
 import type { ThreeEvent } from "@react-three/fiber";
 import { useRef } from "react";
 import type { BuildingData } from "@/data/town";
@@ -28,18 +27,13 @@ export default function Building({ building }: { building: BuildingData }) {
   };
 
   return (
-    <group>
-      <mesh position={[x, height / 2, z]} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
-        <boxGeometry args={[width, height, depth]} />
-        <meshStandardMaterial
-          color={building.color}
-          emissive={isSelected ? "#facc15" : "#000000"}
-          emissiveIntensity={isSelected ? 0.55 : 0}
-        />
-      </mesh>
-      <Html position={[x, height + 0.8, z]} center style={{ pointerEvents: "none" }}>
-        <div className="whitespace-nowrap rounded bg-black/70 px-2 py-1 text-xs text-white">{building.name}</div>
-      </Html>
-    </group>
+    <mesh position={[x, height / 2, z]} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
+      <boxGeometry args={[width, height, depth]} />
+      <meshStandardMaterial
+        color={building.color}
+        emissive={isSelected ? "#facc15" : "#000000"}
+        emissiveIntensity={isSelected ? 0.55 : 0}
+      />
+    </mesh>
   );
 }

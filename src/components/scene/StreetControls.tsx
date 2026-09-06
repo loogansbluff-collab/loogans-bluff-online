@@ -3,14 +3,19 @@
 import { PointerLockControls } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
+import type { ElementRef } from "react";
 import { PerspectiveCamera, Vector3 } from "three";
 import { townData } from "@/data/town";
 import { useGameStore } from "@/state/gameStore";
 
 const SPEED = 8;
 const PLAYER_RADIUS = 0.4;
-const EDGE_PADDING = 0.5;
+const EDGE_PADDING = 1;
 const MOVE_KEYS = new Set(["KeyW", "KeyA", "KeyS", "KeyD"]);
+
+function clampToLimit(value: number, limit: number) {
+  return Math.max(-limit, Math.min(limit, value));
+}
 
 function isBlocked(x: number, z: number) {
   return townData.buildings.some((building) => {
@@ -23,6 +28,7 @@ function isBlocked(x: number, z: number) {
 export default function StreetControls() {
   const { camera } = useThree();
   const setPlayerPosition = useGameStore((state) => state.setPlayerPosition);
+  const controlsRef = useRef<ElementRef<typeof PointerLockControls>>(null);
   const pressedKeys = useRef(new Set<string>());
   const forward = useRef(new Vector3());
   const right = useRef(new Vector3());
@@ -75,17 +81,27 @@ export default function StreetControls() {
       if (movement.current.lengthSq() > 0) {
         movement.current.normalize().multiplyScalar(SPEED * delta);
 
-        const proposedX = Math.max(-limit, Math.min(limit, camera.position.x + movement.current.x));
+        const proposedX = clampToLimit(camera.position.x + movement.current.x, limit);
         if (!isBlocked(proposedX, camera.position.z)) camera.position.x = proposedX;
 
-        const proposedZ = Math.max(-limit, Math.min(limit, camera.position.z + movement.current.z));
+        const proposedZ = clampToLimit(camera.position.z + movement.current.z, limit);
         if (!isBlocked(camera.position.x, proposedZ)) camera.position.z = proposedZ;
       }
     }
 
+    camera.position.x = clampToLimit(camera.position.x, limit);
+    camera.position.z = clampToLimit(camera.position.z, limit);
     camera.position.y = townData.streetSpawn[1];
+
+    const controlsObject = controlsRef.current?.object;
+    if (controlsObject && controlsObject !== camera) {
+      controlsObject.position.x = clampToLimit(controlsObject.position.x, limit);
+      controlsObject.position.z = clampToLimit(controlsObject.position.z, limit);
+      controlsObject.position.y = townData.streetSpawn[1];
+    }
+
     setPlayerPosition([camera.position.x, camera.position.y, camera.position.z]);
   });
 
-  return <PointerLockControls />;
+  return <PointerLockControls ref={controlsRef} />;
 }
