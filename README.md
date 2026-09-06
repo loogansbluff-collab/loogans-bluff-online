@@ -1,3 +1,9 @@
+## Play the game
+
+Open this link in a browser:
+
+https://loogans-bluff-online.vercel.app/
+
 Loogans Bluff Online
 
 Step 2 controls:
