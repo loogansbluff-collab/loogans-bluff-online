@@ -10,15 +10,10 @@ type MainStreetBuildingProps = {
   onPointerUp: (event: ThreeEvent<PointerEvent>) => void;
 };
 
-const WARM_GLASS = "#f4d27a";
-const WARM_EMISSIVE = "#ffe6a0";
-const SILHOUETTE_COLOR = "#1a1a1a";
-const SILHOUETTE_SHOPS = new Set([
-  "LB-BARBER-001",
-  "LB-LIQUOR-001",
-  "LB-TAVERN-001",
-  "LB-REPAIR-001",
-]);
+const LIGHT_BRIGHT = "#ffe9a8";
+const LIGHT_MEDIUM = "#f4d27a";
+const LIGHT_DIM = "#c4a056";
+const FRONT_DOOR_SOUTH_OFFSET = 0.06;
 
 function FacadeBox({ position, size, color }: { position: Vec3; size: Vec3; color: string }) {
   return (
@@ -29,28 +24,46 @@ function FacadeBox({ position, size, color }: { position: Vec3; size: Vec3; colo
   );
 }
 
-function WarmWindow({ position, size }: { position: Vec3; size: Vec3 }) {
+function WarmWindow({
+  position,
+  size,
+  color,
+  intensity,
+}: {
+  position: Vec3;
+  size: Vec3;
+  color: string;
+  intensity: number;
+}) {
   return (
     <mesh position={position}>
       <boxGeometry args={size} />
-      <meshStandardMaterial color={WARM_GLASS} emissive={WARM_EMISSIVE} emissiveIntensity={0.9} />
+      <meshStandardMaterial color={color} emissive={color} emissiveIntensity={intensity} />
     </mesh>
   );
 }
 
-function WindowSilhouette({ x, z }: { x: number; z: number }) {
+function HalfCurtain({ x, z, color = "#e8dcc2" }: { x: number; z: number; color?: string }) {
+  return <FacadeBox position={[x - 0.34, 2.05, z - 0.075]} size={[0.62, 1.08, 0.05]} color={color} />;
+}
+
+function SideDrape({ x, z, side = "left", color = "#6b4a3c" }: { x: number; z: number; side?: "left" | "right"; color?: string }) {
+  const offset = side === "left" ? -0.57 : 0.57;
+  return <FacadeBox position={[x + offset, 2.05, z - 0.075]} size={[0.2, 1.08, 0.05]} color={color} />;
+}
+
+function Blinds({ x, z }: { x: number; z: number }) {
   return (
-    <group position={[x, 2.02, z]}>
-      <mesh position={[0, -0.12, 0]}>
-        <boxGeometry args={[0.4, 0.55, 0.05]} />
-        <meshStandardMaterial color={SILHOUETTE_COLOR} />
-      </mesh>
-      <mesh position={[0, 0.28, 0]}>
-        <sphereGeometry args={[0.16, 10, 8]} />
-        <meshStandardMaterial color={SILHOUETTE_COLOR} />
-      </mesh>
+    <group>
+      {[-0.42, -0.14, 0.14, 0.42].map((offset) => (
+        <FacadeBox key={offset} position={[x, 2.05 + offset, z - 0.075]} size={[1.22, 0.07, 0.05]} color="#d9d4c6" />
+      ))}
     </group>
   );
+}
+
+function LowerCurtain({ x, z, color }: { x: number; z: number; color: string }) {
+  return <FacadeBox position={[x, 1.78, z - 0.075]} size={[1.22, 0.5, 0.05]} color={color} />;
 }
 
 function BarberPole({ x, z }: { x: number; z: number }) {
@@ -72,6 +85,7 @@ export default function MainStreetBuilding({ building, onPointerDown, onPointerU
   const [x, , z] = building.position;
   const [width, height, depth] = building.size;
   const frontZ = -depth / 2 - 0.06;
+  const frontDoorZ = frontZ - FRONT_DOOR_SOUTH_OFFSET;
   const backZ = depth / 2 + 0.06;
   const leftX = -width / 2 - 0.06;
   const rightX = width / 2 + 0.06;
@@ -79,37 +93,64 @@ export default function MainStreetBuilding({ building, onPointerDown, onPointerU
   const rearDoorColor = "#1f2937";
   const leftWindowX = -width * 0.27;
   const rightWindowX = width * 0.27;
-  const silhouetteX = building.id === "LB-LIQUOR-001" || building.id === "LB-REPAIR-001" ? rightWindowX : leftWindowX;
   let bodyColor = building.color;
   let signText = building.name;
   let signColor = "#1f2937";
   let signTextColor = "#f8fafc";
+  let leftLightColor = LIGHT_MEDIUM;
+  let rightLightColor = LIGHT_MEDIUM;
+  let leftIntensity = 0.7;
+  let rightIntensity = 0.7;
 
   if (building.id === "LB-BARBER-001") {
     bodyColor = "#d6c8a9";
     signText = "BARBER";
     signColor = "#7f1d1d";
+    leftLightColor = LIGHT_BRIGHT;
+    rightLightColor = LIGHT_BRIGHT;
+    leftIntensity = 1.1;
+    rightIntensity = 0.7;
   } else if (building.id === "LB-LIQUOR-001") {
     bodyColor = "#4c1d35";
     signText = "LIQUOR";
     signColor = "#25131e";
+    leftLightColor = LIGHT_DIM;
+    rightLightColor = LIGHT_DIM;
+    leftIntensity = 0.3;
+    rightIntensity = 0.3;
   } else if (building.id === "LB-HARDWARE-001") {
     bodyColor = "#a16207";
     signText = "HARDWARE";
     signColor = "#78350f";
+    leftLightColor = LIGHT_BRIGHT;
+    rightLightColor = LIGHT_MEDIUM;
+    leftIntensity = 1.1;
+    rightIntensity = 0.7;
   } else if (building.id === "LB-GAS-001") {
     bodyColor = "#0f766e";
     signText = "GAS";
     signColor = "#134e4a";
+    leftLightColor = LIGHT_BRIGHT;
+    rightLightColor = LIGHT_DIM;
+    leftIntensity = 1.1;
+    rightIntensity = 0.3;
   } else if (building.id === "LB-TAVERN-001") {
     bodyColor = "#783f27";
     signText = "TAVERN";
     signColor = "#422006";
     signTextColor = "#fde68a";
+    leftLightColor = LIGHT_BRIGHT;
+    rightLightColor = LIGHT_MEDIUM;
+    leftIntensity = 1.1;
+    rightIntensity = 0.7;
   } else if (building.id === "LB-REPAIR-001") {
     bodyColor = "#475569";
     signText = "BARRY'S REPAIR";
     signColor = "#1e293b";
+    leftLightColor = LIGHT_MEDIUM;
+    rightLightColor = LIGHT_DIM;
+    leftIntensity = 0.7;
+    rightIntensity = 0.3;
   }
 
   return (
@@ -120,21 +161,27 @@ export default function MainStreetBuilding({ building, onPointerDown, onPointerU
       </mesh>
 
       <FacadeBox position={[0, height + 0.2, 0]} size={[width + 0.8, 0.4, depth + 0.8]} color={roofColor} />
-      <FacadeBox position={[0, 1.15, frontZ]} size={[1.1, 2.3, 0.12]} color="#171717" />
-      <WarmWindow position={[leftWindowX, 2.05, frontZ]} size={[1.45, 1.25, 0.12]} />
-      <WarmWindow position={[rightWindowX, 2.05, frontZ]} size={[1.45, 1.25, 0.12]} />
-      {SILHOUETTE_SHOPS.has(building.id) ? <WindowSilhouette x={silhouetteX} z={frontZ - 0.075} /> : null}
+      <FacadeBox position={[0, 1.15, frontDoorZ]} size={[1.1, 2.3, 0.12]} color="#171717" />
+      <WarmWindow position={[leftWindowX, 2.05, frontZ]} size={[1.45, 1.25, 0.12]} color={leftLightColor} intensity={leftIntensity} />
+      <WarmWindow position={[rightWindowX, 2.05, frontZ]} size={[1.45, 1.25, 0.12]} color={rightLightColor} intensity={rightIntensity} />
+
+      {building.id === "LB-BARBER-001" ? <HalfCurtain x={leftWindowX} z={frontZ} /> : null}
+      {building.id === "LB-LIQUOR-001" ? <SideDrape x={rightWindowX} z={frontZ} side="right" /> : null}
+      {building.id === "LB-HARDWARE-001" ? <Blinds x={leftWindowX} z={frontZ} /> : null}
+      {building.id === "LB-GAS-001" ? <Blinds x={rightWindowX} z={frontZ} /> : null}
+      {building.id === "LB-TAVERN-001" ? <LowerCurtain x={rightWindowX} z={frontZ} color="#4a1726" /> : null}
+
       <group position={[0, height - 0.68, frontZ - 0.12]}>
         <StorefrontSign text={signText} width={Math.max(2.6, width * 0.7)} boardColor={signColor} textColor={signTextColor} />
       </group>
 
-      <WarmWindow position={[leftX, 2.0, -depth * 0.22]} size={[0.12, 1.2, 1.4]} />
-      <WarmWindow position={[leftX, 2.0, depth * 0.22]} size={[0.12, 1.2, 1.4]} />
-      <WarmWindow position={[rightX, 2.0, -depth * 0.22]} size={[0.12, 1.2, 1.4]} />
-      <WarmWindow position={[rightX, 2.0, depth * 0.22]} size={[0.12, 1.2, 1.4]} />
+      <WarmWindow position={[leftX, 2.0, -depth * 0.22]} size={[0.12, 1.2, 1.4]} color={LIGHT_MEDIUM} intensity={0.7} />
+      <WarmWindow position={[leftX, 2.0, depth * 0.22]} size={[0.12, 1.2, 1.4]} color={LIGHT_DIM} intensity={0.3} />
+      <WarmWindow position={[rightX, 2.0, -depth * 0.22]} size={[0.12, 1.2, 1.4]} color={LIGHT_MEDIUM} intensity={0.7} />
+      <WarmWindow position={[rightX, 2.0, depth * 0.22]} size={[0.12, 1.2, 1.4]} color={LIGHT_DIM} intensity={0.3} />
       <FacadeBox position={[0, 1.1, backZ]} size={[1.1, 2.2, 0.12]} color={rearDoorColor} />
-      <WarmWindow position={[-width * 0.28, 2.05, backZ]} size={[1.35, 1.15, 0.12]} />
-      <WarmWindow position={[width * 0.28, 2.05, backZ]} size={[1.35, 1.15, 0.12]} />
+      <WarmWindow position={[-width * 0.28, 2.05, backZ]} size={[1.35, 1.15, 0.12]} color={LIGHT_MEDIUM} intensity={0.7} />
+      <WarmWindow position={[width * 0.28, 2.05, backZ]} size={[1.35, 1.15, 0.12]} color={LIGHT_DIM} intensity={0.3} />
 
       {building.id === "LB-BARBER-001" && (
         <>
