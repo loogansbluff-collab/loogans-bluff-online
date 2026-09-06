@@ -13,14 +13,15 @@ import SpawnMarker from "@/components/scene/SpawnMarker";
 import AerialControls from "@/components/scene/AerialControls";
 import StreetControls from "@/components/scene/StreetControls";
 
-const AERIAL_START: [number, number, number] = [0, 55, 55];
+const AERIAL_START: [number, number, number] = [0, 42, 55];
+const AERIAL_TARGET: [number, number, number] = [0, 0, 20];
 
 function AerialMode() {
   const { camera } = useThree();
 
   useEffect(() => {
     camera.position.set(...AERIAL_START);
-    camera.lookAt(0, 0, 0);
+    camera.lookAt(...AERIAL_TARGET);
 
     if (camera instanceof PerspectiveCamera) {
       camera.fov = 50;

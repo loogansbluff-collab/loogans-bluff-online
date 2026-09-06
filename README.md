@@ -63,6 +63,9 @@ Stage A2 note:
 Stage A3 note:
 - The board is tightened to 120 units with narrow dirt roads, no sidewalks, a packed central shanty-town cluster, and a lower landing/reset camera that frames the built area.
 
+Stage A4 note:
+- The aerial landing now starts from the south edge looking north, horizontal drag is constrained to left/right, existing properties are packed into northward rows, and a thin brown back alley replaces the mid-block parcel gap.
+
 ## V1 status
 Explore V1 preview is complete. Freeze new economy and ownership systems until the V1 playtest below passes on a normal machine.
 

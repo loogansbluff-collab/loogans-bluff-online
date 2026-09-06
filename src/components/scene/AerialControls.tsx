@@ -7,16 +7,21 @@ import type { ElementRef } from "react";
 import { townData } from "@/data/town";
 import { useGameStore } from "@/state/gameStore";
 
-const ORIGIN: [number, number, number] = [0, 0, 0];
-const PAN_LIMIT = 35;
-const CAMERA_XZ_LIMIT = 75;
-const START_HEIGHT = 55;
-const RETURN_HEIGHT = 45;
+const LANDING_TARGET: [number, number, number] = [0, 0, 20];
+const PAN_X_LIMIT = 28;
+const PAN_Z_MIN = -32;
+const PAN_Z_MAX = 32;
+const CAMERA_X_LIMIT = 58;
+const CAMERA_Z_MIN = -46;
+const CAMERA_Z_MAX = 66;
+const START_POSITION: [number, number, number] = [0, 42, 55];
+const RETURN_HEIGHT = 42;
+const RETURN_SOUTH_OFFSET = 35;
 const STREET_ENTER_DISTANCE = 12;
 const PLAYER_RADIUS = 0.4;
 
-function clamp(value: number, limit: number) {
-  return Math.max(-limit, Math.min(limit, value));
+function clamp(value: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, value));
 }
 
 function clampRange(value: number, min: number, max: number) {
@@ -33,8 +38,8 @@ function isBlocked(x: number, z: number) {
 
 function findStreetEntry(x: number, z: number): [number, number] {
   const mapLimit = townData.groundSize / 2 - 1;
-  const targetX = clamp(x, mapLimit);
-  const targetZ = clamp(z, mapLimit);
+  const targetX = clamp(x, -mapLimit, mapLimit);
+  const targetZ = clamp(z, -mapLimit, mapLimit);
 
   if (!isBlocked(targetX, targetZ)) return [targetX, targetZ];
 
@@ -73,6 +78,7 @@ export default function AerialControls() {
   const controlsRef = useRef<ElementRef<typeof MapControls>>(null);
   const enteringStreet = useRef(false);
   const returnFramePending = useRef(true);
+  const lockedTargetZ = useRef(LANDING_TARGET[2]);
   const mode = useGameStore((state) => state.mode);
   const setMode = useGameStore((state) => state.setMode);
   const setPlayerPosition = useGameStore((state) => state.setPlayerPosition);
@@ -80,12 +86,13 @@ export default function AerialControls() {
   const focusNonce = useGameStore((state) => state.focusNonce);
   const focusPosition = useGameStore((state) => state.focusPosition);
   const resetNonce = useGameStore((state) => state.resetNonce);
-  const requestedTarget = mode === "aerial" && focusPosition ? focusPosition : ORIGIN;
+  const requestedTarget = mode === "aerial" && focusPosition ? focusPosition : LANDING_TARGET;
   const target: [number, number, number] = [
-    clamp(requestedTarget[0], PAN_LIMIT),
-    requestedTarget[1],
-    clamp(requestedTarget[2], PAN_LIMIT),
+    clamp(requestedTarget[0], -PAN_X_LIMIT, PAN_X_LIMIT),
+    0,
+    clamp(requestedTarget[2], PAN_Z_MIN, PAN_Z_MAX),
   ];
+
   const returningAbovePlayer =
     focusPosition !== null &&
     Math.abs(focusPosition[0] - playerPosition[0]) < 0.01 &&
@@ -93,10 +100,15 @@ export default function AerialControls() {
     Math.abs(playerPosition[1] - townData.streetSpawn[1]) < 0.01;
 
   useEffect(() => {
+    lockedTargetZ.current = target[2];
+  }, [focusNonce, resetNonce, target[2]]);
+
+  useEffect(() => {
     if (resetNonce === 0) return;
     returnFramePending.current = false;
-    camera.position.set(0, START_HEIGHT, START_HEIGHT);
-    camera.lookAt(0, 0, 0);
+    lockedTargetZ.current = LANDING_TARGET[2];
+    camera.position.set(...START_POSITION);
+    camera.lookAt(...LANDING_TARGET);
   }, [camera, resetNonce]);
 
   useFrame(() => {
@@ -105,10 +117,15 @@ export default function AerialControls() {
     const controls = controlsRef.current;
     if (!controls) return;
 
-    const targetX = clamp(playerPosition[0], PAN_LIMIT);
-    const targetZ = clamp(playerPosition[2], PAN_LIMIT);
+    const targetX = clamp(playerPosition[0], -PAN_X_LIMIT, PAN_X_LIMIT);
+    const targetZ = clamp(playerPosition[2], PAN_Z_MIN, PAN_Z_MAX);
+    lockedTargetZ.current = targetZ;
     controls.target.set(targetX, 0, targetZ);
-    camera.position.set(targetX, RETURN_HEIGHT, clamp(targetZ + RETURN_HEIGHT, CAMERA_XZ_LIMIT));
+    camera.position.set(
+      targetX,
+      RETURN_HEIGHT,
+      clamp(targetZ + RETURN_SOUTH_OFFSET, CAMERA_Z_MIN, CAMERA_Z_MAX),
+    );
     camera.lookAt(targetX, 0, targetZ);
     controls.update();
     returnFramePending.current = false;
@@ -118,20 +135,20 @@ export default function AerialControls() {
     const controls = controlsRef.current;
     if (!controls) return;
 
-    const clampedTargetX = clamp(controls.target.x, PAN_LIMIT);
-    const clampedTargetZ = clamp(controls.target.z, PAN_LIMIT);
+    const clampedTargetX = clamp(controls.target.x, -PAN_X_LIMIT, PAN_X_LIMIT);
+    const clampedTargetZ = clamp(lockedTargetZ.current, PAN_Z_MIN, PAN_Z_MAX);
     const shiftX = clampedTargetX - controls.target.x;
     const shiftZ = clampedTargetZ - controls.target.z;
 
-    if (shiftX !== 0 || shiftZ !== 0) {
-      controls.target.x = clampedTargetX;
-      controls.target.z = clampedTargetZ;
-      camera.position.x += shiftX;
-      camera.position.z += shiftZ;
-    }
+    controls.target.x = clampedTargetX;
+    controls.target.y = 0;
+    controls.target.z = clampedTargetZ;
 
-    camera.position.x = clamp(camera.position.x, CAMERA_XZ_LIMIT);
-    camera.position.z = clamp(camera.position.z, CAMERA_XZ_LIMIT);
+    if (shiftX !== 0) camera.position.x += shiftX;
+    if (shiftZ !== 0) camera.position.z += shiftZ;
+
+    camera.position.x = clamp(camera.position.x, -CAMERA_X_LIMIT, CAMERA_X_LIMIT);
+    camera.position.z = clamp(camera.position.z, CAMERA_Z_MIN, CAMERA_Z_MAX);
 
     if (enteringStreet.current || mode !== "aerial") return;
 
@@ -154,7 +171,7 @@ export default function AerialControls() {
       minDistance={8}
       maxDistance={90}
       target={target}
-      screenSpacePanning
+      screenSpacePanning={false}
       onChange={clampAndMaybeEnterStreet}
     />
   );
