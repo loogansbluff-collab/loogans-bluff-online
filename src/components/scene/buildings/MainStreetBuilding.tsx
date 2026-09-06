@@ -97,6 +97,7 @@ export default function MainStreetBuilding({ building, onPointerDown, onPointerU
   let signText = building.name;
   let signColor = "#1f2937";
   let signTextColor = "#f8fafc";
+  let signY = height - 0.68;
   let leftLightColor = LIGHT_MEDIUM;
   let rightLightColor = LIGHT_MEDIUM;
   let leftIntensity = 0.7;
@@ -130,6 +131,7 @@ export default function MainStreetBuilding({ building, onPointerDown, onPointerU
     bodyColor = "#0f766e";
     signText = "GAS";
     signColor = "#134e4a";
+    signY = height + 0.35;
     leftLightColor = LIGHT_BRIGHT;
     rightLightColor = LIGHT_DIM;
     leftIntensity = 1.1;
@@ -171,7 +173,7 @@ export default function MainStreetBuilding({ building, onPointerDown, onPointerU
       {building.id === "LB-GAS-001" ? <Blinds x={rightWindowX} z={frontZ} /> : null}
       {building.id === "LB-TAVERN-001" ? <LowerCurtain x={rightWindowX} z={frontZ} color="#4a1726" /> : null}
 
-      <group position={[0, height - 0.68, frontZ - 0.12]}>
+      <group position={[0, signY, frontZ - 0.12]}>
         <StorefrontSign text={signText} width={Math.max(2.6, width * 0.7)} boardColor={signColor} textColor={signTextColor} />
       </group>
 
