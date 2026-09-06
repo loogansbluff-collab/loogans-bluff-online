@@ -47,6 +47,10 @@ Step 11 note:
 Step 12 note:
 - The graybox town now has an 8-unit road cross, sidewalks, human-scale districts, building bases, and 10x10 parcel pads while preserving all existing property IDs and interactions.
 
+Step 13 note:
+- Six Main Street businesses now use original low-poly primitive storefront exteriors with physical facade signs; all other districts remain placeholders.
+- Aerial empty-background framing remains a later polish item.
+
 ## V1 status
 Explore V1 preview is complete. Freeze new economy and ownership systems until the V1 playtest below passes on a normal machine.
 

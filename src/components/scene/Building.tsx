@@ -4,6 +4,16 @@ import type { ThreeEvent } from "@react-three/fiber";
 import { useRef } from "react";
 import type { BuildingData } from "@/data/town";
 import { useGameStore } from "@/state/gameStore";
+import MainStreetBuilding from "@/components/scene/buildings/MainStreetBuilding";
+
+const MAIN_STREET_IDS = new Set([
+  "LB-BARBER-001",
+  "LB-LIQUOR-001",
+  "LB-HARDWARE-001",
+  "LB-GAS-001",
+  "LB-TAVERN-001",
+  "LB-REPAIR-001",
+]);
 
 export default function Building({ building }: { building: BuildingData }) {
   const start = useRef<[number, number] | null>(null);
@@ -32,14 +42,24 @@ export default function Building({ building }: { building: BuildingData }) {
         <boxGeometry args={[width + 0.6, 0.15, depth + 0.6]} />
         <meshStandardMaterial color="#262626" />
       </mesh>
-      <mesh position={[x, height / 2, z]} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
-        <boxGeometry args={[width, height, depth]} />
-        <meshStandardMaterial
-          color={building.color}
-          emissive={isSelected ? "#facc15" : "#000000"}
-          emissiveIntensity={isSelected ? 0.55 : 0}
+
+      {MAIN_STREET_IDS.has(building.id) ? (
+        <MainStreetBuilding
+          building={building}
+          isSelected={isSelected}
+          onPointerDown={onPointerDown}
+          onPointerUp={onPointerUp}
         />
-      </mesh>
+      ) : (
+        <mesh position={[x, height / 2, z]} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
+          <boxGeometry args={[width, height, depth]} />
+          <meshStandardMaterial
+            color={building.color}
+            emissive={isSelected ? "#facc15" : "#000000"}
+            emissiveIntensity={isSelected ? 0.55 : 0}
+          />
+        </mesh>
+      )}
     </group>
   );
 }
