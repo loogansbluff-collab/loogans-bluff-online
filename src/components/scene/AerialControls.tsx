@@ -7,14 +7,14 @@ import type { ElementRef } from "react";
 import { townData } from "@/data/town";
 import { useGameStore } from "@/state/gameStore";
 
-const LANDING_TARGET: [number, number, number] = [0, 0, 20];
+const LANDING_TARGET: [number, number, number] = [0, 0, 32];
 const PAN_X_LIMIT = 28;
 const NORTH_TARGET_Z = -28;
-const SOUTH_TARGET_Z = 20;
+const SOUTH_TARGET_Z = 32;
 const CAMERA_HEIGHT = 28;
 const CAMERA_SOUTH_OFFSET = 38;
-const LOOK_AT_Y = 2;
-const LOOK_AHEAD_Z = 8;
+const LOOK_AT_Y = 0.5;
+const LOOK_AHEAD_Z = 6;
 const WHEEL_STEP = 8;
 const STREET_ENTRY_Z = NORTH_TARGET_Z;
 const PLAYER_RADIUS = 0.4;
