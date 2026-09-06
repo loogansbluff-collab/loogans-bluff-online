@@ -66,6 +66,9 @@ Stage A3 note:
 Stage A4 note:
 - The aerial landing now starts from the south edge looking north, horizontal drag is constrained to left/right, existing properties are packed into northward rows, and a thin brown back alley replaces the mid-block parcel gap.
 
+Aerial travel hotfix note:
+- Aerial wheel input now moves the fixed-angle camera north/south along the town instead of dollying toward a fixed target; aerial Esc releases captured interaction without changing mode.
+
 ## V1 status
 Explore V1 preview is complete. Freeze new economy and ownership systems until the V1 playtest below passes on a normal machine.
 

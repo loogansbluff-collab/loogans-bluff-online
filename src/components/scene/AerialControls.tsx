@@ -9,15 +9,12 @@ import { useGameStore } from "@/state/gameStore";
 
 const LANDING_TARGET: [number, number, number] = [0, 0, 20];
 const PAN_X_LIMIT = 28;
-const PAN_Z_MIN = -32;
-const PAN_Z_MAX = 32;
-const CAMERA_X_LIMIT = 58;
-const CAMERA_Z_MIN = -46;
-const CAMERA_Z_MAX = 66;
-const START_POSITION: [number, number, number] = [0, 42, 55];
-const RETURN_HEIGHT = 42;
-const RETURN_SOUTH_OFFSET = 35;
-const STREET_ENTER_DISTANCE = 12;
+const NORTH_TARGET_Z = -28;
+const SOUTH_TARGET_Z = 20;
+const CAMERA_HEIGHT = 42;
+const CAMERA_SOUTH_OFFSET = 35;
+const WHEEL_STEP = 8;
+const STREET_ENTRY_Z = NORTH_TARGET_Z;
 const PLAYER_RADIUS = 0.4;
 
 function clamp(value: number, min: number, max: number) {
@@ -90,7 +87,7 @@ export default function AerialControls() {
   const target: [number, number, number] = [
     clamp(requestedTarget[0], -PAN_X_LIMIT, PAN_X_LIMIT),
     0,
-    clamp(requestedTarget[2], PAN_Z_MIN, PAN_Z_MAX),
+    clamp(requestedTarget[2], NORTH_TARGET_Z, SOUTH_TARGET_Z),
   ];
 
   const returningAbovePlayer =
@@ -99,61 +96,22 @@ export default function AerialControls() {
     Math.abs(focusPosition[2] - playerPosition[2]) < 0.01 &&
     Math.abs(playerPosition[1] - townData.streetSpawn[1]) < 0.01;
 
-  useEffect(() => {
-    lockedTargetZ.current = target[2];
-  }, [focusNonce, resetNonce, target[2]]);
-
-  useEffect(() => {
-    if (resetNonce === 0) return;
-    returnFramePending.current = false;
-    lockedTargetZ.current = LANDING_TARGET[2];
-    camera.position.set(...START_POSITION);
-    camera.lookAt(...LANDING_TARGET);
-  }, [camera, resetNonce]);
-
-  useFrame(() => {
-    if (!returnFramePending.current || !returningAbovePlayer) return;
-
+  const setAerialPose = (targetX: number, targetZ: number) => {
     const controls = controlsRef.current;
     if (!controls) return;
 
-    const targetX = clamp(playerPosition[0], -PAN_X_LIMIT, PAN_X_LIMIT);
-    const targetZ = clamp(playerPosition[2], PAN_Z_MIN, PAN_Z_MAX);
-    lockedTargetZ.current = targetZ;
-    controls.target.set(targetX, 0, targetZ);
-    camera.position.set(
-      targetX,
-      RETURN_HEIGHT,
-      clamp(targetZ + RETURN_SOUTH_OFFSET, CAMERA_Z_MIN, CAMERA_Z_MAX),
-    );
-    camera.lookAt(targetX, 0, targetZ);
+    const clampedX = clamp(targetX, -PAN_X_LIMIT, PAN_X_LIMIT);
+    const clampedZ = clamp(targetZ, NORTH_TARGET_Z, SOUTH_TARGET_Z);
+    lockedTargetZ.current = clampedZ;
+    controls.target.set(clampedX, 0, clampedZ);
+    camera.position.set(clampedX, CAMERA_HEIGHT, clampedZ + CAMERA_SOUTH_OFFSET);
+    camera.lookAt(clampedX, 0, clampedZ);
     controls.update();
-    returnFramePending.current = false;
-  });
+  };
 
-  const clampAndMaybeEnterStreet = () => {
+  const enterStreetAtTarget = () => {
     const controls = controlsRef.current;
-    if (!controls) return;
-
-    const clampedTargetX = clamp(controls.target.x, -PAN_X_LIMIT, PAN_X_LIMIT);
-    const clampedTargetZ = clamp(lockedTargetZ.current, PAN_Z_MIN, PAN_Z_MAX);
-    const shiftX = clampedTargetX - controls.target.x;
-    const shiftZ = clampedTargetZ - controls.target.z;
-
-    controls.target.x = clampedTargetX;
-    controls.target.y = 0;
-    controls.target.z = clampedTargetZ;
-
-    if (shiftX !== 0) camera.position.x += shiftX;
-    if (shiftZ !== 0) camera.position.z += shiftZ;
-
-    camera.position.x = clamp(camera.position.x, -CAMERA_X_LIMIT, CAMERA_X_LIMIT);
-    camera.position.z = clamp(camera.position.z, CAMERA_Z_MIN, CAMERA_Z_MAX);
-
-    if (enteringStreet.current || mode !== "aerial") return;
-
-    const distance = camera.position.distanceTo(controls.target);
-    if (distance >= STREET_ENTER_DISTANCE) return;
+    if (!controls || enteringStreet.current || mode !== "aerial") return;
 
     const [entryX, entryZ] = findStreetEntry(controls.target.x, controls.target.z);
     enteringStreet.current = true;
@@ -163,16 +121,95 @@ export default function AerialControls() {
     setMode("street");
   };
 
+  useEffect(() => {
+    lockedTargetZ.current = target[2];
+  }, [focusNonce, resetNonce, target[2]]);
+
+  useEffect(() => {
+    if (resetNonce === 0) return;
+    returnFramePending.current = false;
+    lockedTargetZ.current = LANDING_TARGET[2];
+    camera.position.set(0, CAMERA_HEIGHT, LANDING_TARGET[2] + CAMERA_SOUTH_OFFSET);
+    camera.lookAt(...LANDING_TARGET);
+  }, [camera, resetNonce]);
+
+  useEffect(() => {
+    if (mode !== "aerial") return;
+
+    const onWheel = (event: WheelEvent) => {
+      if (event.deltaY === 0) return;
+      const controls = controlsRef.current;
+      if (!controls) return;
+
+      event.preventDefault();
+      const direction = event.deltaY < 0 ? -1 : 1;
+      const nextZ = clamp(
+        lockedTargetZ.current + direction * WHEEL_STEP,
+        NORTH_TARGET_Z,
+        SOUTH_TARGET_Z,
+      );
+
+      setAerialPose(controls.target.x, nextZ);
+
+      if (event.deltaY < 0 && nextZ <= STREET_ENTRY_Z) {
+        enterStreetAtTarget();
+      }
+    };
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.code !== "Escape") return;
+      if (document.pointerLockElement) document.exitPointerLock();
+
+      const controls = controlsRef.current;
+      if (!controls) return;
+
+      controls.enabled = false;
+      window.requestAnimationFrame(() => {
+        if (controlsRef.current === controls) controls.enabled = true;
+      });
+    };
+
+    window.addEventListener("wheel", onWheel, { passive: false });
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [mode]);
+
+  useFrame(() => {
+    if (!returnFramePending.current || !returningAbovePlayer) return;
+
+    const targetX = clamp(playerPosition[0], -PAN_X_LIMIT, PAN_X_LIMIT);
+    const targetZ = clamp(playerPosition[2], NORTH_TARGET_Z, SOUTH_TARGET_Z);
+    setAerialPose(targetX, targetZ);
+    returnFramePending.current = false;
+  });
+
+  const clampHorizontalPan = () => {
+    const controls = controlsRef.current;
+    if (!controls) return;
+
+    const targetX = clamp(controls.target.x, -PAN_X_LIMIT, PAN_X_LIMIT);
+    controls.target.x = targetX;
+    controls.target.y = 0;
+    controls.target.z = lockedTargetZ.current;
+    camera.position.x = targetX;
+    camera.position.y = CAMERA_HEIGHT;
+    camera.position.z = lockedTargetZ.current + CAMERA_SOUTH_OFFSET;
+    camera.lookAt(targetX, 0, lockedTargetZ.current);
+  };
+
   return (
     <MapControls
       ref={controlsRef}
       key={`${focusNonce}-${resetNonce}`}
       enableRotate={false}
-      minDistance={8}
-      maxDistance={90}
+      enableZoom={false}
       target={target}
       screenSpacePanning={false}
-      onChange={clampAndMaybeEnterStreet}
+      onChange={clampHorizontalPan}
     />
   );
 }

@@ -7,7 +7,7 @@ export default function ControlsLegend() {
 
   const controls =
     mode === "aerial"
-      ? ["Drag left/right to pan", "Wheel in = north / land", "Wheel out = south / zoom", "Click a building for info"]
+      ? ["Drag left/right to pan", "Wheel forward = north", "Wheel back = south edge", "Click a building for info"]
       : ["WASD move", "Mouse look", "Esc mouse, Esc again = town view", "Wheel out = town view", "E inspect nearby property"];
 
   return (
