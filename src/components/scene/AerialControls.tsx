@@ -11,8 +11,10 @@ const LANDING_TARGET: [number, number, number] = [0, 0, 20];
 const PAN_X_LIMIT = 28;
 const NORTH_TARGET_Z = -28;
 const SOUTH_TARGET_Z = 20;
-const CAMERA_HEIGHT = 42;
-const CAMERA_SOUTH_OFFSET = 35;
+const CAMERA_HEIGHT = 28;
+const CAMERA_SOUTH_OFFSET = 38;
+const LOOK_AT_Y = 2;
+const LOOK_AHEAD_Z = 8;
 const WHEEL_STEP = 8;
 const STREET_ENTRY_Z = NORTH_TARGET_Z;
 const PLAYER_RADIUS = 0.4;
@@ -96,6 +98,10 @@ export default function AerialControls() {
     Math.abs(focusPosition[2] - playerPosition[2]) < 0.01 &&
     Math.abs(playerPosition[1] - townData.streetSpawn[1]) < 0.01;
 
+  const applyObliqueLook = (targetX: number, targetZ: number) => {
+    camera.lookAt(targetX, LOOK_AT_Y, targetZ - LOOK_AHEAD_Z);
+  };
+
   const setAerialPose = (targetX: number, targetZ: number) => {
     const controls = controlsRef.current;
     if (!controls) return;
@@ -105,7 +111,7 @@ export default function AerialControls() {
     lockedTargetZ.current = clampedZ;
     controls.target.set(clampedX, 0, clampedZ);
     camera.position.set(clampedX, CAMERA_HEIGHT, clampedZ + CAMERA_SOUTH_OFFSET);
-    camera.lookAt(clampedX, 0, clampedZ);
+    applyObliqueLook(clampedX, clampedZ);
     controls.update();
   };
 
@@ -130,7 +136,7 @@ export default function AerialControls() {
     returnFramePending.current = false;
     lockedTargetZ.current = LANDING_TARGET[2];
     camera.position.set(0, CAMERA_HEIGHT, LANDING_TARGET[2] + CAMERA_SOUTH_OFFSET);
-    camera.lookAt(...LANDING_TARGET);
+    applyObliqueLook(LANDING_TARGET[0], LANDING_TARGET[2]);
   }, [camera, resetNonce]);
 
   useEffect(() => {
@@ -198,7 +204,7 @@ export default function AerialControls() {
     camera.position.x = targetX;
     camera.position.y = CAMERA_HEIGHT;
     camera.position.z = lockedTargetZ.current + CAMERA_SOUTH_OFFSET;
-    camera.lookAt(targetX, 0, lockedTargetZ.current);
+    applyObliqueLook(targetX, lockedTargetZ.current);
   };
 
   return (
