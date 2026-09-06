@@ -69,6 +69,9 @@ Stage A4 note:
 Aerial travel hotfix note:
 - Aerial wheel input now moves the fixed-angle camera north/south along the town instead of dollying toward a fixed target; aerial Esc releases captured interaction without changing mode.
 
+South-front hotfix note:
+- The six front-row shops are rotated toward the south landing view, LB-LOT-001 through LB-LOT-008 render as non-property trees instead of clickable lots, and the full-width south road stub becomes a thin winding dirt path.
+
 ## V1 status
 Explore V1 preview is complete. Freeze new economy and ownership systems until the V1 playtest below passes on a normal machine.
 

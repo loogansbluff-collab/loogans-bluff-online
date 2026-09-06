@@ -83,7 +83,7 @@ export default function MainStreetBuilding({
   }
 
   return (
-    <group position={[x, 0, z]} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
+    <group position={[x, 0, z]} rotation={[0, Math.PI, 0]} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
       <mesh position={[0, height / 2, 0]}>
         <boxGeometry args={[width, height, depth]} />
         <meshStandardMaterial
@@ -93,29 +93,18 @@ export default function MainStreetBuilding({
         />
       </mesh>
 
-      <FacadeBox
-        position={[0, height + 0.2, 0]}
-        size={[width + 0.8, 0.4, depth + 0.8]}
-        color={roofColor}
-      />
-
+      <FacadeBox position={[0, height + 0.2, 0]} size={[width + 0.8, 0.4, depth + 0.8]} color={roofColor} />
       <FacadeBox position={[0, 1.15, frontZ]} size={[1.1, 2.3, 0.12]} color="#171717" />
       <FacadeBox position={[-width * 0.27, 2.05, frontZ]} size={[1.45, 1.25, 0.12]} color={glassColor} />
       <FacadeBox position={[width * 0.27, 2.05, frontZ]} size={[1.45, 1.25, 0.12]} color={glassColor} />
       <group position={[0, height - 0.68, frontZ - 0.12]}>
-        <StorefrontSign
-          text={signText}
-          width={Math.max(2.6, width * 0.7)}
-          boardColor={signColor}
-          textColor={signTextColor}
-        />
+        <StorefrontSign text={signText} width={Math.max(2.6, width * 0.7)} boardColor={signColor} textColor={signTextColor} />
       </group>
 
       <FacadeBox position={[leftX, 2.0, -depth * 0.22]} size={[0.12, 1.2, 1.4]} color={glassColor} />
       <FacadeBox position={[leftX, 2.0, depth * 0.22]} size={[0.12, 1.2, 1.4]} color={glassColor} />
       <FacadeBox position={[rightX, 2.0, -depth * 0.22]} size={[0.12, 1.2, 1.4]} color={glassColor} />
       <FacadeBox position={[rightX, 2.0, depth * 0.22]} size={[0.12, 1.2, 1.4]} color={glassColor} />
-
       <FacadeBox position={[0, 1.1, backZ]} size={[1.1, 2.2, 0.12]} color={rearDoorColor} />
       <FacadeBox position={[-width * 0.28, 2.05, backZ]} size={[1.35, 1.15, 0.12]} color={glassColor} />
       <FacadeBox position={[width * 0.28, 2.05, backZ]} size={[1.35, 1.15, 0.12]} color={glassColor} />
@@ -126,30 +115,21 @@ export default function MainStreetBuilding({
           <BarberPole x={width / 2 - 0.42} z={frontZ - 0.2} />
         </>
       )}
-
       {building.id === "LB-LIQUOR-001" && (
         <>
           {[-width * 0.27, width * 0.27].flatMap((windowX) =>
             [-0.42, 0, 0.42].map((offset) => (
-              <FacadeBox
-                key={`${windowX}-${offset}`}
-                position={[windowX + offset, 2.05, frontZ - 0.08]}
-                size={[0.07, 1.35, 0.07]}
-                color="#111827"
-              />
+              <FacadeBox key={`${windowX}-${offset}`} position={[windowX + offset, 2.05, frontZ - 0.08]} size={[0.07, 1.35, 0.07]} color="#111827" />
             )),
           )}
         </>
       )}
-
       {building.id === "LB-HARDWARE-001" && (
         <FacadeBox position={[0, height - 1.35, frontZ - 0.34]} size={[width * 0.86, 0.28, 0.85]} color="#713f12" />
       )}
-
       {building.id === "LB-GAS-001" && (
         <FacadeBox position={[0, height - 0.75, frontZ - 0.85]} size={[width * 0.9, 0.22, 1.7]} color="#e5e7eb" />
       )}
-
       {building.id === "LB-TAVERN-001" && (
         <>
           <FacadeBox position={[-width * 0.33, 1.65, frontZ - 0.09]} size={[0.18, 2.3, 0.18]} color="#422006" />
@@ -157,17 +137,11 @@ export default function MainStreetBuilding({
           <FacadeBox position={[width * 0.3, height + 0.65, depth * 0.18]} size={[0.7, 0.9, 0.7]} color="#422006" />
         </>
       )}
-
       {building.id === "LB-REPAIR-001" && (
         <>
           <FacadeBox position={[0, 1.75, frontZ - 0.08]} size={[width * 0.63, 3.15, 0.14]} color="#1f2937" />
           {[-0.8, 0, 0.8].map((offset) => (
-            <FacadeBox
-              key={offset}
-              position={[offset, 1.75, frontZ - 0.16]}
-              size={[0.05, 3.05, 0.05]}
-              color="#64748b"
-            />
+            <FacadeBox key={offset} position={[offset, 1.75, frontZ - 0.16]} size={[0.05, 3.05, 0.05]} color="#64748b" />
           ))}
         </>
       )}

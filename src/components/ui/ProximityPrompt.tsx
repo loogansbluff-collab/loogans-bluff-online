@@ -2,6 +2,7 @@
 
 import { townData } from "@/data/town";
 import { findNearestProperty } from "@/lib/proximity";
+import { isSouthTreeLotId } from "@/lib/southDecor";
 import { useGameStore } from "@/state/gameStore";
 
 const PROXIMITY_RANGE = 4.5;
@@ -14,7 +15,7 @@ export default function ProximityPrompt() {
 
   const nearest = findNearestProperty(
     playerPosition,
-    [...townData.buildings, ...townData.lots],
+    [...townData.buildings, ...townData.lots.filter((lot) => !isSouthTreeLotId(lot.id))],
     PROXIMITY_RANGE,
   );
 

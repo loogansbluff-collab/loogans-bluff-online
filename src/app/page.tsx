@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { useEffect } from "react";
 import { townData } from "@/data/town";
 import { findNearestProperty } from "@/lib/proximity";
+import { isSouthTreeLotId } from "@/lib/southDecor";
 import { useGameStore } from "@/state/gameStore";
 import BuildingPanel from "@/components/ui/BuildingPanel";
 import TopHud from "@/components/ui/TopHud";
@@ -42,7 +43,7 @@ export default function HomePage() {
 
       const nearest = findNearestProperty(
         playerPosition,
-        [...townData.buildings, ...townData.lots],
+        [...townData.buildings, ...townData.lots.filter((lot) => !isSouthTreeLotId(lot.id))],
         PROXIMITY_RANGE,
       );
 

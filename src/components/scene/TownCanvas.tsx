@@ -4,11 +4,13 @@ import { Canvas, useThree } from "@react-three/fiber";
 import { useEffect } from "react";
 import { PerspectiveCamera } from "three";
 import { townData } from "@/data/town";
+import { isSouthTreeLotId } from "@/lib/southDecor";
 import { useGameStore } from "@/state/gameStore";
 import Ground from "@/components/scene/Ground";
 import Building from "@/components/scene/Building";
 import Lot from "@/components/scene/Lot";
 import Roads from "@/components/scene/Roads";
+import SouthTrees from "@/components/scene/SouthTrees";
 import SpawnMarker from "@/components/scene/SpawnMarker";
 import AerialControls from "@/components/scene/AerialControls";
 import StreetControls from "@/components/scene/StreetControls";
@@ -45,11 +47,12 @@ function TownScene() {
 
       <Ground size={townData.groundSize} />
       <Roads />
+      <SouthTrees />
       <SpawnMarker />
       {townData.buildings.map((building) => (
         <Building key={building.id} building={building} />
       ))}
-      {townData.lots.map((lot) => (
+      {townData.lots.filter((lot) => !isSouthTreeLotId(lot.id)).map((lot) => (
         <Lot key={lot.id} lot={lot} />
       ))}
 

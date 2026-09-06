@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { townData } from "@/data/town";
+import { isSouthTreeLotId } from "@/lib/southDecor";
 import { useGameStore } from "@/state/gameStore";
 
 export default function TownDirectory() {
@@ -30,9 +31,10 @@ export default function TownDirectory() {
     () =>
       townData.lots.filter(
         (item) =>
-          !normalizedFilter ||
-          item.name.toLowerCase().includes(normalizedFilter) ||
-          item.id.toLowerCase().includes(normalizedFilter),
+          !isSouthTreeLotId(item.id) &&
+          (!normalizedFilter ||
+            item.name.toLowerCase().includes(normalizedFilter) ||
+            item.id.toLowerCase().includes(normalizedFilter)),
       ),
     [normalizedFilter],
   );
