@@ -11,10 +11,10 @@ const LANDING_TARGET: [number, number, number] = [0, 0, 32];
 const PAN_X_LIMIT = 28;
 const NORTH_TARGET_Z = -28;
 const SOUTH_TARGET_Z = 32;
-const CAMERA_HEIGHT = 28;
+const CAMERA_HEIGHT = 3.5;
 const CAMERA_SOUTH_OFFSET = 38;
-const LOOK_AT_Y = 0.5;
-const LOOK_AHEAD_Z = 6;
+const LOOK_AT_Y = 0;
+const LOOK_POINT_SOUTH_OFFSET = 12;
 const WHEEL_STEP = 8;
 const STREET_ENTRY_Z = NORTH_TARGET_Z;
 const PLAYER_RADIUS = 0.4;
@@ -99,7 +99,7 @@ export default function AerialControls() {
     Math.abs(playerPosition[1] - townData.streetSpawn[1]) < 0.01;
 
   const applyObliqueLook = (targetX: number, targetZ: number) => {
-    camera.lookAt(targetX, LOOK_AT_Y, targetZ - LOOK_AHEAD_Z);
+    camera.lookAt(targetX, LOOK_AT_Y, targetZ + LOOK_POINT_SOUTH_OFFSET);
   };
 
   const setAerialPose = (targetX: number, targetZ: number) => {

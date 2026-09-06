@@ -2,12 +2,32 @@
 
 import { townData } from "@/data/town";
 
-const SOUTH_PATH_SEGMENTS = [
-  { id: "south-path-1", position: [0, 0.025, 44] as [number, number, number], size: [1.2, 0.03, 8] as [number, number, number], rotation: 0 },
-  { id: "south-path-2", position: [1.2, 0.025, 50] as [number, number, number], size: [1.15, 0.03, 6] as [number, number, number], rotation: -0.18 },
-  { id: "south-path-3", position: [-0.6, 0.025, 55] as [number, number, number], size: [1.1, 0.03, 5] as [number, number, number], rotation: 0.24 },
-  { id: "south-path-4", position: [0.4, 0.025, 59] as [number, number, number], size: [1.0, 0.03, 4] as [number, number, number], rotation: -0.16 },
+type TrailPoint = [number, number];
+
+const SOUTH_PATH_POINTS: TrailPoint[] = [
+  [0, 39],
+  [0.3, 42],
+  [-0.35, 45],
+  [0.45, 48],
+  [-0.4, 51],
+  [0.35, 54],
+  [-0.25, 57],
+  [0.2, 60],
 ];
+
+const SOUTH_PATH_SEGMENTS = SOUTH_PATH_POINTS.slice(0, -1).map(([x1, z1], index) => {
+  const [x2, z2] = SOUTH_PATH_POINTS[index + 1];
+  const dx = x2 - x1;
+  const dz = z2 - z1;
+  const length = Math.hypot(dx, dz);
+
+  return {
+    id: `south-path-${index + 1}`,
+    position: [(x1 + x2) / 2, 0.025, (z1 + z2) / 2] as [number, number, number],
+    size: [0.8, 0.03, length + 0.08] as [number, number, number],
+    rotation: Math.atan2(dx, dz),
+  };
+});
 
 export default function Roads() {
   return (
