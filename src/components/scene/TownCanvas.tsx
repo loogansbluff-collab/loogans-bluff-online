@@ -9,12 +9,11 @@ import Ground from "@/components/scene/Ground";
 import Building from "@/components/scene/Building";
 import Lot from "@/components/scene/Lot";
 import Roads from "@/components/scene/Roads";
-import Sidewalks from "@/components/scene/Sidewalks";
 import SpawnMarker from "@/components/scene/SpawnMarker";
 import AerialControls from "@/components/scene/AerialControls";
 import StreetControls from "@/components/scene/StreetControls";
 
-const AERIAL_START: [number, number, number] = [0, 140, 140];
+const AERIAL_START: [number, number, number] = [0, 55, 55];
 
 function AerialMode() {
   const { camera } = useThree();
@@ -45,7 +44,6 @@ function TownScene() {
 
       <Ground size={townData.groundSize} />
       <Roads />
-      <Sidewalks />
       <SpawnMarker />
       {townData.buildings.map((building) => (
         <Building key={building.id} building={building} />

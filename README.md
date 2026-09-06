@@ -60,6 +60,9 @@ Stage A note:
 Stage A2 note:
 - The town board now spans 220 units with a three-line road grid in each direction, smaller existing properties, and 40 total vacant parcel pads while preserving Stage A wheel-to-street controls.
 
+Stage A3 note:
+- The board is tightened to 120 units with narrow dirt roads, no sidewalks, a packed central shanty-town cluster, and a lower landing/reset camera that frames the built area.
+
 ## V1 status
 Explore V1 preview is complete. Freeze new economy and ownership systems until the V1 playtest below passes on a normal machine.
 

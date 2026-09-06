@@ -8,10 +8,10 @@ import { townData } from "@/data/town";
 import { useGameStore } from "@/state/gameStore";
 
 const ORIGIN: [number, number, number] = [0, 0, 0];
-const PAN_LIMIT = townData.groundSize * 0.2;
-const CAMERA_XZ_LIMIT = townData.groundSize * 0.85;
-const START_HEIGHT = 140;
-const RETURN_HEIGHT = 55;
+const PAN_LIMIT = 35;
+const CAMERA_XZ_LIMIT = 75;
+const START_HEIGHT = 55;
+const RETURN_HEIGHT = 45;
 const STREET_ENTER_DISTANCE = 12;
 const PLAYER_RADIUS = 0.4;
 
@@ -152,7 +152,7 @@ export default function AerialControls() {
       key={`${focusNonce}-${resetNonce}`}
       enableRotate={false}
       minDistance={8}
-      maxDistance={280}
+      maxDistance={90}
       target={target}
       screenSpacePanning
       onChange={clampAndMaybeEnterStreet}

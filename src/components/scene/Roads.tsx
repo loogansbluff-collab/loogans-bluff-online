@@ -12,7 +12,7 @@ export default function Roads() {
         return (
           <mesh key={road.id} position={[x, y, z]}>
             <boxGeometry args={[width, height, depth]} />
-            <meshStandardMaterial color="#5c4a3d" />
+            <meshStandardMaterial color="#5a4030" />
           </mesh>
         );
       })}
