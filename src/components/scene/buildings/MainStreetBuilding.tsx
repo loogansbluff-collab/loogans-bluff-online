@@ -3,6 +3,7 @@
 import type { ThreeEvent } from "@react-three/fiber";
 import type { BuildingData, Vec3 } from "@/data/town";
 import StorefrontSign from "@/components/scene/buildings/StorefrontSign";
+import WallFinish from "@/components/scene/buildings/WallFinish";
 
 type MainStreetBuildingProps = {
   building: BuildingData;
@@ -160,6 +161,8 @@ export default function MainStreetBuilding({ building, onPointerDown, onPointerU
         <boxGeometry args={[width, height, depth]} />
         <meshStandardMaterial color={bodyColor} />
       </mesh>
+
+      <WallFinish building={building} />
 
       <FacadeBox position={[0, height + 0.2, 0]} size={[width + 0.8, 0.4, depth + 0.8]} color={roofColor} />
       <FacadeBox position={[0, 1.15, frontDoorZ]} size={[1.1, 2.3, 0.12]} color="#171717" />
