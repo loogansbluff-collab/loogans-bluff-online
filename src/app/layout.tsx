@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Loogans Bluff Online",
-  description: "Explore Loogans Bluff",
+  description: "Explore Loogans Bluff. Walk the town. Property ownership coming soon.",
 };
 
 export default function RootLayout({

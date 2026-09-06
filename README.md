@@ -34,3 +34,18 @@ Step 7 note:
 
 Step 8 note:
 - The aerial Town Directory lists every building and lot; selecting an entry opens its panel and recenters the aerial map on that property.
+
+## V1 playtest
+1. `npm install`
+2. `npm run dev`
+3. `npm run build`
+4. Aerial pan / zoom
+5. Click a building → panel
+6. Directory click → camera focuses
+7. Reset Town View returns overhead
+8. Walk Around → WASD + mouse look
+9. Cannot walk through buildings or off the map
+10. E near a property opens the same panel
+11. Return To Town View
+12. Owner shows Unowned / coming soon
+13. No wallet popup

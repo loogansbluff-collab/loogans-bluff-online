@@ -14,6 +14,8 @@ type GameState = {
   focusNonce: number;
   focusPosition: FocusPosition | null;
   requestFocus: (position: FocusPosition) => void;
+  resetNonce: number;
+  requestAerialReset: () => void;
 };
 
 export const useGameStore = create<GameState>((set) => ({
@@ -33,5 +35,11 @@ export const useGameStore = create<GameState>((set) => ({
     set((state) => ({
       focusPosition: position,
       focusNonce: state.focusNonce + 1,
+    })),
+  resetNonce: 0,
+  requestAerialReset: () =>
+    set((state) => ({
+      focusPosition: null,
+      resetNonce: state.resetNonce + 1,
     })),
 }));
