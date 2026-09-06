@@ -35,6 +35,9 @@ Step 7 note:
 Step 8 note:
 - The aerial Town Directory lists every building and lot; selecting an entry opens its panel and recenters the aerial map on that property.
 
+## V1 status
+Explore V1 preview is complete. Freeze new economy and ownership systems until the V1 playtest below passes on a normal machine.
+
 ## V1 playtest
 1. `npm install`
 2. `npm run dev`

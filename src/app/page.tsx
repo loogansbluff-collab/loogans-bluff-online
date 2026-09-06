@@ -12,6 +12,7 @@ import TitleChrome from "@/components/ui/TitleChrome";
 import ControlsLegend from "@/components/ui/ControlsLegend";
 import ProximityPrompt from "@/components/ui/ProximityPrompt";
 import TownDirectory from "@/components/ui/TownDirectory";
+import V1PreviewBadge from "@/components/ui/V1PreviewBadge";
 
 const TownCanvas = dynamic(() => import("@/components/scene/TownCanvas"), {
   ssr: false,
@@ -62,6 +63,7 @@ export default function HomePage() {
       <ControlsLegend />
       <ProximityPrompt />
       <BuildingPanel />
+      <V1PreviewBadge />
       <ModeFade />
     </main>
   );
