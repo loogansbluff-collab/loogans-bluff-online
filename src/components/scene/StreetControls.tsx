@@ -28,27 +28,27 @@ export default function StreetControls() {
   const { camera } = useThree();
   const setMode = useGameStore((state) => state.setMode);
   const requestFocus = useGameStore((state) => state.requestFocus);
-  const playerPosition = useGameStore((state) => state.playerPosition);
-  const selectedId = useGameStore((state) => state.selectedId);
   const setPlayerPosition = useGameStore((state) => state.setPlayerPosition);
+  const setStreetEntry = useGameStore((state) => state.setStreetEntry);
   const pressedKeys = useRef(new Set<string>());
   const forward = useRef(new Vector3());
   const right = useRef(new Vector3());
   const movement = useRef(new Vector3());
-  const wasPointerLocked = useRef(false);
   const returningToAerial = useRef(false);
   const limit = townData.groundSize / 2 - EDGE_PADDING;
 
   useEffect(() => {
     const streetY = townData.streetSpawn[1];
+    const oneShotEntry = useGameStore.getState().streetEntry;
     const landedFromAerial = Math.abs(camera.position.y - streetY) < 0.05;
     const [spawnX, , spawnZ] = townData.streetSpawn;
-    const entryX = selectedId ? playerPosition[0] : landedFromAerial ? camera.position.x : spawnX;
-    const entryZ = selectedId ? playerPosition[2] : landedFromAerial ? camera.position.z : spawnZ;
+    const entryX = oneShotEntry?.[0] ?? (landedFromAerial ? camera.position.x : spawnX);
+    const entryZ = oneShotEntry?.[2] ?? (landedFromAerial ? camera.position.z : spawnZ);
 
     camera.position.set(entryX, streetY, entryZ);
     camera.rotation.set(0, 0, 0);
     setPlayerPosition([entryX, streetY, entryZ]);
+    setStreetEntry(null);
 
     if (camera instanceof PerspectiveCamera) {
       camera.fov = 70;
@@ -62,6 +62,7 @@ export default function StreetControls() {
       returningToAerial.current = true;
       requestFocus([camera.position.x, 0, camera.position.z]);
       if (document.pointerLockElement) document.exitPointerLock();
+      setStreetEntry(null);
       setMode("aerial");
     };
 
@@ -81,12 +82,6 @@ export default function StreetControls() {
       if (MOVE_KEYS.has(event.code)) pressedKeys.current.delete(event.code);
     };
 
-    const onPointerLockChange = () => {
-      const locked = Boolean(document.pointerLockElement);
-      if (wasPointerLocked.current && !locked) returnToAerial();
-      wasPointerLocked.current = locked;
-    };
-
     const onWheel = (event: WheelEvent) => {
       if (event.deltaY > 0) {
         event.preventDefault();
@@ -97,16 +92,14 @@ export default function StreetControls() {
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("keyup", onKeyUp);
     window.addEventListener("wheel", onWheel, { passive: false });
-    document.addEventListener("pointerlockchange", onPointerLockChange);
 
     return () => {
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("keyup", onKeyUp);
       window.removeEventListener("wheel", onWheel);
-      document.removeEventListener("pointerlockchange", onPointerLockChange);
       pressedKeys.current.clear();
     };
-  }, [camera, playerPosition, requestFocus, selectedId, setMode, setPlayerPosition]);
+  }, [camera, requestFocus, setMode, setPlayerPosition, setStreetEntry]);
 
   useFrame((_, delta) => {
     camera.getWorldDirection(forward.current);

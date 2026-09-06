@@ -38,8 +38,9 @@ export function enterStreetInFront(propertyId: string) {
   }
 
   const state = useGameStore.getState();
-  state.setPlayerPosition([x, townData.streetSpawn[1], spawnZ]);
+  const entry: [number, number, number] = [x, townData.streetSpawn[1], spawnZ];
   state.setSelectedId(propertyId);
+  state.setStreetEntry(entry);
   state.setMode("street");
   return true;
 }

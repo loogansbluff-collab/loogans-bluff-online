@@ -11,6 +11,8 @@ type GameState = {
   setSelectedId: (id: string | null) => void;
   playerPosition: PlayerPosition;
   setPlayerPosition: (position: PlayerPosition) => void;
+  streetEntry: PlayerPosition | null;
+  setStreetEntry: (position: PlayerPosition | null) => void;
   focusNonce: number;
   focusPosition: FocusPosition | null;
   requestFocus: (position: FocusPosition) => void;
@@ -24,7 +26,20 @@ export const useGameStore = create<GameState>((set) => ({
   selectedId: null,
   setSelectedId: (id) => set({ selectedId: id }),
   playerPosition: [0, 0, 0],
-  setPlayerPosition: (position) => set({ playerPosition: position }),
+  setPlayerPosition: (position) =>
+    set((state) => {
+      const [x, y, z] = state.playerPosition;
+      if (
+        Math.abs(position[0] - x) <= 0.001 &&
+        Math.abs(position[1] - y) <= 0.001 &&
+        Math.abs(position[2] - z) <= 0.001
+      ) {
+        return state;
+      }
+      return { playerPosition: position };
+    }),
+  streetEntry: null,
+  setStreetEntry: (position) => set({ streetEntry: position }),
   focusNonce: 0,
   focusPosition: null,
   requestFocus: (position) =>
