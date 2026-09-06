@@ -27,6 +27,7 @@ function isBlocked(x: number, z: number) {
 export default function StreetControls() {
   const { camera } = useThree();
   const setMode = useGameStore((state) => state.setMode);
+  const requestFocus = useGameStore((state) => state.requestFocus);
   const setPlayerPosition = useGameStore((state) => state.setPlayerPosition);
   const pressedKeys = useRef(new Set<string>());
   const forward = useRef(new Vector3());
@@ -36,10 +37,15 @@ export default function StreetControls() {
   const limit = townData.groundSize / 2 - EDGE_PADDING;
 
   useEffect(() => {
-    const [x, y, z] = townData.streetSpawn;
-    camera.position.set(x, y, z);
+    const streetY = townData.streetSpawn[1];
+    const landedFromAerial = Math.abs(camera.position.y - streetY) < 0.05;
+    const [spawnX, , spawnZ] = townData.streetSpawn;
+    const entryX = landedFromAerial ? camera.position.x : spawnX;
+    const entryZ = landedFromAerial ? camera.position.z : spawnZ;
+
+    camera.position.set(entryX, streetY, entryZ);
     camera.rotation.set(0, 0, 0);
-    setPlayerPosition([x, y, z]);
+    setPlayerPosition([entryX, streetY, entryZ]);
 
     if (camera instanceof PerspectiveCamera) {
       camera.fov = 70;
@@ -49,6 +55,7 @@ export default function StreetControls() {
     }
 
     const returnToAerial = () => {
+      requestFocus([camera.position.x, 0, camera.position.z]);
       if (document.pointerLockElement) document.exitPointerLock();
       setMode("aerial");
     };
@@ -74,7 +81,7 @@ export default function StreetControls() {
     };
 
     const onWheel = (event: WheelEvent) => {
-      if (event.deltaY < 0) {
+      if (event.deltaY > 0) {
         event.preventDefault();
         returnToAerial();
       }
@@ -92,7 +99,7 @@ export default function StreetControls() {
       document.removeEventListener("pointerlockchange", onPointerLockChange);
       pressedKeys.current.clear();
     };
-  }, [camera, setMode, setPlayerPosition]);
+  }, [camera, requestFocus, setMode, setPlayerPosition]);
 
   useFrame((_, delta) => {
     camera.getWorldDirection(forward.current);

@@ -54,6 +54,9 @@ Step 13 note:
 Step 14 note:
 - Main Street shops now have visible roof overhangs plus side and rear facade details, street mode can return by Esc twice or scrolling up, and aerial pan framing is tightened on both axes.
 
+Stage A note:
+- The game now lands in aerial view; zooming inside 14 units drops to street mode at the current target or nearest open road, while wheel-out, Esc twice, and Return To Town View restore an aerial view centered above the player.
+
 ## V1 status
 Explore V1 preview is complete. Freeze new economy and ownership systems until the V1 playtest below passes on a normal machine.
 

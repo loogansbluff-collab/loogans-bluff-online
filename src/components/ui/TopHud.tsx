@@ -5,9 +5,12 @@ import { useGameStore } from "@/state/gameStore";
 export default function TopHud() {
   const mode = useGameStore((state) => state.mode);
   const setMode = useGameStore((state) => state.setMode);
+  const playerPosition = useGameStore((state) => state.playerPosition);
+  const requestFocus = useGameStore((state) => state.requestFocus);
   const requestAerialReset = useGameStore((state) => state.requestAerialReset);
 
   const returnToAerial = () => {
+    requestFocus([playerPosition[0], 0, playerPosition[2]]);
     if (document.pointerLockElement) document.exitPointerLock();
     setMode("aerial");
   };
@@ -41,17 +44,14 @@ export default function TopHud() {
         <div className="space-y-2">
           <button
             type="button"
-            onPointerDown={(event) => {
-              event.stopPropagation();
-              returnToAerial();
-            }}
+            onPointerDown={(event) => event.stopPropagation()}
             onClick={returnToAerial}
             className="pointer-events-auto relative z-[60] rounded bg-slate-900/90 px-4 py-2 text-sm font-semibold text-white shadow-lg"
           >
             RETURN TO TOWN VIEW
           </button>
           <p className="rounded bg-black/70 px-3 py-1 text-xs text-white">
-            Click the canvas to look around. Esc releases the mouse. Esc again or scroll up returns to town view. WASD moves.
+            Click the canvas to look around. Esc releases the mouse. Esc again or wheel out returns to town view. WASD moves.
           </p>
         </div>
       )}
