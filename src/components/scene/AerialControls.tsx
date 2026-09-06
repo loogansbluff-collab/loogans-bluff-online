@@ -7,8 +7,8 @@ import type { ElementRef } from "react";
 import { useGameStore } from "@/state/gameStore";
 
 const ORIGIN: [number, number, number] = [0, 0, 0];
-const PAN_LIMIT = 22;
-const CAMERA_XZ_LIMIT = 70;
+const PAN_LIMIT = 20;
+const CAMERA_XZ_LIMIT = 54;
 
 function clamp(value: number, limit: number) {
   return Math.max(-limit, Math.min(limit, value));

@@ -8,7 +8,7 @@ export default function ControlsLegend() {
   const controls =
     mode === "aerial"
       ? ["Drag to pan", "Scroll to zoom", "Click a building for info"]
-      : ["WASD move", "Mouse look", "Esc release mouse", "E inspect nearby property"];
+      : ["WASD move", "Mouse look", "Esc mouse, Esc again or scroll up = town view", "E inspect nearby property"];
 
   return (
     <div className="pointer-events-none fixed bottom-4 left-4 z-20 rounded bg-slate-950/75 px-3 py-2 text-xs text-white shadow-lg backdrop-blur-sm">

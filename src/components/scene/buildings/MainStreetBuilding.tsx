@@ -11,15 +11,7 @@ type MainStreetBuildingProps = {
   onPointerUp: (event: ThreeEvent<PointerEvent>) => void;
 };
 
-function FacadeBox({
-  position,
-  size,
-  color,
-}: {
-  position: Vec3;
-  size: Vec3;
-  color: string;
-}) {
+function FacadeBox({ position, size, color }: { position: Vec3; size: Vec3; color: string }) {
   return (
     <mesh position={position}>
       <boxGeometry args={size} />
@@ -52,7 +44,12 @@ export default function MainStreetBuilding({
   const [x, , z] = building.position;
   const [width, height, depth] = building.size;
   const frontZ = -depth / 2 - 0.06;
+  const backZ = depth / 2 + 0.06;
+  const leftX = -width / 2 - 0.06;
+  const rightX = width / 2 + 0.06;
   const roofColor = "#262626";
+  const glassColor = "#334155";
+  const rearDoorColor = "#1f2937";
   let bodyColor = building.color;
   let signText = building.name;
   let signColor = "#1f2937";
@@ -96,10 +93,15 @@ export default function MainStreetBuilding({
         />
       </mesh>
 
-      <FacadeBox position={[0, height + 0.12, 0]} size={[width + 0.3, 0.24, depth + 0.3]} color={roofColor} />
+      <FacadeBox
+        position={[0, height + 0.2, 0]}
+        size={[width + 0.8, 0.4, depth + 0.8]}
+        color={roofColor}
+      />
+
       <FacadeBox position={[0, 1.15, frontZ]} size={[1.1, 2.3, 0.12]} color="#171717" />
-      <FacadeBox position={[-width * 0.27, 2.05, frontZ]} size={[1.45, 1.25, 0.12]} color="#334155" />
-      <FacadeBox position={[width * 0.27, 2.05, frontZ]} size={[1.45, 1.25, 0.12]} color="#334155" />
+      <FacadeBox position={[-width * 0.27, 2.05, frontZ]} size={[1.45, 1.25, 0.12]} color={glassColor} />
+      <FacadeBox position={[width * 0.27, 2.05, frontZ]} size={[1.45, 1.25, 0.12]} color={glassColor} />
       <group position={[0, height - 0.68, frontZ - 0.12]}>
         <StorefrontSign
           text={signText}
@@ -108,6 +110,15 @@ export default function MainStreetBuilding({
           textColor={signTextColor}
         />
       </group>
+
+      <FacadeBox position={[leftX, 2.0, -depth * 0.22]} size={[0.12, 1.2, 1.4]} color={glassColor} />
+      <FacadeBox position={[leftX, 2.0, depth * 0.22]} size={[0.12, 1.2, 1.4]} color={glassColor} />
+      <FacadeBox position={[rightX, 2.0, -depth * 0.22]} size={[0.12, 1.2, 1.4]} color={glassColor} />
+      <FacadeBox position={[rightX, 2.0, depth * 0.22]} size={[0.12, 1.2, 1.4]} color={glassColor} />
+
+      <FacadeBox position={[0, 1.1, backZ]} size={[1.1, 2.2, 0.12]} color={rearDoorColor} />
+      <FacadeBox position={[-width * 0.28, 2.05, backZ]} size={[1.35, 1.15, 0.12]} color={glassColor} />
+      <FacadeBox position={[width * 0.28, 2.05, backZ]} size={[1.35, 1.15, 0.12]} color={glassColor} />
 
       {building.id === "LB-BARBER-001" && (
         <>
@@ -143,6 +154,7 @@ export default function MainStreetBuilding({
         <>
           <FacadeBox position={[-width * 0.33, 1.65, frontZ - 0.09]} size={[0.18, 2.3, 0.18]} color="#422006" />
           <FacadeBox position={[width * 0.33, 1.65, frontZ - 0.09]} size={[0.18, 2.3, 0.18]} color="#422006" />
+          <FacadeBox position={[width * 0.3, height + 0.65, depth * 0.18]} size={[0.7, 0.9, 0.7]} color="#422006" />
         </>
       )}
 

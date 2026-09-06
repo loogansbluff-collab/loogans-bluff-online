@@ -26,11 +26,13 @@ function isBlocked(x: number, z: number) {
 
 export default function StreetControls() {
   const { camera } = useThree();
+  const setMode = useGameStore((state) => state.setMode);
   const setPlayerPosition = useGameStore((state) => state.setPlayerPosition);
   const pressedKeys = useRef(new Set<string>());
   const forward = useRef(new Vector3());
   const right = useRef(new Vector3());
   const movement = useRef(new Vector3());
+  const escapeReady = useRef(false);
   const limit = townData.groundSize / 2 - EDGE_PADDING;
 
   useEffect(() => {
@@ -46,21 +48,51 @@ export default function StreetControls() {
       camera.updateProjectionMatrix();
     }
 
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (MOVE_KEYS.has(event.code)) pressedKeys.current.add(event.code);
+    const returnToAerial = () => {
+      if (document.pointerLockElement) document.exitPointerLock();
+      setMode("aerial");
     };
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (MOVE_KEYS.has(event.code)) {
+        pressedKeys.current.add(event.code);
+        return;
+      }
+
+      if (event.code === "Escape" && !document.pointerLockElement && escapeReady.current) {
+        event.preventDefault();
+        returnToAerial();
+      }
+    };
+
     const onKeyUp = (event: KeyboardEvent) => {
       if (MOVE_KEYS.has(event.code)) pressedKeys.current.delete(event.code);
     };
 
+    const onPointerLockChange = () => {
+      escapeReady.current = !document.pointerLockElement;
+    };
+
+    const onWheel = (event: WheelEvent) => {
+      if (event.deltaY < 0) {
+        event.preventDefault();
+        returnToAerial();
+      }
+    };
+
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("keyup", onKeyUp);
+    window.addEventListener("wheel", onWheel, { passive: false });
+    document.addEventListener("pointerlockchange", onPointerLockChange);
+
     return () => {
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("keyup", onKeyUp);
+      window.removeEventListener("wheel", onWheel);
+      document.removeEventListener("pointerlockchange", onPointerLockChange);
       pressedKeys.current.clear();
     };
-  }, [camera, setPlayerPosition]);
+  }, [camera, setMode, setPlayerPosition]);
 
   useFrame((_, delta) => {
     camera.getWorldDirection(forward.current);

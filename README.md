@@ -51,6 +51,9 @@ Step 13 note:
 - Six Main Street businesses now use original low-poly primitive storefront exteriors with physical facade signs; all other districts remain placeholders.
 - Aerial empty-background framing remains a later polish item.
 
+Step 14 note:
+- Main Street shops now have visible roof overhangs plus side and rear facade details, street mode can return by Esc twice or scrolling up, and aerial pan framing is tightened on both axes.
+
 ## V1 status
 Explore V1 preview is complete. Freeze new economy and ownership systems until the V1 playtest below passes on a normal machine.
 
