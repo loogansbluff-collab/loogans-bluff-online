@@ -35,6 +35,7 @@ export default function StreetControls() {
   const right = useRef(new Vector3());
   const movement = useRef(new Vector3());
   const returningToAerial = useRef(false);
+  const wasPointerLocked = useRef(false);
   const limit = townData.groundSize / 2 - EDGE_PADDING;
 
   useEffect(() => {
@@ -82,6 +83,12 @@ export default function StreetControls() {
       if (MOVE_KEYS.has(event.code)) pressedKeys.current.delete(event.code);
     };
 
+    const onPointerLockChange = () => {
+      const locked = Boolean(document.pointerLockElement);
+      if (wasPointerLocked.current && !locked) returnToAerial();
+      wasPointerLocked.current = locked;
+    };
+
     const onWheel = (event: WheelEvent) => {
       if (event.deltaY > 0) {
         event.preventDefault();
@@ -92,11 +99,13 @@ export default function StreetControls() {
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("keyup", onKeyUp);
     window.addEventListener("wheel", onWheel, { passive: false });
+    document.addEventListener("pointerlockchange", onPointerLockChange);
 
     return () => {
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("keyup", onKeyUp);
       window.removeEventListener("wheel", onWheel);
+      document.removeEventListener("pointerlockchange", onPointerLockChange);
       pressedKeys.current.clear();
     };
   }, [camera, requestFocus, setMode, setPlayerPosition, setStreetEntry]);
