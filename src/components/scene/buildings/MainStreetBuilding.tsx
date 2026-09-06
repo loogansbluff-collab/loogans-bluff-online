@@ -93,11 +93,11 @@ export default function MainStreetBuilding({ building, onPointerDown, onPointerU
   const rearDoorColor = "#1f2937";
   const leftWindowX = -width * 0.27;
   const rightWindowX = width * 0.27;
+  const isGas = building.id === "LB-GAS-001";
   let bodyColor = building.color;
   let signText = building.name;
   let signColor = "#1f2937";
   let signTextColor = "#f8fafc";
-  let signY = height - 0.68;
   let leftLightColor = LIGHT_MEDIUM;
   let rightLightColor = LIGHT_MEDIUM;
   let leftIntensity = 0.7;
@@ -127,11 +127,10 @@ export default function MainStreetBuilding({ building, onPointerDown, onPointerU
     rightLightColor = LIGHT_MEDIUM;
     leftIntensity = 1.1;
     rightIntensity = 0.7;
-  } else if (building.id === "LB-GAS-001") {
+  } else if (isGas) {
     bodyColor = "#0f766e";
     signText = "GAS";
     signColor = "#134e4a";
-    signY = height + 0.35;
     leftLightColor = LIGHT_BRIGHT;
     rightLightColor = LIGHT_DIM;
     leftIntensity = 1.1;
@@ -170,12 +169,14 @@ export default function MainStreetBuilding({ building, onPointerDown, onPointerU
       {building.id === "LB-BARBER-001" ? <HalfCurtain x={leftWindowX} z={frontZ} /> : null}
       {building.id === "LB-LIQUOR-001" ? <SideDrape x={rightWindowX} z={frontZ} side="right" /> : null}
       {building.id === "LB-HARDWARE-001" ? <Blinds x={leftWindowX} z={frontZ} /> : null}
-      {building.id === "LB-GAS-001" ? <Blinds x={rightWindowX} z={frontZ} /> : null}
+      {isGas ? <Blinds x={rightWindowX} z={frontZ} /> : null}
       {building.id === "LB-TAVERN-001" ? <LowerCurtain x={rightWindowX} z={frontZ} color="#4a1726" /> : null}
 
-      <group position={[0, signY, frontZ - 0.12]}>
-        <StorefrontSign text={signText} width={Math.max(2.6, width * 0.7)} boardColor={signColor} textColor={signTextColor} />
-      </group>
+      {!isGas ? (
+        <group position={[0, height - 0.68, frontZ - 0.12]}>
+          <StorefrontSign text={signText} width={Math.max(2.6, width * 0.7)} boardColor={signColor} textColor={signTextColor} />
+        </group>
+      ) : null}
 
       <WarmWindow position={[leftX, 2.0, -depth * 0.22]} size={[0.12, 1.2, 1.4]} color={LIGHT_MEDIUM} intensity={0.7} />
       <WarmWindow position={[leftX, 2.0, depth * 0.22]} size={[0.12, 1.2, 1.4]} color={LIGHT_DIM} intensity={0.3} />
@@ -203,8 +204,13 @@ export default function MainStreetBuilding({ building, onPointerDown, onPointerU
       {building.id === "LB-HARDWARE-001" && (
         <FacadeBox position={[0, height - 1.35, frontZ - 0.34]} size={[width * 0.86, 0.28, 0.85]} color="#713f12" />
       )}
-      {building.id === "LB-GAS-001" && (
-        <FacadeBox position={[0, height - 0.75, frontZ - 0.85]} size={[width * 0.9, 0.22, 1.7]} color="#e5e7eb" />
+      {isGas && (
+        <>
+          <FacadeBox position={[0, height - 0.75, frontZ - 0.85]} size={[width * 0.9, 0.22, 1.7]} color="#e5e7eb" />
+          <group position={[0, height - 0.75, frontZ - 1.74]}>
+            <StorefrontSign text="GAS" width={Math.max(3.8, width * 0.78)} boardColor={signColor} textColor={signTextColor} />
+          </group>
+        </>
       )}
       {building.id === "LB-TAVERN-001" && (
         <>
