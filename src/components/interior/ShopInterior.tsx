@@ -120,6 +120,7 @@ function BarberFloor() {
 function BarberDress() {
   const larryChairTexture = useTexture("/interior/larry-chair.png");
   const barryChairTexture = useTexture("/interior/barry-chair.png");
+  const garryTooSexyTexture = useTexture("/interior/garry-toosexy.png");
 
   return (
     <>
@@ -133,6 +134,10 @@ function BarberDress() {
       <mesh position={[2, 1.6, -2.7]}>
         <planeGeometry args={[2.4, 3.2]} />
         <meshBasicMaterial map={barryChairTexture} transparent alphaTest={0.05} />
+      </mesh>
+      <mesh position={[3.65, 1.6, -0.8]}>
+        <planeGeometry args={[2.4, 3.2]} />
+        <meshBasicMaterial map={garryTooSexyTexture} transparent alphaTest={0.05} />
       </mesh>
       <mesh position={[-2, 2.15, -5.83]}>
         <planeGeometry args={[1.5, 1.55]} />
