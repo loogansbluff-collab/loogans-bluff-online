@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
-import type { Group } from "three";
+import { CanvasTexture, RepeatWrapping, type Mesh } from "three";
 import type { BuildingData, Vec3 } from "@/data/town";
 import StorefrontSign from "@/components/scene/buildings/StorefrontSign";
 import WallFinish from "@/components/scene/buildings/WallFinish";
@@ -70,17 +70,34 @@ function LowerCurtain({ x, z, color }: { x: number; z: number; color: string }) 
 }
 
 function BarberPole({ x, z }: { x: number; z: number }) {
-  const poleRef = useRef<Group>(null);
-  const stripeSegments = Array.from({ length: 28 }, (_, index) => {
-    const progress = index / 27;
-    const angle = progress * Math.PI * 4;
-    return {
-      angle,
-      y: -0.82 + progress * 1.64,
-      x: Math.cos(angle) * 0.17,
-      z: Math.sin(angle) * 0.17,
-    };
-  });
+  const poleRef = useRef<Mesh>(null);
+  const stripeTexture = useMemo(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 128;
+    canvas.height = 256;
+    const context = canvas.getContext("2d");
+
+    if (!context) return null;
+
+    context.fillStyle = "#f8fafc";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.strokeStyle = "#dc2626";
+    context.lineWidth = 34;
+
+    for (let offset = -256; offset <= 256; offset += 64) {
+      context.beginPath();
+      context.moveTo(-32, offset + 96);
+      context.lineTo(160, offset - 96);
+      context.stroke();
+    }
+
+    const texture = new CanvasTexture(canvas);
+    texture.wrapS = RepeatWrapping;
+    texture.wrapT = RepeatWrapping;
+    texture.repeat.set(1, 1);
+    texture.needsUpdate = true;
+    return texture;
+  }, []);
 
   useFrame((_, delta) => {
     if (poleRef.current) {
@@ -88,23 +105,13 @@ function BarberPole({ x, z }: { x: number; z: number }) {
     }
   });
 
+  if (!stripeTexture) return null;
+
   return (
-    <group ref={poleRef} position={[x, 1.55, z]}>
-      <mesh>
-        <cylinderGeometry args={[0.16, 0.16, 1.8, 18]} />
-        <meshStandardMaterial color="#f8fafc" />
-      </mesh>
-      {stripeSegments.map((segment, index) => (
-        <mesh
-          key={index}
-          position={[segment.x, segment.y, segment.z]}
-          rotation={[0, -segment.angle, Math.PI / 4]}
-        >
-          <boxGeometry args={[0.2, 0.16, 0.055]} />
-          <meshStandardMaterial color="#dc2626" />
-        </mesh>
-      ))}
-    </group>
+    <mesh ref={poleRef} position={[x, 1.55, z]}>
+      <cylinderGeometry args={[0.16, 0.16, 1.8, 24]} />
+      <meshStandardMaterial map={stripeTexture} />
+    </mesh>
   );
 }
 
