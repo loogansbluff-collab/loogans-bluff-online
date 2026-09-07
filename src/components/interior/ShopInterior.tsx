@@ -1,6 +1,6 @@
 "use client";
 
-import { PointerLockControls } from "@react-three/drei";
+import { PointerLockControls, useTexture } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import { Vector3 } from "three";
@@ -119,12 +119,17 @@ function BarberFloor() {
 }
 
 function BarberDress() {
+  const larryChairTexture = useTexture("/interior/larry-chair.png");
+
   return (
     <>
       <BarberFloor />
       <pointLight position={[0, 3.55, 0]} intensity={1.2} distance={18} color="#ffd8a8" />
       <InteriorCounter position={[3.0, 0.55, 2.15]} />
-      <BarberChair position={[-2, 0, -2.7]} rotationY={Math.PI / 2} />
+      <mesh position={[-2, 1.6, -2.7]}>
+        <planeGeometry args={[2.4, 3.2]} />
+        <meshBasicMaterial map={larryChairTexture} transparent alphaTest={0.05} />
+      </mesh>
       <BarberChair position={[2, 0, -2.7]} rotationY={-Math.PI / 2} />
       <mesh position={[-2, 2.15, -5.83]}>
         <planeGeometry args={[1.5, 1.55]} />
