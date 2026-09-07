@@ -1,8 +1,9 @@
 "use client";
 
+import { Text } from "@react-three/drei";
 import { useMemo, useRef } from "react";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
-import { CanvasTexture, RepeatWrapping, type Group } from "three";
+import { CanvasTexture, RepeatWrapping, type Group, type MeshStandardMaterial } from "three";
 import type { BuildingData, Vec3 } from "@/data/town";
 import StorefrontSign from "@/components/scene/buildings/StorefrontSign";
 import WallFinish from "@/components/scene/buildings/WallFinish";
@@ -43,6 +44,44 @@ function WarmWindow({
       <boxGeometry args={size} />
       <meshStandardMaterial color={color} emissive={color} emissiveIntensity={intensity} />
     </mesh>
+  );
+}
+
+function PulsingNeonSign({ x, z }: { x: number; z: number }) {
+  const glowRef = useRef<MeshStandardMaterial>(null);
+
+  useFrame(({ clock }) => {
+    if (!glowRef.current) return;
+    const pulse = (Math.sin(clock.elapsedTime * 3) + 1) / 2;
+    glowRef.current.emissiveIntensity = 1.15 + pulse * 1.15;
+  });
+
+  return (
+    <group position={[x, 2.05, z - 0.16]}>
+      <mesh>
+        <boxGeometry args={[1.45, 1.25, 0.04]} />
+        <meshStandardMaterial color="#18091b" emissive="#3b0a45" emissiveIntensity={0.35} />
+      </mesh>
+      <Text
+        position={[0, 0, -0.035]}
+        rotation={[0, Math.PI, 0]}
+        fontSize={0.29}
+        maxWidth={1.18}
+        lineHeight={1.08}
+        textAlign="center"
+        anchorX="center"
+        anchorY="middle"
+      >
+        WINE & SPIRITS
+        <meshStandardMaterial
+          ref={glowRef}
+          color="#ff4fd8"
+          emissive="#ff1493"
+          emissiveIntensity={1.7}
+          toneMapped={false}
+        />
+      </Text>
+    </group>
   );
 }
 
@@ -226,6 +265,7 @@ export default function MainStreetBuilding({ building, onPointerDown, onPointerU
 
       {building.id === "LB-BARBER-001" ? <HalfCurtain x={leftWindowX} z={frontZ} /> : null}
       {building.id === "LB-LIQUOR-001" ? <SideDrape x={rightWindowX} z={frontZ} side="right" /> : null}
+      {building.id === "LB-LIQUOR-001" ? <PulsingNeonSign x={rightWindowX} z={frontZ} /> : null}
       {building.id === "LB-HARDWARE-001" ? <Blinds x={leftWindowX} z={frontZ} /> : null}
       {isGas ? <Blinds x={rightWindowX} z={frontZ} /> : null}
       {building.id === "LB-TAVERN-001" ? <LowerCurtain x={rightWindowX} z={frontZ} color="#4a1726" /> : null}
