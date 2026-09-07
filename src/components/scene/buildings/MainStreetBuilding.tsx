@@ -87,23 +87,24 @@ function PulsingNeonSign({ x, z }: { x: number; z: number }) {
 
 function HardwareJokeSign({ x, z }: { x: number; z: number }) {
   return (
-    <group position={[x, 2.05, z - 0.2]}>
+    <group position={[x, 2.05, z - 0.22]}>
       <mesh>
-        <boxGeometry args={[1.45, 1.25, 0.04]} />
+        <boxGeometry args={[1.6, 1.4, 0.05]} />
         <meshStandardMaterial color="#e5e7eb" />
       </mesh>
       <Text
-        position={[0, 0, -0.035]}
+        position={[0, 0, -0.04]}
         rotation={[0, Math.PI, 0]}
-        fontSize={0.17}
-        maxWidth={1.22}
-        lineHeight={1.05}
+        fontSize={0.23}
+        maxWidth={1.38}
+        lineHeight={0.92}
+        letterSpacing={0.015}
         textAlign="center"
         anchorX="center"
         anchorY="middle"
         color="#990000"
       >
-        We sell all kinds of tools, one bag at a time!
+        {"We sell all\nkinds of tools,\none bag at a\ntime!"}
       </Text>
     </group>
   );
