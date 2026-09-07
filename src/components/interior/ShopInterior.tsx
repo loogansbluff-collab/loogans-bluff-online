@@ -4,7 +4,11 @@ import { PointerLockControls } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import { Vector3 } from "three";
+import InteriorCounter from "@/components/interior/InteriorCounter";
+import InteriorShelf from "@/components/interior/InteriorShelf";
+import InteriorSign from "@/components/interior/InteriorSign";
 import { exitInterior } from "@/lib/enterInterior";
+import { useGameStore } from "@/state/gameStore";
 
 const SPEED = 6;
 const EYE_HEIGHT = 1.7;
@@ -94,6 +98,7 @@ function InteriorControls() {
 }
 
 export default function ShopInterior() {
+  const interiorId = useGameStore((state) => state.interiorId);
   const wallColor = "#d6d3d1";
   const floorColor = "#78716c";
   const ceilingColor = "#e7e5e4";
@@ -102,6 +107,7 @@ export default function ShopInterior() {
   const doorWidth = 2.4;
   const doorHeight = 2.7;
   const frontSideWidth = (ROOM_HALF_WIDTH * 2 - doorWidth) / 2;
+  const isBarber = interiorId === "LB-BARBER-001";
 
   return (
     <>
@@ -145,6 +151,22 @@ export default function ShopInterior() {
         <boxGeometry args={[doorWidth, wallHeight - doorHeight, wallThickness]} />
         <meshStandardMaterial color={wallColor} />
       </mesh>
+
+      {isBarber ? (
+        <>
+          <InteriorCounter position={[0, 0.55, 1.4]} />
+          <mesh position={[-1.6, 0.55, -1.2]}>
+            <boxGeometry args={[0.9, 1.1, 0.9]} />
+            <meshStandardMaterial color="#3f3f46" />
+          </mesh>
+          <mesh position={[1.6, 0.55, -1.2]}>
+            <boxGeometry args={[0.9, 1.1, 0.9]} />
+            <meshStandardMaterial color="#3f3f46" />
+          </mesh>
+          <InteriorSign text="BARBER" position={[0, 2.75, -5.84]} />
+          <InteriorShelf position={[-4.25, 1.15, -1.6]} />
+        </>
+      ) : null}
 
       <InteriorControls />
     </>
