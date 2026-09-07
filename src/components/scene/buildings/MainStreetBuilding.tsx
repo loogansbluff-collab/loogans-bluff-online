@@ -1,6 +1,8 @@
 "use client";
 
-import type { ThreeEvent } from "@react-three/fiber";
+import { useRef } from "react";
+import { useFrame, type ThreeEvent } from "@react-three/fiber";
+import type { Group } from "three";
 import type { BuildingData, Vec3 } from "@/data/town";
 import StorefrontSign from "@/components/scene/buildings/StorefrontSign";
 import WallFinish from "@/components/scene/buildings/WallFinish";
@@ -68,10 +70,17 @@ function LowerCurtain({ x, z, color }: { x: number; z: number; color: string }) 
 }
 
 function BarberPole({ x, z }: { x: number; z: number }) {
+  const poleRef = useRef<Group>(null);
   const bands = ["#dc2626", "#f8fafc", "#dc2626", "#f8fafc", "#dc2626", "#f8fafc"];
 
+  useFrame((_, delta) => {
+    if (poleRef.current) {
+      poleRef.current.rotation.y += delta * ((Math.PI * 2) / 2.5);
+    }
+  });
+
   return (
-    <group position={[x, 1.55, z]}>
+    <group ref={poleRef} position={[x, 1.55, z]}>
       {bands.map((color, index) => (
         <mesh key={`${color}-${index}`} position={[0, -0.75 + index * 0.3, 0]}>
           <cylinderGeometry args={[0.16, 0.16, 0.3, 8]} />
