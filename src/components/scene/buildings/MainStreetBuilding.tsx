@@ -52,15 +52,15 @@ function PulsingNeonSign({ x, z }: { x: number; z: number }) {
 
   useFrame(({ clock }) => {
     if (!glowRef.current) return;
-    const pulse = (Math.sin(clock.elapsedTime * 3) + 1) / 2;
-    glowRef.current.emissiveIntensity = 1.15 + pulse * 1.15;
+    const pulse = (Math.sin(clock.elapsedTime * Math.PI * 2) + 1) / 2;
+    glowRef.current.emissiveIntensity = 0.35 + pulse * 3.65;
   });
 
   return (
-    <group position={[x, 2.05, z - 0.16]}>
+    <group position={[x, 2.05, z - 0.2]}>
       <mesh>
-        <boxGeometry args={[1.45, 1.25, 0.04]} />
-        <meshStandardMaterial color="#18091b" emissive="#3b0a45" emissiveIntensity={0.35} />
+        <boxGeometry args={[1.45, 1.25, 0.035]} />
+        <meshStandardMaterial color="#130817" emissive="#210628" emissiveIntensity={0.18} />
       </mesh>
       <Text
         position={[0, 0, -0.035]}
@@ -77,7 +77,7 @@ function PulsingNeonSign({ x, z }: { x: number; z: number }) {
           ref={glowRef}
           color="#ff4fd8"
           emissive="#ff1493"
-          emissiveIntensity={1.7}
+          emissiveIntensity={2.1}
           toneMapped={false}
         />
       </Text>
@@ -265,7 +265,7 @@ export default function MainStreetBuilding({ building, onPointerDown, onPointerU
 
       {building.id === "LB-BARBER-001" ? <HalfCurtain x={leftWindowX} z={frontZ} /> : null}
       {building.id === "LB-LIQUOR-001" ? <SideDrape x={rightWindowX} z={frontZ} side="right" /> : null}
-      {building.id === "LB-LIQUOR-001" ? <PulsingNeonSign x={rightWindowX} z={frontZ} /> : null}
+      {building.id === "LB-LIQUOR-001" ? <PulsingNeonSign x={leftWindowX} z={frontZ} /> : null}
       {building.id === "LB-HARDWARE-001" ? <Blinds x={leftWindowX} z={frontZ} /> : null}
       {isGas ? <Blinds x={rightWindowX} z={frontZ} /> : null}
       {building.id === "LB-TAVERN-001" ? <LowerCurtain x={rightWindowX} z={frontZ} color="#4a1726" /> : null}
