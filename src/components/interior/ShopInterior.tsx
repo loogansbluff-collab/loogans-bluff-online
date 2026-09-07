@@ -4,7 +4,6 @@ import { PointerLockControls, useTexture } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import { Vector3 } from "three";
-import BarberChair from "@/components/interior/BarberChair";
 import InteriorCounter from "@/components/interior/InteriorCounter";
 import InteriorOfferBoard from "@/components/interior/InteriorOfferBoard";
 import InteriorShelf from "@/components/interior/InteriorShelf";
@@ -120,6 +119,7 @@ function BarberFloor() {
 
 function BarberDress() {
   const larryChairTexture = useTexture("/interior/larry-chair.png");
+  const barryChairTexture = useTexture("/interior/barry-chair.png");
 
   return (
     <>
@@ -130,7 +130,10 @@ function BarberDress() {
         <planeGeometry args={[2.4, 3.2]} />
         <meshBasicMaterial map={larryChairTexture} transparent alphaTest={0.05} />
       </mesh>
-      <BarberChair position={[2, 0, -2.7]} rotationY={-Math.PI / 2} />
+      <mesh position={[2, 1.6, -2.7]}>
+        <planeGeometry args={[2.4, 3.2]} />
+        <meshBasicMaterial map={barryChairTexture} transparent alphaTest={0.05} />
+      </mesh>
       <mesh position={[-2, 2.15, -5.83]}>
         <planeGeometry args={[1.5, 1.55]} />
         <meshStandardMaterial color="#e5f3ff" emissive="#dbeafe" emissiveIntensity={0.18} />
