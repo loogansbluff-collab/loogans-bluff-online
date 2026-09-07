@@ -2,7 +2,7 @@
 
 import { useMemo, useRef } from "react";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
-import { CanvasTexture, RepeatWrapping, type Mesh } from "three";
+import { CanvasTexture, RepeatWrapping, type Group } from "three";
 import type { BuildingData, Vec3 } from "@/data/town";
 import StorefrontSign from "@/components/scene/buildings/StorefrontSign";
 import WallFinish from "@/components/scene/buildings/WallFinish";
@@ -70,26 +70,38 @@ function LowerCurtain({ x, z, color }: { x: number; z: number; color: string }) 
 }
 
 function BarberPole({ x, z }: { x: number; z: number }) {
-  const poleRef = useRef<Mesh>(null);
+  const poleRef = useRef<Group>(null);
   const stripeTexture = useMemo(() => {
     const canvas = document.createElement("canvas");
-    canvas.width = 128;
-    canvas.height = 256;
+    canvas.width = 126;
+    canvas.height = 252;
     const context = canvas.getContext("2d");
 
     if (!context) return null;
 
-    context.fillStyle = "#f8fafc";
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    context.strokeStyle = "#dc2626";
-    context.lineWidth = 34;
+    const stripeWidth = 14;
+    const stripePeriod = stripeWidth * 3;
+    const colors = ["#1d4ed8", "#f8fafc", "#dc2626"];
+    const image = context.createImageData(canvas.width, canvas.height);
 
-    for (let offset = -256; offset <= 256; offset += 64) {
-      context.beginPath();
-      context.moveTo(-32, offset + 96);
-      context.lineTo(160, offset - 96);
-      context.stroke();
+    for (let py = 0; py < canvas.height; py += 1) {
+      for (let px = 0; px < canvas.width; px += 1) {
+        const phase = (px + py) % stripePeriod;
+        const stripeIndex = Math.floor(phase / stripeWidth);
+        const color = colors[stripeIndex];
+        const red = Number.parseInt(color.slice(1, 3), 16);
+        const green = Number.parseInt(color.slice(3, 5), 16);
+        const blue = Number.parseInt(color.slice(5, 7), 16);
+        const offset = (py * canvas.width + px) * 4;
+
+        image.data[offset] = red;
+        image.data[offset + 1] = green;
+        image.data[offset + 2] = blue;
+        image.data[offset + 3] = 255;
+      }
     }
+
+    context.putImageData(image, 0, 0);
 
     const texture = new CanvasTexture(canvas);
     texture.wrapS = RepeatWrapping;
@@ -108,10 +120,20 @@ function BarberPole({ x, z }: { x: number; z: number }) {
   if (!stripeTexture) return null;
 
   return (
-    <mesh ref={poleRef} position={[x, 1.55, z]}>
-      <cylinderGeometry args={[0.16, 0.16, 1.8, 24]} />
-      <meshStandardMaterial map={stripeTexture} />
-    </mesh>
+    <group ref={poleRef} position={[x, 1.55, z]}>
+      <mesh>
+        <cylinderGeometry args={[0.16, 0.16, 1.8, 32]} />
+        <meshStandardMaterial map={stripeTexture} />
+      </mesh>
+      <mesh position={[0, 0.98, 0]} scale={[1, 0.55, 1]}>
+        <sphereGeometry args={[0.22, 18, 10]} />
+        <meshStandardMaterial color="#cbd5e1" metalness={0.75} roughness={0.25} />
+      </mesh>
+      <mesh position={[0, -0.98, 0]} scale={[1, 0.55, 1]}>
+        <sphereGeometry args={[0.22, 18, 10]} />
+        <meshStandardMaterial color="#cbd5e1" metalness={0.75} roughness={0.25} />
+      </mesh>
+    </group>
   );
 }
 
