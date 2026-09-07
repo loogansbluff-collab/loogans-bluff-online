@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useEffect } from "react";
 import { townData } from "@/data/town";
+import { enterInterior } from "@/lib/enterInterior";
 import { findNearestProperty } from "@/lib/proximity";
 import { isSouthTreeLotId } from "@/lib/southDecor";
 import { useGameStore } from "@/state/gameStore";
@@ -19,6 +20,10 @@ const TownCanvas = dynamic(() => import("@/components/scene/TownCanvas"), {
   ssr: false,
 });
 
+const InteriorCanvas = dynamic(() => import("@/components/interior/InteriorCanvas"), {
+  ssr: false,
+});
+
 const PROXIMITY_RANGE = 4.5;
 
 export default function HomePage() {
@@ -29,7 +34,7 @@ export default function HomePage() {
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.code !== "KeyE" || mode !== "street") return;
+      if (mode !== "street" || (event.code !== "KeyE" && event.code !== "KeyF")) return;
 
       const target = event.target;
       if (
@@ -48,6 +53,12 @@ export default function HomePage() {
       );
 
       if (!nearest) return;
+
+      if (event.code === "KeyF") {
+        enterInterior(nearest.id);
+        return;
+      }
+
       setSelectedId(selectedId === nearest.id ? null : nearest.id);
     };
 
@@ -57,13 +68,13 @@ export default function HomePage() {
 
   return (
     <main className="h-screen w-screen overflow-hidden bg-slate-950">
-      <TownCanvas />
+      {mode === "interior" ? <InteriorCanvas /> : <TownCanvas />}
       <TitleChrome />
       <TopHud />
-      <TownDirectory />
+      {mode !== "interior" ? <TownDirectory /> : null}
       <ControlsLegend />
       <ProximityPrompt />
-      <BuildingPanel />
+      {mode !== "interior" ? <BuildingPanel /> : null}
       <V1PreviewBadge />
       <ModeFade />
     </main>

@@ -1,12 +1,14 @@
 import { create } from "zustand";
 
-type GameMode = "aerial" | "street";
+type GameMode = "aerial" | "street" | "interior";
 type PlayerPosition = [number, number, number];
 type FocusPosition = [number, number, number];
 
 type GameState = {
   mode: GameMode;
   setMode: (mode: GameMode) => void;
+  interiorId: string | null;
+  setInteriorId: (id: string | null) => void;
   selectedId: string | null;
   setSelectedId: (id: string | null) => void;
   playerPosition: PlayerPosition;
@@ -23,6 +25,8 @@ type GameState = {
 export const useGameStore = create<GameState>((set) => ({
   mode: "aerial",
   setMode: (mode) => set({ mode }),
+  interiorId: null,
+  setInteriorId: (id) => set({ interiorId: id }),
   selectedId: null,
   setSelectedId: (id) => set({ selectedId: id }),
   playerPosition: [0, 0, 0],
