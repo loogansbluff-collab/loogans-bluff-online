@@ -4,7 +4,9 @@ import { PointerLockControls } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import { Vector3 } from "three";
+import BarberChair from "@/components/interior/BarberChair";
 import InteriorCounter from "@/components/interior/InteriorCounter";
+import InteriorOfferBoard from "@/components/interior/InteriorOfferBoard";
 import InteriorShelf from "@/components/interior/InteriorShelf";
 import InteriorSign from "@/components/interior/InteriorSign";
 import { exitInterior } from "@/lib/enterInterior";
@@ -97,9 +99,71 @@ function InteriorControls() {
   return <PointerLockControls />;
 }
 
+function BarberFloor() {
+  const tiles = [];
+  for (let x = -5; x < 5; x += 1) {
+    for (let z = -6; z < 6; z += 1) {
+      const isDark = (x + z) % 2 === 0;
+      tiles.push(
+        <mesh key={`${x}-${z}`} position={[x + 0.5, -0.045, z + 0.5]}>
+          <boxGeometry args={[1, 0.08, 1]} />
+          <meshStandardMaterial color={isDark ? "#111111" : "#f5f1e8"} />
+        </mesh>,
+      );
+    }
+  }
+  return <>{tiles}</>;
+}
+
+function BarberDress() {
+  return (
+    <>
+      <BarberFloor />
+      <pointLight position={[0, 3.55, 0]} intensity={1.2} distance={18} color="#ffd8a8" />
+      <InteriorCounter position={[3.0, 0.55, 2.15]} />
+      <BarberChair position={[-2, 0, -2.7]} />
+      <BarberChair position={[2, 0, -2.7]} />
+      <mesh position={[-2, 2.15, -5.83]}>
+        <planeGeometry args={[1.5, 1.55]} />
+        <meshStandardMaterial color="#e5f3ff" emissive="#dbeafe" emissiveIntensity={0.18} />
+      </mesh>
+      <mesh position={[2, 2.15, -5.83]}>
+        <planeGeometry args={[1.5, 1.55]} />
+        <meshStandardMaterial color="#e5f3ff" emissive="#dbeafe" emissiveIntensity={0.18} />
+      </mesh>
+      <mesh position={[-4.45, 0.45, 2.05]}>
+        <boxGeometry args={[0.75, 0.9, 2.6]} />
+        <meshStandardMaterial color="#7c5a3b" />
+      </mesh>
+      <InteriorShelf position={[-4.25, 1.15, -1.6]} />
+      {[-2.2, -1.6, -1].map((z, index) => (
+        <mesh key={z} position={[-3.86, 1.5, z]}>
+          <cylinderGeometry args={[0.13 + index * 0.015, 0.13 + index * 0.015, 0.42, 10]} />
+          <meshStandardMaterial color={index === 0 ? "#f5f1e8" : index === 1 ? "#d4a373" : "#9ca3af"} />
+        </mesh>
+      ))}
+      <mesh position={[0, 0.14, -5.45]}>
+        <boxGeometry args={[9.6, 0.16, 0.16]} />
+        <meshStandardMaterial color="#8b5e3c" />
+      </mesh>
+      <mesh position={[-4.82, 0.14, 0]}>
+        <boxGeometry args={[0.16, 0.16, 11.6]} />
+        <meshStandardMaterial color="#8b5e3c" />
+      </mesh>
+      <mesh position={[4.82, 0.14, 0]}>
+        <boxGeometry args={[0.16, 0.16, 11.6]} />
+        <meshStandardMaterial color="#8b5e3c" />
+      </mesh>
+      <InteriorOfferBoard />
+      <InteriorSign text="BARBER" position={[0, 3.65, -5.82]} />
+    </>
+  );
+}
+
 export default function ShopInterior() {
   const interiorId = useGameStore((state) => state.interiorId);
-  const wallColor = "#d6d3d1";
+  const isBarber = interiorId === "LB-BARBER-001";
+  const wallColor = isBarber ? "#f3ead7" : "#d6d3d1";
   const floorColor = "#78716c";
   const ceilingColor = "#e7e5e4";
   const wallThickness = 0.2;
@@ -107,17 +171,18 @@ export default function ShopInterior() {
   const doorWidth = 2.4;
   const doorHeight = 2.7;
   const frontSideWidth = (ROOM_HALF_WIDTH * 2 - doorWidth) / 2;
-  const isBarber = interiorId === "LB-BARBER-001";
 
   return (
     <>
-      <ambientLight intensity={0.9} />
+      <ambientLight intensity={isBarber ? 1.0 : 0.9} />
       <directionalLight position={[3, 5, 2]} intensity={0.7} />
 
-      <mesh position={[0, -0.05, 0]}>
-        <boxGeometry args={[ROOM_HALF_WIDTH * 2, 0.1, ROOM_HALF_DEPTH * 2]} />
-        <meshStandardMaterial color={floorColor} />
-      </mesh>
+      {!isBarber ? (
+        <mesh position={[0, -0.05, 0]}>
+          <boxGeometry args={[ROOM_HALF_WIDTH * 2, 0.1, ROOM_HALF_DEPTH * 2]} />
+          <meshStandardMaterial color={floorColor} />
+        </mesh>
+      ) : null}
 
       <mesh position={[0, wallHeight + 0.05, 0]}>
         <boxGeometry args={[ROOM_HALF_WIDTH * 2, 0.1, ROOM_HALF_DEPTH * 2]} />
@@ -152,21 +217,7 @@ export default function ShopInterior() {
         <meshStandardMaterial color={wallColor} />
       </mesh>
 
-      {isBarber ? (
-        <>
-          <InteriorCounter position={[0, 0.55, 1.4]} />
-          <mesh position={[-1.6, 0.55, -1.2]}>
-            <boxGeometry args={[0.9, 1.1, 0.9]} />
-            <meshStandardMaterial color="#3f3f46" />
-          </mesh>
-          <mesh position={[1.6, 0.55, -1.2]}>
-            <boxGeometry args={[0.9, 1.1, 0.9]} />
-            <meshStandardMaterial color="#3f3f46" />
-          </mesh>
-          <InteriorSign text="BARBER" position={[0, 2.75, -5.84]} />
-          <InteriorShelf position={[-4.25, 1.15, -1.6]} />
-        </>
-      ) : null}
+      {isBarber ? <BarberDress /> : null}
 
       <InteriorControls />
     </>
