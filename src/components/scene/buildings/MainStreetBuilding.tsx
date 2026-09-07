@@ -89,7 +89,7 @@ function HardwareJokeSign({ x, z }: { x: number; z: number }) {
   return (
     <group position={[x, 1.98, z - 0.22]}>
       <mesh>
-        <boxGeometry args={[1.45, 1.28, 0.05]} />
+        <boxGeometry args={[1.54, 1.34, 0.05]} />
         <meshStandardMaterial color="#e5e7eb" />
       </mesh>
       <Text
