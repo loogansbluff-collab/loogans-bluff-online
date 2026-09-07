@@ -71,7 +71,16 @@ function LowerCurtain({ x, z, color }: { x: number; z: number; color: string }) 
 
 function BarberPole({ x, z }: { x: number; z: number }) {
   const poleRef = useRef<Group>(null);
-  const bands = ["#dc2626", "#f8fafc", "#dc2626", "#f8fafc", "#dc2626", "#f8fafc"];
+  const stripeSegments = Array.from({ length: 28 }, (_, index) => {
+    const progress = index / 27;
+    const angle = progress * Math.PI * 4;
+    return {
+      angle,
+      y: -0.82 + progress * 1.64,
+      x: Math.cos(angle) * 0.17,
+      z: Math.sin(angle) * 0.17,
+    };
+  });
 
   useFrame((_, delta) => {
     if (poleRef.current) {
@@ -81,10 +90,18 @@ function BarberPole({ x, z }: { x: number; z: number }) {
 
   return (
     <group ref={poleRef} position={[x, 1.55, z]}>
-      {bands.map((color, index) => (
-        <mesh key={`${color}-${index}`} position={[0, -0.75 + index * 0.3, 0]}>
-          <cylinderGeometry args={[0.16, 0.16, 0.3, 8]} />
-          <meshStandardMaterial color={color} />
+      <mesh>
+        <cylinderGeometry args={[0.16, 0.16, 1.8, 18]} />
+        <meshStandardMaterial color="#f8fafc" />
+      </mesh>
+      {stripeSegments.map((segment, index) => (
+        <mesh
+          key={index}
+          position={[segment.x, segment.y, segment.z]}
+          rotation={[0, -segment.angle, Math.PI / 4]}
+        >
+          <boxGeometry args={[0.2, 0.16, 0.055]} />
+          <meshStandardMaterial color="#dc2626" />
         </mesh>
       ))}
     </group>
