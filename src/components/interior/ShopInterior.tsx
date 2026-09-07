@@ -124,8 +124,8 @@ function BarberDress() {
       <BarberFloor />
       <pointLight position={[0, 3.55, 0]} intensity={1.2} distance={18} color="#ffd8a8" />
       <InteriorCounter position={[3.0, 0.55, 2.15]} />
-      <BarberChair position={[-2, 0, -2.7]} />
-      <BarberChair position={[2, 0, -2.7]} />
+      <BarberChair position={[-2, 0, -2.7]} rotationY={Math.PI / 2} />
+      <BarberChair position={[2, 0, -2.7]} rotationY={-Math.PI / 2} />
       <mesh position={[-2, 2.15, -5.83]}>
         <planeGeometry args={[1.5, 1.55]} />
         <meshStandardMaterial color="#e5f3ff" emissive="#dbeafe" emissiveIntensity={0.18} />
