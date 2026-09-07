@@ -89,22 +89,22 @@ function HardwareJokeSign({ x, z }: { x: number; z: number }) {
   return (
     <group position={[x, 1.98, z - 0.22]}>
       <mesh>
-        <boxGeometry args={[1.64, 1.32, 0.05]} />
+        <boxGeometry args={[1.45, 1.28, 0.05]} />
         <meshStandardMaterial color="#e5e7eb" />
       </mesh>
       <Text
         position={[0, 0, -0.04]}
         rotation={[0, Math.PI, 0]}
-        fontSize={0.145}
-        maxWidth={1.42}
-        lineHeight={1.12}
-        letterSpacing={0.005}
+        fontSize={0.135}
+        maxWidth={1.2}
+        lineHeight={1.08}
+        letterSpacing={0.002}
         textAlign="center"
         anchorX="center"
         anchorY="middle"
         color="#990000"
       >
-        {"We sell all kinds of tools,\none bag at a time!"}
+        {"We sell all kinds\nof tools, one bag\nat a time!"}
       </Text>
     </group>
   );
