@@ -6,7 +6,6 @@ import { useEffect, useRef } from "react";
 import { Vector3 } from "three";
 import InteriorCounter from "@/components/interior/InteriorCounter";
 import InteriorOfferBoard from "@/components/interior/InteriorOfferBoard";
-import InteriorShelf from "@/components/interior/InteriorShelf";
 import InteriorSign from "@/components/interior/InteriorSign";
 import { exitInterior } from "@/lib/enterInterior";
 import { useGameStore } from "@/state/gameStore";
@@ -121,6 +120,7 @@ function BarberDress() {
   const larryChairTexture = useTexture("/interior/larry-chair.png");
   const barryChairTexture = useTexture("/interior/barry-chair.png");
   const garryTooSexyTexture = useTexture("/interior/garry-toosexy.png");
+  const fishTankTexture = useTexture("/interior/fish-tank.png");
 
   return (
     <>
@@ -151,13 +151,10 @@ function BarberDress() {
         <boxGeometry args={[0.75, 0.9, 2.6]} />
         <meshStandardMaterial color="#7c5a3b" />
       </mesh>
-      <InteriorShelf position={[-4.25, 1.15, -1.6]} />
-      {[-2.2, -1.6, -1].map((z, index) => (
-        <mesh key={z} position={[-3.86, 1.5, z]}>
-          <cylinderGeometry args={[0.13 + index * 0.015, 0.13 + index * 0.015, 0.42, 10]} />
-          <meshStandardMaterial color={index === 0 ? "#f5f1e8" : index === 1 ? "#d4a373" : "#9ca3af"} />
-        </mesh>
-      ))}
+      <mesh position={[-4.88, 1.65, -1.6]} rotation={[0, Math.PI / 2, 0]}>
+        <planeGeometry args={[3.0, 2.2]} />
+        <meshBasicMaterial map={fishTankTexture} transparent alphaTest={0.05} />
+      </mesh>
       <mesh position={[0, 0.14, -5.45]}>
         <boxGeometry args={[9.6, 0.16, 0.16]} />
         <meshStandardMaterial color="#8b5e3c" />
