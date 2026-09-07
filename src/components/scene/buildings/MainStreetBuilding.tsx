@@ -85,6 +85,30 @@ function PulsingNeonSign({ x, z }: { x: number; z: number }) {
   );
 }
 
+function HardwareJokeSign({ x, z }: { x: number; z: number }) {
+  return (
+    <group position={[x, 2.05, z - 0.2]}>
+      <mesh>
+        <boxGeometry args={[1.45, 1.25, 0.04]} />
+        <meshStandardMaterial color="#e5e7eb" />
+      </mesh>
+      <Text
+        position={[0, 0, -0.035]}
+        rotation={[0, Math.PI, 0]}
+        fontSize={0.17}
+        maxWidth={1.22}
+        lineHeight={1.05}
+        textAlign="center"
+        anchorX="center"
+        anchorY="middle"
+        color="#990000"
+      >
+        We sell all kinds of tools, one bag at a time!
+      </Text>
+    </group>
+  );
+}
+
 function HalfCurtain({ x, z, color = "#e8dcc2" }: { x: number; z: number; color?: string }) {
   return <FacadeBox position={[x - 0.34, 2.05, z - 0.075]} size={[0.62, 1.08, 0.05]} color={color} />;
 }
@@ -267,6 +291,7 @@ export default function MainStreetBuilding({ building, onPointerDown, onPointerU
       {building.id === "LB-LIQUOR-001" ? <SideDrape x={rightWindowX} z={frontZ} side="right" /> : null}
       {building.id === "LB-LIQUOR-001" ? <PulsingNeonSign x={leftWindowX} z={frontZ} /> : null}
       {building.id === "LB-HARDWARE-001" ? <Blinds x={leftWindowX} z={frontZ} /> : null}
+      {building.id === "LB-HARDWARE-001" ? <HardwareJokeSign x={rightWindowX} z={frontZ} /> : null}
       {isGas ? <Blinds x={rightWindowX} z={frontZ} /> : null}
       {building.id === "LB-TAVERN-001" ? <LowerCurtain x={rightWindowX} z={frontZ} color="#4a1726" /> : null}
 
