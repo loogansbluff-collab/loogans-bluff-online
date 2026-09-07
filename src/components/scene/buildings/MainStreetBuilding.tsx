@@ -185,7 +185,7 @@ export default function MainStreetBuilding({ building, onPointerDown, onPointerU
     rightIntensity = 0.7;
   } else if (isGas) {
     bodyColor = "#0f766e";
-    signText = "GAS";
+    signText = "Skeeter's Gas & CO";
     signColor = "#134e4a";
     leftLightColor = LIGHT_BRIGHT;
     rightLightColor = LIGHT_DIM;
@@ -202,7 +202,7 @@ export default function MainStreetBuilding({ building, onPointerDown, onPointerU
     rightIntensity = 0.7;
   } else if (building.id === "LB-REPAIR-001") {
     bodyColor = "#475569";
-    signText = "BARRY'S REPAIR";
+    signText = "Bluff Pawnshop";
     signColor = "#1e293b";
     leftLightColor = LIGHT_MEDIUM;
     rightLightColor = LIGHT_DIM;
@@ -266,7 +266,7 @@ export default function MainStreetBuilding({ building, onPointerDown, onPointerU
         <>
           <FacadeBox position={[0, height - 0.75, frontZ - 0.85]} size={[width * 0.9, 0.22, 1.7]} color="#e5e7eb" />
           <group position={[0, height - 0.75, frontZ - 1.74]}>
-            <StorefrontSign text="GAS" width={Math.max(3.8, width * 0.78)} boardColor={signColor} textColor={signTextColor} />
+            <StorefrontSign text={signText} width={Math.max(3.8, width * 0.78)} boardColor={signColor} textColor={signTextColor} />
           </group>
         </>
       )}
