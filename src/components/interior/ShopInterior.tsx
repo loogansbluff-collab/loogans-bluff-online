@@ -158,7 +158,7 @@ function BarberDress() {
         <meshStandardMaterial color="#8b5e3c" />
       </mesh>
       <InteriorOfferBoard />
-      <InteriorSign text="BARBER" position={[0, 3.65, -5.82]} />
+      <InteriorSign text="We only offer SCALP cuts!" position={[0, 3.65, -5.82]} />
     </>
   );
 }
