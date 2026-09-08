@@ -232,6 +232,41 @@ function TavernJokeSign({ x, z }: { x: number; z: number }) {
   );
 }
 
+function GasWindowSign({ x, z }: { x: number; z: number }) {
+  return (
+    <group position={[x, 2.05, z - 0.2]}>
+      <mesh>
+        <boxGeometry args={[1.32, 0.92, 0.045]} />
+        <meshStandardMaterial color="#ded5bd" roughness={0.92} />
+      </mesh>
+      <Text
+        position={[0, 0.18, -0.04]}
+        rotation={[0, Math.PI, 0]}
+        fontSize={0.105}
+        maxWidth={1.08}
+        textAlign="center"
+        anchorX="center"
+        anchorY="middle"
+      >
+        Skeeter&apos;s Gas &amp; CO
+        <meshStandardMaterial color="#29241f" />
+      </Text>
+      <Text
+        position={[0, -0.17, -0.04]}
+        rotation={[0, Math.PI, 0]}
+        fontSize={0.17}
+        maxWidth={1.1}
+        textAlign="center"
+        anchorX="center"
+        anchorY="middle"
+      >
+        WE Pump...Sometimes!
+        <meshStandardMaterial color="#29241f" />
+      </Text>
+    </group>
+  );
+}
+
 function HalfCurtain({ x, z, color = "#e8dcc2" }: { x: number; z: number; color?: string }) {
   return <FacadeBox position={[x - 0.34, 2.05, z - 0.075]} size={[0.62, 1.08, 0.05]} color={color} />;
 }
@@ -421,6 +456,7 @@ export default function MainStreetBuilding({ building, onPointerDown, onPointerU
       {building.id === "LB-LIQUOR-001" ? <PulsingNeonSign x={leftWindowX} z={frontZ} /> : null}
       {building.id === "LB-HARDWARE-001" ? <Blinds x={leftWindowX} z={frontZ} /> : null}
       {building.id === "LB-HARDWARE-001" ? <HardwareJokeSign x={rightWindowX} z={frontZ} /> : null}
+      {isGas ? <GasWindowSign x={leftWindowX} z={frontZ} /> : null}
       {isGas ? <Blinds x={rightWindowX} z={frontZ} /> : null}
       {isTavern ? <TavernJokeSign x={leftWindowX} z={frontZ} /> : null}
       {isTavern ? <LowerCurtain x={rightWindowX} z={frontZ} color="#4a1726" /> : null}
