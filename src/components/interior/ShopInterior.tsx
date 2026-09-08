@@ -1,6 +1,6 @@
 "use client";
 
-import { PointerLockControls, useTexture } from "@react-three/drei";
+import { PointerLockControls, Text, useTexture } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import { Vector3 } from "three";
@@ -173,9 +173,33 @@ function BarberDress() {
   );
 }
 
+function LiquorDress() {
+  return (
+    <group position={[0, 2.25, -5.82]}>
+      <mesh>
+        <boxGeometry args={[6.6, 2.0, 0.14]} />
+        <meshStandardMaterial color="#4b2e1f" />
+      </mesh>
+      <Text
+        position={[0, 0, 0.09]}
+        fontSize={0.34}
+        maxWidth={5.9}
+        lineHeight={1.28}
+        textAlign="center"
+        anchorX="center"
+        anchorY="middle"
+        color="#f8fafc"
+      >
+        {"We Lied.\nWe only sell ToKillYa\nEnglish translation: Bluff Tequila"}
+      </Text>
+    </group>
+  );
+}
+
 export default function ShopInterior() {
   const interiorId = useGameStore((state) => state.interiorId);
   const isBarber = interiorId === "LB-BARBER-001";
+  const isLiquor = interiorId === "LB-LIQUOR-001";
   const wallColor = isBarber ? "#f3ead7" : "#d6d3d1";
   const floorColor = "#78716c";
   const ceilingColor = "#e7e5e4";
@@ -231,6 +255,7 @@ export default function ShopInterior() {
       </mesh>
 
       {isBarber ? <BarberDress /> : null}
+      {isLiquor ? <LiquorDress /> : null}
 
       <InteriorControls />
     </>
