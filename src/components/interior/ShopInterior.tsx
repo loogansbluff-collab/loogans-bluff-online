@@ -175,13 +175,13 @@ function BarberDress() {
 
 function LiquorDress() {
   return (
-    <group position={[0, 2.2, -5.82]}>
+    <group position={[0, 2.05, -5.82]}>
       <mesh>
-        <boxGeometry args={[6.6, 2.9, 0.14]} />
+        <boxGeometry args={[6.6, 3.5, 0.14]} />
         <meshStandardMaterial color="#4b2e1f" />
       </mesh>
       <Text
-        position={[0, 0.48, 0.09]}
+        position={[0, 0.85, 0.09]}
         fontSize={0.34}
         maxWidth={5.9}
         lineHeight={1.28}
@@ -193,7 +193,29 @@ function LiquorDress() {
         {"We Lied.\nWe only sell ToKillYa\nEnglish translation: Bluff Tequila"}
       </Text>
       <Text
-        position={[0, -0.63, 0.09]}
+        position={[0, -0.2, 0.09]}
+        fontSize={0.24}
+        maxWidth={5.9}
+        textAlign="center"
+        anchorX="center"
+        anchorY="middle"
+        color="#f8fafc"
+      >
+        0.1 SOL worth of $LOOGANS
+      </Text>
+      <Text
+        position={[0, -0.62, 0.09]}
+        fontSize={0.22}
+        maxWidth={5.9}
+        textAlign="center"
+        anchorX="center"
+        anchorY="middle"
+        color="#f8fafc"
+      >
+        Connect Phantom wallet to:
+      </Text>
+      <Text
+        position={[0, -1.08, 0.09]}
         fontSize={0.36}
         maxWidth={5.9}
         textAlign="center"
@@ -204,7 +226,7 @@ function LiquorDress() {
         $Buy ToKillYa
       </Text>
       <Text
-        position={[0, -1.08, 0.09]}
+        position={[0, -1.48, 0.09]}
         fontSize={0.36}
         maxWidth={5.9}
         textAlign="center"
