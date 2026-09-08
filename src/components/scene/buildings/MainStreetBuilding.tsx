@@ -150,12 +150,7 @@ function PawnHeartSign({ x, z }: { x: number; z: number }) {
       </mesh>
 
       <group ref={heartRef} position={[0, 0.28, -0.045]}>
-        <Text
-          rotation={[0, Math.PI, 0]}
-          fontSize={0.42}
-          anchorX="center"
-          anchorY="middle"
-        >
+        <Text rotation={[0, Math.PI, 0]} fontSize={0.42} anchorX="center" anchorY="middle">
           ♥
           <meshStandardMaterial
             ref={heartGlowRef}
@@ -193,6 +188,45 @@ function PawnHeartSign({ x, z }: { x: number; z: number }) {
       >
         {"BRING SOMETHING\nYOU’LL MISS."}
         <meshStandardMaterial color="#67e8f9" emissive="#67e8f9" emissiveIntensity={0.8} toneMapped={false} />
+      </Text>
+    </group>
+  );
+}
+
+function TavernJokeSign({ x, z }: { x: number; z: number }) {
+  const textGlowRef = useRef<MeshStandardMaterial>(null);
+
+  useFrame(({ clock }) => {
+    if (!textGlowRef.current) return;
+    const slowPulse = (Math.sin(clock.elapsedTime * Math.PI * 0.9) + 1) / 2;
+    const softFlicker = Math.sin(clock.elapsedTime * 4.2) > 0.72 ? 0.62 : 1;
+    textGlowRef.current.emissiveIntensity = (0.55 + slowPulse * 1.15) * softFlicker;
+  });
+
+  return (
+    <group position={[x, 2.05, z - 0.21]}>
+      <mesh>
+        <boxGeometry args={[1.45, 1.25, 0.05]} />
+        <meshStandardMaterial color="#21170b" emissive="#3b2607" emissiveIntensity={0.18} />
+      </mesh>
+      <Text
+        position={[0, 0, -0.045]}
+        rotation={[0, Math.PI, 0]}
+        fontSize={0.125}
+        maxWidth={1.18}
+        lineHeight={1.22}
+        textAlign="center"
+        anchorX="center"
+        anchorY="middle"
+      >
+        {"ALGOHOLICS WELCOME\nNO VOMITING ALLOWED"}
+        <meshStandardMaterial
+          ref={textGlowRef}
+          color="#f6c453"
+          emissive="#d99818"
+          emissiveIntensity={1.1}
+          toneMapped={false}
+        />
       </Text>
     </group>
   );
@@ -303,6 +337,7 @@ export default function MainStreetBuilding({ building, onPointerDown, onPointerU
   const rightWindowX = width * 0.27;
   const isGas = building.id === "LB-GAS-001";
   const isPawnshop = building.id === "LB-REPAIR-001";
+  const isTavern = building.id === "LB-TAVERN-001";
   let bodyColor = building.color;
   let signText = building.name;
   let signColor = "#1f2937";
@@ -344,7 +379,7 @@ export default function MainStreetBuilding({ building, onPointerDown, onPointerU
     rightLightColor = LIGHT_DIM;
     leftIntensity = 1.1;
     rightIntensity = 0.3;
-  } else if (building.id === "LB-TAVERN-001") {
+  } else if (isTavern) {
     bodyColor = "#783f27";
     signText = "TAVERN";
     signColor = "#422006";
@@ -374,7 +409,9 @@ export default function MainStreetBuilding({ building, onPointerDown, onPointerU
 
       <FacadeBox position={[0, height + 0.2, 0]} size={[width + 0.8, 0.4, depth + 0.8]} color={roofColor} />
       <FacadeBox position={[0, 1.15, frontDoorZ]} size={[1.1, 2.3, 0.12]} color="#171717" />
-      <WarmWindow position={[leftWindowX, 2.05, frontZ]} size={[1.45, 1.25, 0.12]} color={leftLightColor} intensity={leftIntensity} />
+      {!isTavern ? (
+        <WarmWindow position={[leftWindowX, 2.05, frontZ]} size={[1.45, 1.25, 0.12]} color={leftLightColor} intensity={leftIntensity} />
+      ) : null}
       {!isPawnshop ? (
         <WarmWindow position={[rightWindowX, 2.05, frontZ]} size={[1.45, 1.25, 0.12]} color={rightLightColor} intensity={rightIntensity} />
       ) : null}
@@ -385,7 +422,8 @@ export default function MainStreetBuilding({ building, onPointerDown, onPointerU
       {building.id === "LB-HARDWARE-001" ? <Blinds x={leftWindowX} z={frontZ} /> : null}
       {building.id === "LB-HARDWARE-001" ? <HardwareJokeSign x={rightWindowX} z={frontZ} /> : null}
       {isGas ? <Blinds x={rightWindowX} z={frontZ} /> : null}
-      {building.id === "LB-TAVERN-001" ? <LowerCurtain x={rightWindowX} z={frontZ} color="#4a1726" /> : null}
+      {isTavern ? <TavernJokeSign x={leftWindowX} z={frontZ} /> : null}
+      {isTavern ? <LowerCurtain x={rightWindowX} z={frontZ} color="#4a1726" /> : null}
       {isPawnshop ? <PawnHeartSign x={rightWindowX} z={frontZ} /> : null}
 
       {!isGas ? (
@@ -428,7 +466,7 @@ export default function MainStreetBuilding({ building, onPointerDown, onPointerU
           </group>
         </>
       )}
-      {building.id === "LB-TAVERN-001" && (
+      {isTavern && (
         <>
           <FacadeBox position={[-width * 0.33, 1.65, frontZ - 0.09]} size={[0.18, 2.3, 0.18]} color="#422006" />
           <FacadeBox position={[width * 0.33, 1.65, frontZ - 0.09]} size={[0.18, 2.3, 0.18]} color="#422006" />
