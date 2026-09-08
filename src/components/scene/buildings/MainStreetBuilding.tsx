@@ -508,7 +508,7 @@ export default function MainStreetBuilding({ building, onPointerDown, onPointerU
 
       {building.id === "LB-BARBER-001" && (
         <>
-          <FacadeBox position={[0, height - 1.45, frontZ - 0.24]} size={[width * 0.78, 0.22, 0.62]} color="#b91c1c" />
+          <FacadeBox position={[0, height - 1.165, frontZ - 0.24]} size={[width * 0.78, 0.22, 0.62]} color="#b91c1c" />
           <BarberPole x={width / 2 - 0.42} z={frontZ - 0.2} />
         </>
       )}
