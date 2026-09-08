@@ -175,13 +175,13 @@ function BarberDress() {
 
 function LiquorDress() {
   return (
-    <group position={[0, 2.25, -5.82]}>
+    <group position={[0, 2.2, -5.82]}>
       <mesh>
-        <boxGeometry args={[6.6, 2.0, 0.14]} />
+        <boxGeometry args={[6.6, 2.9, 0.14]} />
         <meshStandardMaterial color="#4b2e1f" />
       </mesh>
       <Text
-        position={[0, 0, 0.09]}
+        position={[0, 0.48, 0.09]}
         fontSize={0.34}
         maxWidth={5.9}
         lineHeight={1.28}
@@ -191,6 +191,28 @@ function LiquorDress() {
         color="#f8fafc"
       >
         {"We Lied.\nWe only sell ToKillYa\nEnglish translation: Bluff Tequila"}
+      </Text>
+      <Text
+        position={[0, -0.63, 0.09]}
+        fontSize={0.36}
+        maxWidth={5.9}
+        textAlign="center"
+        anchorX="center"
+        anchorY="middle"
+        color="#22c55e"
+      >
+        $Buy ToKillYa
+      </Text>
+      <Text
+        position={[0, -1.08, 0.09]}
+        fontSize={0.36}
+        maxWidth={5.9}
+        textAlign="center"
+        anchorX="center"
+        anchorY="middle"
+        color="#ef4444"
+      >
+        Refund
       </Text>
     </group>
   );
