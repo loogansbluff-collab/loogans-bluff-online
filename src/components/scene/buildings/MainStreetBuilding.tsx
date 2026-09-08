@@ -159,8 +159,8 @@ function PawnHeartSign({ x, z }: { x: number; z: number }) {
           ♥
           <meshStandardMaterial
             ref={heartGlowRef}
-            color="#67e8f9"
-            emissive="#67e8f9"
+            color="#8A1538"
+            emissive="#8A1538"
             emissiveIntensity={1.8}
             toneMapped={false}
           />
