@@ -244,23 +244,23 @@ function LiquorDress() {
         </Text>
       </group>
 
-      <mesh position={[-3.45, 1.55, -1.45]}>
-        <planeGeometry args={[3.25, 4.1]} />
+      <mesh position={[-3.55, 1.45, -2.35]}>
+        <planeGeometry args={[2.35, 3.15]} />
         <meshBasicMaterial map={womanTexture} transparent alphaTest={0.05} />
       </mesh>
 
-      <mesh position={[-4.05, 1.45, -1.15]}>
-        <planeGeometry args={[1.9, 2.9]} />
+      <mesh position={[-2.15, 1.25, -0.95]}>
+        <planeGeometry args={[1.45, 2.25]} />
         <meshBasicMaterial map={garryTexture} transparent alphaTest={0.05} />
       </mesh>
 
-      <mesh position={[-4.05, 1.45, -3.45]}>
-        <planeGeometry args={[1.85, 2.85]} />
+      <mesh position={[-2.05, 1.4, -4.55]}>
+        <planeGeometry args={[1.55, 2.45]} />
         <meshBasicMaterial map={larryTexture} transparent alphaTest={0.05} />
       </mesh>
 
-      <mesh position={[4.05, 1.5, -3.35]}>
-        <planeGeometry args={[1.95, 3.0]} />
+      <mesh position={[2.05, 1.4, -4.55]}>
+        <planeGeometry args={[1.55, 2.45]} />
         <meshBasicMaterial map={barryTexture} transparent alphaTest={0.05} />
       </mesh>
     </>
