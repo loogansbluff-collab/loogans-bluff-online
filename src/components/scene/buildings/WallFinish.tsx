@@ -65,12 +65,12 @@ export default function WallFinish({ building }: WallFinishProps) {
     const sideSlats = Array.from({ length: 9 }, (_, i) => -depth / 2 + 0.3 + i * ((depth - 0.6) / 8));
     return (
       <group>
-        <SouthSkin width={width} height={height} depth={depth} color="#3d2530" />
-        <SideSkins width={width} height={height} depth={depth} color="#3d2530" />
-        {frontSlats.map((x) => <SkinBox key={`f-${x}`} position={[x, height / 2, frontZ]} size={[0.07, height, 0.025]} color="#26171d" />)}
+        <SouthSkin width={width} height={height} depth={depth} color="#eee9df" />
+        <SideSkins width={width} height={height} depth={depth} color="#eee9df" />
+        {frontSlats.map((x) => <SkinBox key={`f-${x}`} position={[x, height / 2, frontZ]} size={[0.07, height, 0.025]} color="#c8c0b2" />)}
         {sideSlats.flatMap((z) => [
-          <SkinBox key={`l-${z}`} position={[leftX, height / 2, z]} size={[0.025, height, 0.07]} color="#26171d" />,
-          <SkinBox key={`r-${z}`} position={[rightX, height / 2, z]} size={[0.025, height, 0.07]} color="#26171d" />,
+          <SkinBox key={`l-${z}`} position={[leftX, height / 2, z]} size={[0.025, height, 0.07]} color="#c8c0b2" />,
+          <SkinBox key={`r-${z}`} position={[rightX, height / 2, z]} size={[0.025, height, 0.07]} color="#c8c0b2" />,
         ])}
       </group>
     );
