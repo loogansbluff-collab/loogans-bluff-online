@@ -460,8 +460,8 @@ export default function MainStreetBuilding({ building, onPointerDown, onPointerU
       )}
       {isGas && (
         <>
-          <FacadeBox position={[0, height - 0.75, frontZ - 0.85]} size={[width * 0.9, 0.22, 1.7]} color="#e5e7eb" />
-          <group position={[0, height - 0.75, frontZ - 1.74]}>
+          <FacadeBox position={[0, height - 0.75, frontZ - 0.35]} size={[width * 0.9, 0.22, 0.62]} color="#e5e7eb" />
+          <group position={[0, height - 0.75, frontZ - 0.7]}>
             <StorefrontSign text={signText} width={Math.max(3.8, width * 0.78)} boardColor={signColor} textColor={signTextColor} />
           </group>
         </>
