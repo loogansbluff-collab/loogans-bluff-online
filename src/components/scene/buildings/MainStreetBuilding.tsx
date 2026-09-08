@@ -236,26 +236,26 @@ function GasWindowSign({ x, z }: { x: number; z: number }) {
   return (
     <group position={[x, 2.05, z - 0.2]}>
       <mesh>
-        <boxGeometry args={[1.34, 0.88, 0.045]} />
+        <boxGeometry args={[1.5, 1.3, 0.045]} />
         <meshStandardMaterial color="#ded5bd" roughness={0.92} />
       </mesh>
       <Text
-        position={[0, 0.18, -0.04]}
+        position={[0, 0.2, -0.04]}
         rotation={[0, Math.PI, 0]}
         fontSize={0.09}
-        maxWidth={1.18}
+        maxWidth={1.24}
         textAlign="center"
         anchorX="center"
         anchorY="middle"
       >
-        Skeeter&apos;s Gas &amp; CO
+        SKEETERS GAS & CO
         <meshStandardMaterial color="#29241f" />
       </Text>
       <Text
-        position={[0, -0.18, -0.04]}
+        position={[0, -0.2, -0.04]}
         rotation={[0, Math.PI, 0]}
-        fontSize={0.105}
-        maxWidth={1.18}
+        fontSize={0.1}
+        maxWidth={1.24}
         textAlign="center"
         anchorX="center"
         anchorY="middle"
@@ -447,7 +447,7 @@ export default function MainStreetBuilding({ building, onPointerDown, onPointerU
       {!isTavern ? (
         <WarmWindow position={[leftWindowX, 2.05, frontZ]} size={[1.45, 1.25, 0.12]} color={leftLightColor} intensity={leftIntensity} />
       ) : null}
-      {!isPawnshop ? (
+      {!isPawnshop && !isGas ? (
         <WarmWindow position={[rightWindowX, 2.05, frontZ]} size={[1.45, 1.25, 0.12]} color={rightLightColor} intensity={rightIntensity} />
       ) : null}
 
