@@ -233,6 +233,17 @@ function TavernJokeSign({ x, z }: { x: number; z: number }) {
 }
 
 function GasWindowSign({ x, z }: { x: number; z: number }) {
+  const topTextGlowRef = useRef<MeshStandardMaterial>(null);
+  const bottomTextGlowRef = useRef<MeshStandardMaterial>(null);
+
+  useFrame(({ clock }) => {
+    const pulse = (Math.sin(clock.elapsedTime * Math.PI * 1.8) + 1) / 2;
+    const intensity = 0.55 + pulse * 2.45;
+
+    if (topTextGlowRef.current) topTextGlowRef.current.emissiveIntensity = intensity;
+    if (bottomTextGlowRef.current) bottomTextGlowRef.current.emissiveIntensity = intensity;
+  });
+
   return (
     <group position={[x, 2.05, z - 0.2]}>
       <mesh>
@@ -249,7 +260,13 @@ function GasWindowSign({ x, z }: { x: number; z: number }) {
         anchorY="middle"
       >
         SKEETERS GAS & CO
-        <meshStandardMaterial color="#29241f" />
+        <meshStandardMaterial
+          ref={topTextGlowRef}
+          color="#39ff14"
+          emissive="#39ff14"
+          emissiveIntensity={1.7}
+          toneMapped={false}
+        />
       </Text>
       <Text
         position={[0, -0.2, -0.04]}
@@ -261,7 +278,13 @@ function GasWindowSign({ x, z }: { x: number; z: number }) {
         anchorY="middle"
       >
         WE Pump...Sometimes!
-        <meshStandardMaterial color="#29241f" />
+        <meshStandardMaterial
+          ref={bottomTextGlowRef}
+          color="#39ff14"
+          emissive="#39ff14"
+          emissiveIntensity={1.7}
+          toneMapped={false}
+        />
       </Text>
     </group>
   );
