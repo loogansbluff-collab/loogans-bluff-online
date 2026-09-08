@@ -125,6 +125,79 @@ function HardwareJokeSign({ x, z }: { x: number; z: number }) {
   );
 }
 
+function PawnHeartSign({ x, z }: { x: number; z: number }) {
+  const heartRef = useRef<Group>(null);
+  const heartGlowRef = useRef<MeshStandardMaterial>(null);
+
+  useFrame(({ clock }) => {
+    const pulse = (Math.sin(clock.elapsedTime * Math.PI * 2.4) + 1) / 2;
+
+    if (heartRef.current) {
+      const scale = 0.9 + pulse * 0.16;
+      heartRef.current.scale.setScalar(scale);
+    }
+
+    if (heartGlowRef.current) {
+      heartGlowRef.current.emissiveIntensity = 0.75 + pulse * 2.75;
+    }
+  });
+
+  return (
+    <group position={[x, 2.05, z - 0.2]}>
+      <mesh>
+        <boxGeometry args={[1.45, 1.25, 0.05]} />
+        <meshStandardMaterial color="#0f172a" emissive="#083344" emissiveIntensity={0.22} />
+      </mesh>
+
+      <group ref={heartRef} position={[0, 0.28, -0.045]}>
+        <Text
+          rotation={[0, Math.PI, 0]}
+          fontSize={0.42}
+          anchorX="center"
+          anchorY="middle"
+        >
+          ♥
+          <meshStandardMaterial
+            ref={heartGlowRef}
+            color="#67e8f9"
+            emissive="#67e8f9"
+            emissiveIntensity={1.8}
+            toneMapped={false}
+          />
+        </Text>
+      </group>
+
+      <Text
+        position={[0, -0.03, -0.045]}
+        rotation={[0, Math.PI, 0]}
+        fontSize={0.16}
+        maxWidth={1.16}
+        lineHeight={1.05}
+        textAlign="center"
+        anchorX="center"
+        anchorY="middle"
+      >
+        NEED CASH?
+        <meshStandardMaterial color="#67e8f9" emissive="#67e8f9" emissiveIntensity={1.15} toneMapped={false} />
+      </Text>
+
+      <Text
+        position={[0, -0.34, -0.045]}
+        rotation={[0, Math.PI, 0]}
+        fontSize={0.105}
+        maxWidth={1.16}
+        lineHeight={1.08}
+        textAlign="center"
+        anchorX="center"
+        anchorY="middle"
+      >
+        {"BRING SOMETHING\nYOU’LL MISS."}
+        <meshStandardMaterial color="#67e8f9" emissive="#67e8f9" emissiveIntensity={0.8} toneMapped={false} />
+      </Text>
+    </group>
+  );
+}
+
 function HalfCurtain({ x, z, color = "#e8dcc2" }: { x: number; z: number; color?: string }) {
   return <FacadeBox position={[x - 0.34, 2.05, z - 0.075]} size={[0.62, 1.08, 0.05]} color={color} />;
 }
@@ -229,6 +302,7 @@ export default function MainStreetBuilding({ building, onPointerDown, onPointerU
   const leftWindowX = -width * 0.27;
   const rightWindowX = width * 0.27;
   const isGas = building.id === "LB-GAS-001";
+  const isPawnshop = building.id === "LB-REPAIR-001";
   let bodyColor = building.color;
   let signText = building.name;
   let signColor = "#1f2937";
@@ -279,7 +353,7 @@ export default function MainStreetBuilding({ building, onPointerDown, onPointerU
     rightLightColor = LIGHT_MEDIUM;
     leftIntensity = 1.1;
     rightIntensity = 0.7;
-  } else if (building.id === "LB-REPAIR-001") {
+  } else if (isPawnshop) {
     bodyColor = "#475569";
     signText = "Bluff Pawnshop";
     signColor = "#1e293b";
@@ -301,7 +375,9 @@ export default function MainStreetBuilding({ building, onPointerDown, onPointerU
       <FacadeBox position={[0, height + 0.2, 0]} size={[width + 0.8, 0.4, depth + 0.8]} color={roofColor} />
       <FacadeBox position={[0, 1.15, frontDoorZ]} size={[1.1, 2.3, 0.12]} color="#171717" />
       <WarmWindow position={[leftWindowX, 2.05, frontZ]} size={[1.45, 1.25, 0.12]} color={leftLightColor} intensity={leftIntensity} />
-      <WarmWindow position={[rightWindowX, 2.05, frontZ]} size={[1.45, 1.25, 0.12]} color={rightLightColor} intensity={rightIntensity} />
+      {!isPawnshop ? (
+        <WarmWindow position={[rightWindowX, 2.05, frontZ]} size={[1.45, 1.25, 0.12]} color={rightLightColor} intensity={rightIntensity} />
+      ) : null}
 
       {building.id === "LB-BARBER-001" ? <HalfCurtain x={leftWindowX} z={frontZ} /> : null}
       {building.id === "LB-LIQUOR-001" ? <SideDrape x={rightWindowX} z={frontZ} side="right" /> : null}
@@ -310,6 +386,7 @@ export default function MainStreetBuilding({ building, onPointerDown, onPointerU
       {building.id === "LB-HARDWARE-001" ? <HardwareJokeSign x={rightWindowX} z={frontZ} /> : null}
       {isGas ? <Blinds x={rightWindowX} z={frontZ} /> : null}
       {building.id === "LB-TAVERN-001" ? <LowerCurtain x={rightWindowX} z={frontZ} color="#4a1726" /> : null}
+      {isPawnshop ? <PawnHeartSign x={rightWindowX} z={frontZ} /> : null}
 
       {!isGas ? (
         <group position={[0, height - 0.68, frontZ - 0.12]}>
@@ -356,14 +433,6 @@ export default function MainStreetBuilding({ building, onPointerDown, onPointerU
           <FacadeBox position={[-width * 0.33, 1.65, frontZ - 0.09]} size={[0.18, 2.3, 0.18]} color="#422006" />
           <FacadeBox position={[width * 0.33, 1.65, frontZ - 0.09]} size={[0.18, 2.3, 0.18]} color="#422006" />
           <FacadeBox position={[width * 0.3, height + 0.65, depth * 0.18]} size={[0.7, 0.9, 0.7]} color="#422006" />
-        </>
-      )}
-      {building.id === "LB-REPAIR-001" && (
-        <>
-          <FacadeBox position={[0, 1.75, frontZ - 0.08]} size={[width * 0.63, 3.15, 0.14]} color="#1f2937" />
-          {[-0.8, 0, 0.8].map((offset) => (
-            <FacadeBox key={offset} position={[offset, 1.75, frontZ - 0.16]} size={[0.05, 3.05, 0.05]} color="#64748b" />
-          ))}
         </>
       )}
     </group>
