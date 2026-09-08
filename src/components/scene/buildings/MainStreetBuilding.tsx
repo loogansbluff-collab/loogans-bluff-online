@@ -86,6 +86,15 @@ function PulsingNeonSign({ x, z }: { x: number; z: number }) {
 }
 
 function HardwareJokeSign({ x, z }: { x: number; z: number }) {
+  const textGlowRef = useRef<MeshStandardMaterial>(null);
+
+  useFrame(({ clock }) => {
+    if (!textGlowRef.current) return;
+    const slowPulse = (Math.sin(clock.elapsedTime * Math.PI * 2.2) + 1) / 2;
+    const flicker = Math.sin(clock.elapsedTime * 22) > 0.9 ? 0.35 : 1;
+    textGlowRef.current.emissiveIntensity = (0.25 + slowPulse * 1.9) * flicker;
+  });
+
   return (
     <group position={[x, 1.98, z - 0.22]}>
       <mesh>
@@ -102,9 +111,15 @@ function HardwareJokeSign({ x, z }: { x: number; z: number }) {
         textAlign="center"
         anchorX="center"
         anchorY="middle"
-        color="#990000"
       >
         {"We sell all kinds\nof tools, one bag\nat a time!"}
+        <meshStandardMaterial
+          ref={textGlowRef}
+          color="#990000"
+          emissive="#990000"
+          emissiveIntensity={0.9}
+          toneMapped={false}
+        />
       </Text>
     </group>
   );
