@@ -174,69 +174,96 @@ function BarberDress() {
 }
 
 function LiquorDress() {
+  const womanTexture = useTexture("/interior/woman-liquor.png");
+  const garryTexture = useTexture("/interior/garry-liquor.png");
+  const larryTexture = useTexture("/interior/larry-liquor.png");
+  const barryTexture = useTexture("/interior/barry-liquor.png");
+
   return (
-    <group position={[0, 2.05, -5.82]}>
-      <mesh>
-        <boxGeometry args={[6.6, 3.5, 0.14]} />
-        <meshStandardMaterial color="#4b2e1f" />
+    <>
+      <group position={[0, 2.05, -5.82]}>
+        <mesh>
+          <boxGeometry args={[6.6, 3.5, 0.14]} />
+          <meshStandardMaterial color="#4b2e1f" />
+        </mesh>
+        <Text
+          position={[0, 0.85, 0.09]}
+          fontSize={0.34}
+          maxWidth={5.9}
+          lineHeight={1.28}
+          textAlign="center"
+          anchorX="center"
+          anchorY="middle"
+          color="#f8fafc"
+        >
+          {"We Lied.\nWe only sell ToKillYa\nEnglish translation: Bluff Tequila"}
+        </Text>
+        <Text
+          position={[0, -0.2, 0.09]}
+          fontSize={0.24}
+          maxWidth={5.9}
+          textAlign="center"
+          anchorX="center"
+          anchorY="middle"
+          color="#f8fafc"
+        >
+          0.1 SOL worth of $LOOGANS
+        </Text>
+        <Text
+          position={[0, -0.62, 0.09]}
+          fontSize={0.22}
+          maxWidth={5.9}
+          textAlign="center"
+          anchorX="center"
+          anchorY="middle"
+          color="#f8fafc"
+        >
+          Connect Phantom wallet to:
+        </Text>
+        <Text
+          position={[0, -1.08, 0.09]}
+          fontSize={0.36}
+          maxWidth={5.9}
+          textAlign="center"
+          anchorX="center"
+          anchorY="middle"
+          color="#22c55e"
+        >
+          $Buy ToKillYa
+        </Text>
+        <Text
+          position={[0, -1.48, 0.09]}
+          fontSize={0.36}
+          maxWidth={5.9}
+          textAlign="center"
+          anchorX="center"
+          anchorY="middle"
+          color="#ef4444"
+        >
+          Refund
+        </Text>
+      </group>
+
+      <mesh position={[-3.45, 1.55, -1.45]}>
+        <planeGeometry args={[3.25, 4.1]} />
+        <meshBasicMaterial map={womanTexture} transparent alphaTest={0.05} />
       </mesh>
-      <Text
-        position={[0, 0.85, 0.09]}
-        fontSize={0.34}
-        maxWidth={5.9}
-        lineHeight={1.28}
-        textAlign="center"
-        anchorX="center"
-        anchorY="middle"
-        color="#f8fafc"
-      >
-        {"We Lied.\nWe only sell ToKillYa\nEnglish translation: Bluff Tequila"}
-      </Text>
-      <Text
-        position={[0, -0.2, 0.09]}
-        fontSize={0.24}
-        maxWidth={5.9}
-        textAlign="center"
-        anchorX="center"
-        anchorY="middle"
-        color="#f8fafc"
-      >
-        0.1 SOL worth of $LOOGANS
-      </Text>
-      <Text
-        position={[0, -0.62, 0.09]}
-        fontSize={0.22}
-        maxWidth={5.9}
-        textAlign="center"
-        anchorX="center"
-        anchorY="middle"
-        color="#f8fafc"
-      >
-        Connect Phantom wallet to:
-      </Text>
-      <Text
-        position={[0, -1.08, 0.09]}
-        fontSize={0.36}
-        maxWidth={5.9}
-        textAlign="center"
-        anchorX="center"
-        anchorY="middle"
-        color="#22c55e"
-      >
-        $Buy ToKillYa
-      </Text>
-      <Text
-        position={[0, -1.48, 0.09]}
-        fontSize={0.36}
-        maxWidth={5.9}
-        textAlign="center"
-        anchorX="center"
-        anchorY="middle"
-        color="#ef4444"
-      >
-        Refund
-      </Text>
-    </group>
+
+      <mesh position={[-4.0, 1.55, 1.25]}>
+        <planeGeometry args={[2.55, 3.75]} />
+        <meshBasicMaterial map={garryTexture} transparent alphaTest={0.05} />
+      </mesh>
+
+      <mesh position={[3.05, 1.55, -3.35]}>
+        <planeGeometry args={[2.45, 3.55]} />
+        <meshBasicMaterial map={larryTexture} transparent alphaTest={0.05} />
+      </mesh>
+
+      <mesh position={[4.0, 1.55, -1.35]}>
+        <planeGeometry args={[2.45, 3.75]} />
+        <meshBasicMaterial map={barryTexture} transparent alphaTest={0.05} />
+      </mesh>
+    </>
   );
 }
 
