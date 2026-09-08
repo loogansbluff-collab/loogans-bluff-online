@@ -235,13 +235,18 @@ function TavernJokeSign({ x, z }: { x: number; z: number }) {
 function GasWindowSign({ x, z }: { x: number; z: number }) {
   const topTextGlowRef = useRef<MeshStandardMaterial>(null);
   const bottomTextGlowRef = useRef<MeshStandardMaterial>(null);
+  const topTextGroupRef = useRef<Group>(null);
+  const bottomTextGroupRef = useRef<Group>(null);
 
   useFrame(({ clock }) => {
     const pulse = (Math.sin(clock.elapsedTime * Math.PI * 1.8) + 1) / 2;
-    const intensity = 0.55 + pulse * 2.45;
+    const intensity = 0.2 + pulse * 4.8;
+    const scale = 0.96 + pulse * 0.08;
 
     if (topTextGlowRef.current) topTextGlowRef.current.emissiveIntensity = intensity;
     if (bottomTextGlowRef.current) bottomTextGlowRef.current.emissiveIntensity = intensity;
+    if (topTextGroupRef.current) topTextGroupRef.current.scale.setScalar(scale);
+    if (bottomTextGroupRef.current) bottomTextGroupRef.current.scale.setScalar(scale);
   });
 
   return (
@@ -250,42 +255,44 @@ function GasWindowSign({ x, z }: { x: number; z: number }) {
         <boxGeometry args={[1.5, 1.3, 0.045]} />
         <meshStandardMaterial color="#ded5bd" roughness={0.92} />
       </mesh>
-      <Text
-        position={[0, 0.2, -0.04]}
-        rotation={[0, Math.PI, 0]}
-        fontSize={0.09}
-        maxWidth={1.24}
-        textAlign="center"
-        anchorX="center"
-        anchorY="middle"
-      >
-        SKEETERS GAS & CO
-        <meshStandardMaterial
-          ref={topTextGlowRef}
-          color="#39ff14"
-          emissive="#39ff14"
-          emissiveIntensity={1.7}
-          toneMapped={false}
-        />
-      </Text>
-      <Text
-        position={[0, -0.2, -0.04]}
-        rotation={[0, Math.PI, 0]}
-        fontSize={0.1}
-        maxWidth={1.24}
-        textAlign="center"
-        anchorX="center"
-        anchorY="middle"
-      >
-        WE Pump...Sometimes!
-        <meshStandardMaterial
-          ref={bottomTextGlowRef}
-          color="#39ff14"
-          emissive="#39ff14"
-          emissiveIntensity={1.7}
-          toneMapped={false}
-        />
-      </Text>
+      <group ref={topTextGroupRef} position={[0, 0.2, -0.04]}>
+        <Text
+          rotation={[0, Math.PI, 0]}
+          fontSize={0.09}
+          maxWidth={1.24}
+          textAlign="center"
+          anchorX="center"
+          anchorY="middle"
+        >
+          SKEETERS GAS & CO
+          <meshStandardMaterial
+            ref={topTextGlowRef}
+            color="#39ff14"
+            emissive="#39ff14"
+            emissiveIntensity={1.7}
+            toneMapped={false}
+          />
+        </Text>
+      </group>
+      <group ref={bottomTextGroupRef} position={[0, -0.2, -0.04]}>
+        <Text
+          rotation={[0, Math.PI, 0]}
+          fontSize={0.1}
+          maxWidth={1.24}
+          textAlign="center"
+          anchorX="center"
+          anchorY="middle"
+        >
+          WE Pump...Sometimes!
+          <meshStandardMaterial
+            ref={bottomTextGlowRef}
+            color="#39ff14"
+            emissive="#39ff14"
+            emissiveIntensity={1.7}
+            toneMapped={false}
+          />
+        </Text>
+      </group>
     </group>
   );
 }
