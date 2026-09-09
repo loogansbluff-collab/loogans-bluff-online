@@ -79,12 +79,12 @@ export default function CommunityHallBuilding({
           </Text>
         </group>
 
-        <group position={[0, height + 1.2, 0]}>
+        <group position={[0, height + 0.55, 0]}>
           <mesh>
-            <boxGeometry args={[16.5, 1.85, 0.34]} />
+            <boxGeometry args={[16.5, 1.35, 0.34]} />
             <meshStandardMaterial color="#171717" />
           </mesh>
-          <Text position={[0, 0, 0.19]} fontSize={0.78} maxWidth={15.6} textAlign="center" anchorX="center" anchorY="middle" color="#f8fafc">
+          <Text position={[0, 0, 0.19]} fontSize={0.64} maxWidth={15.6} textAlign="center" anchorX="center" anchorY="middle" color="#f8fafc">
             COMMUNITY HALL
           </Text>
         </group>
