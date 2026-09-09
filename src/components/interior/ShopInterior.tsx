@@ -267,10 +267,130 @@ function LiquorDress() {
   );
 }
 
+function HardwareDress() {
+  return (
+    <>
+      <group position={[0, 2.05, -5.82]}>
+        <mesh>
+          <boxGeometry args={[6.6, 3.5, 0.14]} />
+          <meshStandardMaterial color="#3f3a32" />
+        </mesh>
+        <Text
+          position={[0, 0.88, 0.09]}
+          fontSize={0.34}
+          maxWidth={5.9}
+          lineHeight={1.2}
+          textAlign="center"
+          anchorX="center"
+          anchorY="middle"
+          color="#f8fafc"
+        >
+          {"WE SELL ALL KINDS OF TOOLS\nSome even function."}
+        </Text>
+        <Text
+          position={[0, -0.15, 0.09]}
+          fontSize={0.24}
+          maxWidth={5.9}
+          textAlign="center"
+          anchorX="center"
+          anchorY="middle"
+          color="#f8fafc"
+        >
+          0.1 SOL worth of $LOOGANS
+        </Text>
+        <Text
+          position={[0, -0.58, 0.09]}
+          fontSize={0.22}
+          maxWidth={5.9}
+          textAlign="center"
+          anchorX="center"
+          anchorY="middle"
+          color="#f8fafc"
+        >
+          Connect Phantom wallet to:
+        </Text>
+        <Text
+          position={[0, -1.05, 0.09]}
+          fontSize={0.36}
+          maxWidth={5.9}
+          textAlign="center"
+          anchorX="center"
+          anchorY="middle"
+          color="#22c55e"
+        >
+          $Buy Toolbag
+        </Text>
+        <Text
+          position={[0, -1.45, 0.09]}
+          fontSize={0.36}
+          maxWidth={5.9}
+          textAlign="center"
+          anchorX="center"
+          anchorY="middle"
+          color="#ef4444"
+        >
+          Refund
+        </Text>
+      </group>
+
+      <group position={[4.35, 0, -0.6]}>
+        <mesh position={[0, 0.92, 0]}>
+          <boxGeometry args={[0.9, 0.18, 3.4]} />
+          <meshStandardMaterial color="#8b5e3c" />
+        </mesh>
+        <mesh position={[-0.32, 0.43, -1.25]}>
+          <boxGeometry args={[0.18, 0.86, 0.18]} />
+          <meshStandardMaterial color="#5b4636" />
+        </mesh>
+        <mesh position={[-0.32, 0.43, 1.25]}>
+          <boxGeometry args={[0.18, 0.86, 0.18]} />
+          <meshStandardMaterial color="#5b4636" />
+        </mesh>
+        <mesh position={[0.32, 0.43, -1.25]}>
+          <boxGeometry args={[0.18, 0.86, 0.18]} />
+          <meshStandardMaterial color="#5b4636" />
+        </mesh>
+        <mesh position={[0.32, 0.43, 1.25]}>
+          <boxGeometry args={[0.18, 0.86, 0.18]} />
+          <meshStandardMaterial color="#5b4636" />
+        </mesh>
+      </group>
+
+      <group position={[-4.84, 2.0, -1.25]} rotation={[0, Math.PI / 2, 0]}>
+        <mesh>
+          <boxGeometry args={[3.5, 2.4, 0.12]} />
+          <meshStandardMaterial color="#8a7b68" />
+        </mesh>
+        <mesh position={[-0.9, 0.35, 0.12]}>
+          <boxGeometry args={[0.18, 1.25, 0.16]} />
+          <meshStandardMaterial color="#6b7280" />
+        </mesh>
+        <mesh position={[-0.55, 0.78, 0.12]}>
+          <boxGeometry args={[0.85, 0.22, 0.16]} />
+          <meshStandardMaterial color="#374151" />
+        </mesh>
+        <mesh position={[0.45, 0.12, 0.12]} rotation={[0, 0, -0.55]}>
+          <boxGeometry args={[0.22, 1.35, 0.16]} />
+          <meshStandardMaterial color="#6b7280" />
+        </mesh>
+        <mesh position={[0.78, 0.62, 0.12]} rotation={[0, 0, -0.55]}>
+          <boxGeometry args={[0.7, 0.24, 0.16]} />
+          <meshStandardMaterial color="#374151" />
+        </mesh>
+        <mesh position={[1.15, -0.52, 0.12]}>
+          <boxGeometry args={[0.22, 0.9, 0.16]} />
+          <meshStandardMaterial color="#6b7280" />
+        </mesh>
+      </group>
+    </>
+  );
+}
+
 export default function ShopInterior() {
   const interiorId = useGameStore((state) => state.interiorId);
   const isBarber = interiorId === "LB-BARBER-001";
   const isLiquor = interiorId === "LB-LIQUOR-001";
+  const isHardware = interiorId === "LB-HARDWARE-001";
   const wallColor = isBarber ? "#f3ead7" : "#d6d3d1";
   const floorColor = "#78716c";
   const ceilingColor = "#e7e5e4";
@@ -327,6 +447,7 @@ export default function ShopInterior() {
 
       {isBarber ? <BarberDress /> : null}
       {isLiquor ? <LiquorDress /> : null}
+      {isHardware ? <HardwareDress /> : null}
 
       <InteriorControls />
     </>
