@@ -6,37 +6,6 @@ import type { Group } from "three";
 import { townData } from "@/data/town";
 import { isSouthTreeLotId } from "@/lib/southDecor";
 
-function Crow({ position, rotation = [0, 0, 0], scale = 1 }: { position: [number, number, number]; rotation?: [number, number, number]; scale?: number }) {
-  return (
-    <group position={position} rotation={rotation} scale={scale}>
-      <mesh>
-        <sphereGeometry args={[0.16, 8, 6]} />
-        <meshStandardMaterial color="#080808" />
-      </mesh>
-      <mesh position={[0.14, 0.11, 0]}>
-        <sphereGeometry args={[0.11, 8, 6]} />
-        <meshStandardMaterial color="#050505" />
-      </mesh>
-      <mesh position={[0.27, 0.1, 0]} rotation={[0, 0, -Math.PI / 2]}>
-        <coneGeometry args={[0.045, 0.18, 5]} />
-        <meshStandardMaterial color="#242424" />
-      </mesh>
-      <mesh position={[-0.1, -0.02, 0]} rotation={[0, 0, 0.35]}>
-        <coneGeometry args={[0.12, 0.28, 5]} />
-        <meshStandardMaterial color="#0b0b0b" />
-      </mesh>
-      <mesh position={[-0.05, -0.17, -0.05]}>
-        <boxGeometry args={[0.025, 0.19, 0.025]} />
-        <meshStandardMaterial color="#111111" />
-      </mesh>
-      <mesh position={[0.03, -0.17, 0.05]}>
-        <boxGeometry args={[0.025, 0.19, 0.025]} />
-        <meshStandardMaterial color="#111111" />
-      </mesh>
-    </group>
-  );
-}
-
 function FlyingBird({ position, scale = 1 }: { position: [number, number, number]; scale?: number }) {
   return (
     <group position={position} scale={scale}>
@@ -134,16 +103,8 @@ function SouthTree({ index, position }: { index: number; position: [number, numb
               <coneGeometry args={[1.08, height, 8]} />
               <meshStandardMaterial color={foliageColor} />
             </mesh>
-            <mesh position={[0.34 * branchSide, -0.36, 0.14]} scale={[0.72, 0.68, 0.72]}>
-              <coneGeometry args={[0.95, height * 0.82, 7]} />
-              <meshStandardMaterial color={index % 2 === 0 ? "#3b7742" : "#2b6337"} />
-            </mesh>
           </group>
         )}
-
-        {index === 1 ? <Crow position={[0.78, 2.45, 0.02]} rotation={[0, -0.45, 0]} scale={1.05} /> : null}
-        {index === 5 ? <Crow position={[-0.72, 2.72, 0.02]} rotation={[0, 0.55, 0]} scale={1.12} /> : null}
-        {index === 7 ? <Crow position={[0.45, 3.05, 0.05]} rotation={[0, -0.2, 0]} scale={0.95} /> : null}
       </group>
     </group>
   );
