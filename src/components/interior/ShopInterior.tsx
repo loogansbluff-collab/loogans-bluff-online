@@ -338,6 +338,74 @@ function HardwareDress() {
           <meshStandardMaterial color="#6b7280" />
         </mesh>
       </group>
+
+      <group position={[-4.3, 0, 0]}>
+        <mesh position={[0, 0.52, -3.65]}>
+          <cylinderGeometry args={[0.28, 0.28, 0.72, 16]} />
+          <meshStandardMaterial color="#6b7280" />
+        </mesh>
+        <mesh position={[0, 1.56, -2.55]} rotation={[0.08, 0, 0.12]}>
+          <boxGeometry args={[0.16, 0.18, 1.55]} />
+          <meshStandardMaterial color="#d6b64c" />
+        </mesh>
+        <mesh position={[0, 0.42, -1.35]}>
+          <boxGeometry args={[0.72, 0.78, 0.62]} />
+          <meshStandardMaterial color="#8b7355" />
+        </mesh>
+      </group>
+
+      <group position={[4.3, 0, 0]}>
+        <mesh position={[0, 0.44, -3.7]}>
+          <cylinderGeometry args={[0.25, 0.25, 0.62, 16]} />
+          <meshStandardMaterial color="#e7e5e4" />
+        </mesh>
+        <mesh position={[0, 0.44, -3.15]}>
+          <cylinderGeometry args={[0.25, 0.25, 0.62, 16]} />
+          <meshStandardMaterial color="#f5f5f4" />
+        </mesh>
+        <mesh position={[0, 1.35, -2.0]}>
+          <boxGeometry args={[0.18, 2.25, 1.1]} />
+          <meshStandardMaterial color="#9a6b45" />
+        </mesh>
+        <mesh position={[-0.11, 1.35, -1.7]} rotation={[0, 0, Math.PI / 2]}>
+          <cylinderGeometry args={[0.11, 0.11, 0.06, 16]} />
+          <meshStandardMaterial color="#2f2a26" />
+        </mesh>
+        <group position={[0, 1.85, -0.55]}>
+          <mesh position={[0, 0.62, 0]}><boxGeometry args={[0.12, 0.12, 1.25]} /><meshStandardMaterial color="#5b4636" /></mesh>
+          <mesh position={[0, -0.62, 0]}><boxGeometry args={[0.12, 0.12, 1.25]} /><meshStandardMaterial color="#5b4636" /></mesh>
+          <mesh position={[0, 0, -0.56]}><boxGeometry args={[0.12, 1.12, 0.12]} /><meshStandardMaterial color="#5b4636" /></mesh>
+          <mesh position={[0, 0, 0.56]}><boxGeometry args={[0.12, 1.12, 0.12]} /><meshStandardMaterial color="#5b4636" /></mesh>
+        </group>
+      </group>
+
+      {[
+        [-3.72, 1.0, -3.65, "Assorted. Mostly tetanus."],
+        [-3.72, 1.92, -2.55, "This one is decorative."],
+        [-3.72, 0.98, -1.35, "One bag at a time."],
+        [3.72, 0.98, -3.42, "Close enough to white."],
+        [3.72, 2.72, -2.0, "You supply the house."],
+        [3.72, 2.72, -0.55, "Position available. Bring tools."],
+      ].map(([x, y, z, label]) => (
+        <group key={label as string} position={[x as number, y as number, z as number]}>
+          <mesh>
+            <boxGeometry args={[0.9, 0.28, 0.05]} />
+            <meshStandardMaterial color="#f5e7c8" />
+          </mesh>
+          <Text
+            position={[0, 0, 0.03]}
+            fontSize={0.085}
+            maxWidth={0.8}
+            lineHeight={1.06}
+            textAlign="center"
+            anchorX="center"
+            anchorY="middle"
+            color="#1f2937"
+          >
+            {label as string}
+          </Text>
+        </group>
+      ))}
     </>
   );
 }
