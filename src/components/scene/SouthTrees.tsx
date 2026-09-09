@@ -25,7 +25,6 @@ function SouthTree({ index, position }: { index: number; position: [number, numb
   const swayAmount = 0.018 + (index % 3) * 0.006;
   const foliageColor = ["#2f6b3b", "#3f7b46", "#285d34", "#477f49"][index % 4];
   const isBroadleaf = index === 2 || index === 6;
-  const isSplitPine = index === 3 || index === 7;
 
   useFrame(({ clock }) => {
     if (!swayRef.current) return;
@@ -50,17 +49,6 @@ function SouthTree({ index, position }: { index: number; position: [number, numb
             <LeafClump position={[0.52, 0.12, 0.05]} scale={[1.05, 1.12, 1.0]} color="#4d884d" />
             <LeafClump position={[0, 0.65, -0.05]} scale={[1.12, 1.18, 1.08]} color="#39743f" />
             <LeafClump position={[0.05, -0.42, 0.08]} scale={[1.25, 0.9, 1.08]} color="#326b3a" />
-          </group>
-        ) : isSplitPine ? (
-          <group position={[0, crownY, 0]}>
-            <mesh position={[-0.38, -0.15, 0]} rotation={[0, 0, 0.08]}>
-              <coneGeometry args={[0.9, height * 0.92, 7]} />
-              <meshStandardMaterial color={foliageColor} />
-            </mesh>
-            <mesh position={[0.48, 0.18, 0]} rotation={[0, 0, -0.11]}>
-              <coneGeometry args={[0.78, height * 0.78, 7]} />
-              <meshStandardMaterial color="#356f3d" />
-            </mesh>
           </group>
         ) : (
           <group position={[0, crownY, 0]} scale={[crownScale, 1, crownScale]}>
