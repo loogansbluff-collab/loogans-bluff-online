@@ -85,7 +85,7 @@ export default function TownBusinessBuilding({ building, onPointerDown, onPointe
   return (
     <group position={[x, 0, z]} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
       <mesh position={[0, height / 2, 0]}><boxGeometry args={[width, height, depth]} /><meshStandardMaterial color={profile.wall} /></mesh>
-      <mesh position={[0, height + 0.09, 0]}><boxGeometry args={[width + 0.28, 0.18, depth + 0.28]} /><meshStandardMaterial color={profile.trim} /></mesh>
+      <mesh position={[0, height + 0.09, 0]}><boxGeometry args={[width + 0.28, 0.18, depth + 0.28]} /><meshStandardMaterial color="#111111" /></mesh>
       {profile.feature === "police" ? <><mesh position={[-0.42, height + 0.18, 0]}><boxGeometry args={[0.55, 0.18, 0.35]} /><meshStandardMaterial color="#2563eb" emissive="#1d4ed8" emissiveIntensity={0.6} /></mesh><mesh position={[0.42, height + 0.18, 0]}><boxGeometry args={[0.55, 0.18, 0.35]} /><meshStandardMaterial color="#dc2626" emissive="#b91c1c" emissiveIntensity={0.6} /></mesh></> : null}
 
       <group rotation={[0, faceNorth ? Math.PI : 0, 0]}>
