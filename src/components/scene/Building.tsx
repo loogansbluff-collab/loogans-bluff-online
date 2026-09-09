@@ -54,6 +54,18 @@ const TOWN_BUSINESS_IDS = new Set([
   "LB-AUTOPARTS-001",
   "LB-TIRE-001",
   "LB-CARWASH-001",
+  "LB-USEDCAR-001",
+  "LB-TAXI-001",
+  "LB-BUSDEPOT-001",
+  "LB-HOTEL-001",
+  "LB-INSURANCE-001",
+  "LB-ACCOUNTANT-001",
+  "LB-LAWYER-001",
+  "LB-NEWSPAPER-001",
+  "LB-RADIO-001",
+  "LB-JEWELRY-001",
+  "LB-FLORIST-001",
+  "LB-PHOTO-001",
 ]);
 
 export default function Building({ building }: { building: BuildingData }) {

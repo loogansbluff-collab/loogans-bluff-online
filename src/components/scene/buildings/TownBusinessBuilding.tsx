@@ -35,11 +35,15 @@ const UNDER_CONSTRUCTION_IDS = new Set([
   "LB-FUNERAL-001", "LB-LAUNDRY-001", "LB-BAKERY-001", "LB-COFFEE-001", "LB-PIZZA-001", "LB-BURGER-001",
   "LB-ICECREAM-001", "LB-CHINESE-001", "LB-BUTCHER-001", "LB-CLOTHING-001", "LB-SHOE-001", "LB-FURNITURE-001",
   "LB-APPLIANCE-001", "LB-ELECTRONICS-001", "LB-OUTDOOR-001", "LB-AUTOPARTS-001", "LB-TIRE-001", "LB-CARWASH-001",
+  "LB-USEDCAR-001", "LB-TAXI-001", "LB-BUSDEPOT-001", "LB-HOTEL-001", "LB-INSURANCE-001", "LB-ACCOUNTANT-001",
+  "LB-LAWYER-001", "LB-NEWSPAPER-001", "LB-RADIO-001", "LB-JEWELRY-001", "LB-FLORIST-001", "LB-PHOTO-001",
 ]);
 
 function rowFacesNorth(z: number) {
-  if (z <= -50) return false;
-  if (z <= -37) return true;
+  if (z < 0) {
+    const phase = ((-z - 12) % 32 + 32) % 32;
+    return phase < 8 || phase > 24;
+  }
   const rowIndex = Math.round((32 - z) / 16);
   return Math.abs(rowIndex) % 2 === 1;
 }
