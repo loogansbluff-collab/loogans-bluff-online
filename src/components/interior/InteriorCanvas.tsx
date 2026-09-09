@@ -2,10 +2,15 @@
 
 import { Canvas } from "@react-three/fiber";
 import ShopInterior from "@/components/interior/ShopInterior";
+import TavernDress from "@/components/interior/TavernDress";
+import { useGameStore } from "@/state/gameStore";
 
 const INTERIOR_CAMERA: [number, number, number] = [0, 1.7, 3.5];
 
 export default function InteriorCanvas() {
+  const interiorId = useGameStore((state) => state.interiorId);
+  const isTavern = interiorId === "LB-TAVERN-001";
+
   return (
     <Canvas
       camera={{ position: INTERIOR_CAMERA, fov: 70, near: 0.1, far: 100 }}
@@ -13,6 +18,7 @@ export default function InteriorCanvas() {
     >
       <color attach="background" args={["#111827"]} />
       <ShopInterior />
+      {isTavern ? <TavernDress /> : null}
     </Canvas>
   );
 }
