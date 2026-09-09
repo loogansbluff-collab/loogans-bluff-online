@@ -1,4 +1,5 @@
 import townJson from "./town.json";
+import { isSouthTreeLotId } from "@/lib/southDecor";
 
 export type TownType = "business" | "government" | "home" | "barn" | "lot";
 export type TownStatus = "coming_soon" | "for_sale_coming_soon";
@@ -76,11 +77,17 @@ const NORTH_EXPANSION_ROADS: RoadData[] = [
   { id: "LB-ROAD-EW-003", position: [0, 0.02, -19], size: [66, 0.04, 3] },
 ];
 
+const OUTER_RING_ROADS: RoadData[] = [
+  { id: "LB-ROAD-OUTER-W-001", position: [-34, 0.02, 0], size: [3, 0.04, 78] },
+  { id: "LB-ROAD-OUTER-E-001", position: [34, 0.02, 0], size: [3, 0.04, 78] },
+  { id: "LB-ROAD-OUTER-N-001", position: [0, 0.02, -39], size: [68, 0.04, 3] },
+];
+
 const rawTown = townJson as TownData;
 
 export const townData: TownData = {
   ...rawTown,
-  roads: [...rawTown.roads, ...NORTH_EXPANSION_ROADS],
+  roads: [...rawTown.roads, ...NORTH_EXPANSION_ROADS, ...OUTER_RING_ROADS],
   buildings: [
     ...rawTown.buildings.map((building) => {
       const override = BUSINESS_OVERRIDES[building.id];
@@ -88,4 +95,5 @@ export const townData: TownData = {
     }),
     ...NORTH_EXPANSION_BUILDINGS,
   ],
+  lots: rawTown.lots.filter((lot) => isSouthTreeLotId(lot.id)),
 };
