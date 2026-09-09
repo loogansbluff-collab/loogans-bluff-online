@@ -114,6 +114,7 @@ const NORTH_EXPANSION_BUILDINGS: BuildingData[] = [
   { id: "LB-DONUTS-001", name: "Bluff Donuts", type: "business", status: "coming_soon", owner: null, position: [25, 0, -140.5], size: [4.3, 3.7, 5.0], color: "#8a6b72", description: "Future Bluff Donuts." },
   { id: "LB-CHICKEN-001", name: "Chicken Shack", type: "business", status: "coming_soon", owner: null, position: [-5, 0, -153.95], size: [5.2, 4.2, 5.9], color: "#8a7048", description: "Future chicken shack." },
   { id: "LB-FISH-001", name: "Fish & Chips", type: "business", status: "coming_soon", owner: null, position: [5, 0, -153.7], size: [4.6, 4.0, 5.4], color: "#587889", description: "Future fish and chips shop." },
+  { id: "LB-COMMUNITY-001", name: "Community Hall", type: "business", status: "coming_soon", owner: null, position: [0, 0, -184], size: [18, 11, 10], color: "#6b7075", description: "Future Loogans Bluff Community Hall." },
 ];
 
 const NORTH_EXPANSION_ROADS: RoadData[] = [
@@ -128,21 +129,21 @@ const NORTH_EXPANSION_ROADS: RoadData[] = [
   { id: "LB-ALLEY-006", position: [0, 0.025, -132.5], size: [58, 0.03, 1.6] },
   { id: "LB-ROAD-EW-007", position: [0, 0.02, -147], size: [66, 0.04, 3] },
   { id: "LB-ROAD-NS-NORTH-001", position: [0, 0.02, -99.5], size: [3, 0.04, 121] },
-  { id: "LB-ROAD-OUTER-W-NORTH-001", position: [-34, 0.02, -99.5], size: [3, 0.04, 121] },
-  { id: "LB-ROAD-OUTER-E-NORTH-001", position: [34, 0.02, -99.5], size: [3, 0.04, 121] },
+  { id: "LB-ROAD-OUTER-W-NORTH-001", position: [-34, 0.02, -117], size: [3, 0.04, 156] },
+  { id: "LB-ROAD-OUTER-E-NORTH-001", position: [34, 0.02, -117], size: [3, 0.04, 156] },
 ];
 
 const OUTER_RING_ROADS: RoadData[] = [
   { id: "LB-ROAD-OUTER-W-001", position: [-34, 0.02, 0], size: [3, 0.04, 78] },
   { id: "LB-ROAD-OUTER-E-001", position: [34, 0.02, 0], size: [3, 0.04, 78] },
-  { id: "LB-ROAD-OUTER-N-001", position: [0, 0.02, -160], size: [68, 0.04, 3] },
+  { id: "LB-ROAD-OUTER-N-001", position: [0, 0.02, -195], size: [68, 0.04, 3] },
 ];
 
 const rawTown = townJson as TownData;
 
 export const townData: TownData = {
   ...rawTown,
-  groundSize: 330,
+  groundSize: 396,
   roads: [...rawTown.roads, ...NORTH_EXPANSION_ROADS, ...OUTER_RING_ROADS],
   buildings: [
     ...rawTown.buildings.map((building) => {

@@ -9,7 +9,7 @@ import { useGameStore } from "@/state/gameStore";
 
 const LANDING_TARGET: [number, number, number] = [0, 0, 32];
 const PAN_X_LIMIT = 36;
-const NORTH_TARGET_Z = -162;
+const NORTH_TARGET_Z = -197;
 const SOUTH_TARGET_Z = 32;
 const CAMERA_HEIGHT = 14;
 const CAMERA_SOUTH_OFFSET = 38;

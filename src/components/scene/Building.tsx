@@ -6,6 +6,7 @@ import type { BuildingData } from "@/data/town";
 import { enterStreetInFront } from "@/lib/enterBuildingStreet";
 import { useGameStore } from "@/state/gameStore";
 import DoorWalkway from "@/components/scene/DoorWalkway";
+import CommunityHallBuilding from "@/components/scene/buildings/CommunityHallBuilding";
 import MainStreetBuilding from "@/components/scene/buildings/MainStreetBuilding";
 import TownBusinessBuilding from "@/components/scene/buildings/TownBusinessBuilding";
 
@@ -94,6 +95,7 @@ export default function Building({ building }: { building: BuildingData }) {
   const [x, , z] = building.position;
   const [width, height, depth] = building.size;
   const isMainStreet = MAIN_STREET_IDS.has(building.id);
+  const isCommunityHall = building.id === "LB-COMMUNITY-001";
   const isTownBusiness = TOWN_BUSINESS_IDS.has(building.id);
 
   const onPointerDown = (event: ThreeEvent<PointerEvent>) => {
@@ -120,6 +122,8 @@ export default function Building({ building }: { building: BuildingData }) {
 
       {isMainStreet ? (
         <MainStreetBuilding building={building} onPointerDown={onPointerDown} onPointerUp={onPointerUp} />
+      ) : isCommunityHall ? (
+        <CommunityHallBuilding building={building} onPointerDown={onPointerDown} onPointerUp={onPointerUp} />
       ) : isTownBusiness ? (
         <TownBusinessBuilding building={building} onPointerDown={onPointerDown} onPointerUp={onPointerUp} />
       ) : (
