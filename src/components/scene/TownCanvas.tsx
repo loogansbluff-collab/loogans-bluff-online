@@ -11,6 +11,7 @@ import Building from "@/components/scene/Building";
 import Lot from "@/components/scene/Lot";
 import Roads from "@/components/scene/Roads";
 import SouthTrees from "@/components/scene/SouthTrees";
+import PerimeterDecor from "@/components/scene/PerimeterDecor";
 import SpawnMarker from "@/components/scene/SpawnMarker";
 import AerialControls from "@/components/scene/AerialControls";
 import StreetControls from "@/components/scene/StreetControls";
@@ -48,6 +49,7 @@ function TownScene() {
       <Ground size={townData.groundSize} />
       <Roads />
       <SouthTrees />
+      <PerimeterDecor />
       <SpawnMarker />
       {townData.buildings.map((building) => (
         <Building key={building.id} building={building} />
