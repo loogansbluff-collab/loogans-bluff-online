@@ -39,7 +39,6 @@ export default function Building({ building }: { building: BuildingData }) {
   const [width, height, depth] = building.size;
   const isMainStreet = MAIN_STREET_IDS.has(building.id);
   const isTownBusiness = TOWN_BUSINESS_IDS.has(building.id);
-  const hasDetailedFront = isMainStreet || isTownBusiness;
 
   const onPointerDown = (event: ThreeEvent<PointerEvent>) => {
     event.stopPropagation();
@@ -61,7 +60,7 @@ export default function Building({ building }: { building: BuildingData }) {
         <meshStandardMaterial color="#262626" />
       </mesh>
 
-      {hasDetailedFront ? <DoorWalkway building={building} /> : null}
+      {isMainStreet ? <DoorWalkway building={building} /> : null}
 
       {isMainStreet ? (
         <MainStreetBuilding building={building} onPointerDown={onPointerDown} onPointerUp={onPointerUp} />

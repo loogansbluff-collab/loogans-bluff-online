@@ -30,6 +30,13 @@ const PROFILES: Record<string, Profile> = {
   "LB-HOME-004": { wall: "#b65f62", trim: "#f6d6d7", door: "#6b2f33", sign: "LOOGANS MOTEL", signColor: "#fde68a", feature: "motel" },
 };
 
+// Main Street is row 0 at z ~= 32 and faces south. Each row north flips.
+// The ~16-unit row spacing also correctly classifies the existing z=18 and z=2 rows.
+function rowFacesNorth(z: number) {
+  const rowIndex = Math.round((32 - z) / 16);
+  return Math.abs(rowIndex) % 2 === 1;
+}
+
 function Window({ x, y, z, width = 1.15, bars = false }: { x: number; y: number; z: number; width?: number; bars?: boolean }) {
   return (
     <group position={[x, y, z]}>
@@ -56,14 +63,6 @@ function Window({ x, y, z, width = 1.15, bars = false }: { x: number; y: number;
 }
 
 function SpecialFeature({ feature, width, height, frontZ }: { feature?: Profile["feature"]; width: number; height: number; frontZ: number }) {
-  if (feature === "police") {
-    return (
-      <>
-        <mesh position={[-0.42, height + 0.18, 0]}><boxGeometry args={[0.55, 0.18, 0.35]} /><meshStandardMaterial color="#2563eb" emissive="#1d4ed8" emissiveIntensity={0.6} /></mesh>
-        <mesh position={[0.42, height + 0.18, 0]}><boxGeometry args={[0.55, 0.18, 0.35]} /><meshStandardMaterial color="#dc2626" emissive="#b91c1c" emissiveIntensity={0.6} /></mesh>
-      </>
-    );
-  }
   if (feature === "medical") {
     return (
       <group position={[width * 0.33, height * 0.72, frontZ + 0.08]}>
@@ -132,6 +131,7 @@ export default function TownBusinessBuilding({
   const windowX = -width * 0.22;
   const secondWindowX = width > 4.2 ? -width * 0.38 : -width * 0.2;
   const barred = profile.feature === "bail" || profile.feature === "police";
+  const faceNorth = rowFacesNorth(z);
 
   return (
     <group position={[x, 0, z]} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
@@ -145,60 +145,69 @@ export default function TownBusinessBuilding({
         <meshStandardMaterial color={profile.trim} />
       </mesh>
 
-      <mesh position={[doorX, 1.15, frontZ]}>
-        <boxGeometry args={[0.92, 2.3, 0.1]} />
-        <meshStandardMaterial color={profile.door} />
-      </mesh>
-      <mesh position={[doorX + 0.28, 1.15, frontZ + 0.065]}>
-        <sphereGeometry args={[0.055, 10, 10]} />
-        <meshStandardMaterial color="#d6b36a" />
-      </mesh>
+      {profile.feature === "police" ? (
+        <>
+          <mesh position={[-0.42, height + 0.18, 0]}><boxGeometry args={[0.55, 0.18, 0.35]} /><meshStandardMaterial color="#2563eb" emissive="#1d4ed8" emissiveIntensity={0.6} /></mesh>
+          <mesh position={[0.42, height + 0.18, 0]}><boxGeometry args={[0.55, 0.18, 0.35]} /><meshStandardMaterial color="#dc2626" emissive="#b91c1c" emissiveIntensity={0.6} /></mesh>
+        </>
+      ) : null}
 
-      <Window x={windowX} y={height * 0.48} z={frontZ} width={Math.min(1.35, width * 0.3)} bars={barred} />
-      {width >= 5 ? <Window x={secondWindowX} y={height * 0.48} z={frontZ} width={1.05} bars={barred} /> : null}
-
-      <mesh position={[0, height * 0.82, frontZ + 0.04]}>
-        <boxGeometry args={[Math.min(width * 0.9, 5.5), 0.72, 0.09]} />
-        <meshStandardMaterial color="#252525" />
-      </mesh>
-      <Text
-        position={[0, height * 0.82, frontZ + 0.1]}
-        fontSize={Math.min(0.32, width / Math.max(profile.sign.length, 12) * 0.95)}
-        maxWidth={Math.min(width * 0.82, 5.1)}
-        textAlign="center"
-        anchorX="center"
-        anchorY="middle"
-        color={profile.signColor ?? "#f8fafc"}
-      >
-        {profile.sign}
-      </Text>
-
-      {profile.awning ? (
-        <mesh position={[0, height * 0.63, frontZ + 0.38]} rotation={[0.18, 0, 0]}>
-          <boxGeometry args={[width * 0.9, 0.12, 0.8]} />
-          <meshStandardMaterial color={profile.awning} />
+      <group rotation={[0, faceNorth ? Math.PI : 0, 0]}>
+        <mesh position={[doorX, 1.15, frontZ]}>
+          <boxGeometry args={[0.92, 2.3, 0.1]} />
+          <meshStandardMaterial color={profile.door} />
         </mesh>
-      ) : null}
-
-      {profile.feature === "realty" ? (
-        <group position={[-width * 0.24, height * 0.42, frontZ + 0.11]}>
-          {[-0.35, 0, 0.35].map((dx, index) => (
-            <mesh key={dx} position={[dx, index % 2 ? -0.22 : 0.2, 0]}>
-              <boxGeometry args={[0.28, 0.34, 0.035]} />
-              <meshStandardMaterial color="#f5f5dc" />
-            </mesh>
-          ))}
-        </group>
-      ) : null}
-
-      {profile.feature === "diner" ? (
-        <mesh position={[-width * 0.28, 0.92, frontZ + 0.07]}>
-          <boxGeometry args={[width * 0.42, 1.35, 0.08]} />
-          <meshStandardMaterial color="#a8d4de" emissive="#79aebb" emissiveIntensity={0.12} />
+        <mesh position={[doorX + 0.28, 1.15, frontZ + 0.065]}>
+          <sphereGeometry args={[0.055, 10, 10]} />
+          <meshStandardMaterial color="#d6b36a" />
         </mesh>
-      ) : null}
 
-      <SpecialFeature feature={profile.feature} width={width} height={height} frontZ={frontZ} />
+        <Window x={windowX} y={height * 0.48} z={frontZ} width={Math.min(1.35, width * 0.3)} bars={barred} />
+        {width >= 5 ? <Window x={secondWindowX} y={height * 0.48} z={frontZ} width={1.05} bars={barred} /> : null}
+
+        <mesh position={[0, height * 0.82, frontZ + 0.04]}>
+          <boxGeometry args={[Math.min(width * 0.9, 5.5), 0.72, 0.09]} />
+          <meshStandardMaterial color="#252525" />
+        </mesh>
+        <Text
+          position={[0, height * 0.82, frontZ + 0.1]}
+          fontSize={Math.min(0.32, width / Math.max(profile.sign.length, 12) * 0.95)}
+          maxWidth={Math.min(width * 0.82, 5.1)}
+          textAlign="center"
+          anchorX="center"
+          anchorY="middle"
+          color={profile.signColor ?? "#f8fafc"}
+        >
+          {profile.sign}
+        </Text>
+
+        {profile.awning ? (
+          <mesh position={[0, height * 0.63, frontZ + 0.38]} rotation={[0.18, 0, 0]}>
+            <boxGeometry args={[width * 0.9, 0.12, 0.8]} />
+            <meshStandardMaterial color={profile.awning} />
+          </mesh>
+        ) : null}
+
+        {profile.feature === "realty" ? (
+          <group position={[-width * 0.24, height * 0.42, frontZ + 0.11]}>
+            {[-0.35, 0, 0.35].map((dx, index) => (
+              <mesh key={dx} position={[dx, index % 2 ? -0.22 : 0.2, 0]}>
+                <boxGeometry args={[0.28, 0.34, 0.035]} />
+                <meshStandardMaterial color="#f5f5dc" />
+              </mesh>
+            ))}
+          </group>
+        ) : null}
+
+        {profile.feature === "diner" ? (
+          <mesh position={[-width * 0.28, 0.92, frontZ + 0.07]}>
+            <boxGeometry args={[width * 0.42, 1.35, 0.08]} />
+            <meshStandardMaterial color="#a8d4de" emissive="#79aebb" emissiveIntensity={0.12} />
+          </mesh>
+        ) : null}
+
+        <SpecialFeature feature={profile.feature} width={width} height={height} frontZ={frontZ} />
+      </group>
     </group>
   );
 }
