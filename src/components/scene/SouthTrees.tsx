@@ -6,25 +6,6 @@ import type { Group } from "three";
 import { townData } from "@/data/town";
 import { isSouthTreeLotId } from "@/lib/southDecor";
 
-function FlyingBird({ position, scale = 1 }: { position: [number, number, number]; scale?: number }) {
-  return (
-    <group position={position} scale={scale}>
-      <mesh position={[-0.18, 0, 0]} rotation={[0, 0, -0.55]}>
-        <boxGeometry args={[0.38, 0.045, 0.055]} />
-        <meshStandardMaterial color="#151515" />
-      </mesh>
-      <mesh position={[0.18, 0, 0]} rotation={[0, 0, 0.55]}>
-        <boxGeometry args={[0.38, 0.045, 0.055]} />
-        <meshStandardMaterial color="#151515" />
-      </mesh>
-      <mesh>
-        <sphereGeometry args={[0.08, 6, 5]} />
-        <meshStandardMaterial color="#181818" />
-      </mesh>
-    </group>
-  );
-}
-
 function LeafClump({ position, scale, color }: { position: [number, number, number]; scale: [number, number, number]; color: string }) {
   return (
     <mesh position={position} scale={scale}>
@@ -42,7 +23,6 @@ function SouthTree({ index, position }: { index: number; position: [number, numb
   const lean = ((index % 5) - 2) * 0.018;
   const phase = index * 0.83;
   const swayAmount = 0.018 + (index % 3) * 0.006;
-  const branchSide = index % 2 === 0 ? 1 : -1;
   const foliageColor = ["#2f6b3b", "#3f7b46", "#285d34", "#477f49"][index % 4];
   const isBroadleaf = index === 2 || index === 6;
   const isSplitPine = index === 3 || index === 7;
@@ -63,21 +43,6 @@ function SouthTree({ index, position }: { index: number; position: [number, numb
           <cylinderGeometry args={[0.18, 0.27, trunkHeight, 8]} />
           <meshStandardMaterial color={index % 2 === 0 ? "#5b3a24" : "#6a4428"} />
         </mesh>
-
-        <mesh position={[0.5 * branchSide, 1.18, 0]} rotation={[0, 0, branchSide * -0.92]}>
-          <cylinderGeometry args={[0.07, 0.1, 1.05, 6]} />
-          <meshStandardMaterial color="#5b3a24" />
-        </mesh>
-        <mesh position={[-0.42 * branchSide, 1.48, 0.08]} rotation={[0.18, 0, branchSide * 1.02]}>
-          <cylinderGeometry args={[0.055, 0.085, 0.88, 6]} />
-          <meshStandardMaterial color="#5b3a24" />
-        </mesh>
-        {index % 3 === 0 ? (
-          <mesh position={[0.18, 1.72, -0.12]} rotation={[0.55, 0.25, -0.55]}>
-            <cylinderGeometry args={[0.045, 0.07, 0.72, 6]} />
-            <meshStandardMaterial color="#5b3a24" />
-          </mesh>
-        ) : null}
 
         {isBroadleaf ? (
           <group position={[0, crownY + 0.15, 0]}>
@@ -119,10 +84,6 @@ export default function SouthTrees() {
         const [x, , z] = lot.position;
         return <SouthTree key={lot.id} index={index} position={[x, 0, z]} />;
       })}
-
-      <FlyingBird position={[-11.5, 4.25, 39.5]} scale={1.25} />
-      <FlyingBird position={[-10.3, 4.75, 39.0]} scale={0.95} />
-      <FlyingBird position={[10.8, 4.35, 40.2]} scale={1.15} />
     </group>
   );
 }
