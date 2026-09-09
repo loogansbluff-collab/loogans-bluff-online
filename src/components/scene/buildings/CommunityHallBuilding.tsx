@@ -1,7 +1,10 @@
 "use client";
 
 import { Text } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber";
 import type { ThreeEvent } from "@react-three/fiber";
+import { useRef } from "react";
+import type { Group } from "three";
 import type { BuildingData } from "@/data/town";
 
 type Handler = (event: ThreeEvent<PointerEvent>) => void;
@@ -23,6 +26,13 @@ export default function CommunityHallBuilding({
   const [x, , z] = building.position;
   const [width, height, depth] = building.size;
   const frontZ = depth / 2 + 0.055;
+  const warningRef = useRef<Group>(null);
+
+  useFrame(({ clock }) => {
+    if (!warningRef.current) return;
+    const pulse = 1 + Math.sin(clock.elapsedTime * 3.2) * 0.035;
+    warningRef.current.scale.set(pulse, pulse, 1);
+  });
 
   return (
     <group>
@@ -76,6 +86,26 @@ export default function CommunityHallBuilding({
           </mesh>
           <Text position={[0, 0, 0.04]} fontSize={0.18} maxWidth={2.35} lineHeight={1.12} textAlign="center" anchorX="center" anchorY="middle" color="#1f2937">
             {"UNDER CONSTRUCTION\ncheck back soon"}
+          </Text>
+        </group>
+
+        <group ref={warningRef} position={[0, 9.75, frontZ + 0.16]}>
+          <mesh>
+            <boxGeometry args={[16.8, 1.05, 0.07]} />
+            <meshStandardMaterial color="#101820" emissive="#0b3d91" emissiveIntensity={0.22} />
+          </mesh>
+          <Text
+            position={[0, 0, 0.06]}
+            fontSize={0.52}
+            maxWidth={15.9}
+            textAlign="center"
+            anchorX="center"
+            anchorY="middle"
+            color="#38bdf8"
+            outlineWidth={0.025}
+            outlineColor="#0b3d91"
+          >
+            COMMUNITY CENTER ENTER AT OWN RISK
           </Text>
         </group>
 
