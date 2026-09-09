@@ -352,6 +352,35 @@ function HardwareDress() {
           <boxGeometry args={[0.72, 0.78, 0.62]} />
           <meshStandardMaterial color="#8b7355" />
         </mesh>
+
+        <mesh position={[0, 2.75, -3.45]} rotation={[0, 0, -0.35]}>
+          <boxGeometry args={[0.12, 0.12, 1.25]} />
+          <meshStandardMaterial color="#6b7280" />
+        </mesh>
+        <mesh position={[0, 2.55, -2.9]} rotation={[0, 0, 0.2]}>
+          <boxGeometry args={[0.12, 0.9, 0.12]} />
+          <meshStandardMaterial color="#b91c1c" />
+        </mesh>
+        <mesh position={[0, 2.42, -2.35]} rotation={[0, 0, -0.15]}>
+          <cylinderGeometry args={[0.08, 0.08, 1.15, 10]} />
+          <meshStandardMaterial color="#64748b" />
+        </mesh>
+
+        <group position={[0, 1.55, -0.55]}>
+          <mesh><boxGeometry args={[0.72, 0.95, 0.08]} /><meshStandardMaterial color="#8b5e3c" /></mesh>
+          <mesh position={[0, 0.08, 0.06]}><boxGeometry args={[0.58, 0.72, 0.03]} /><meshStandardMaterial color="#f5f5dc" /></mesh>
+        </group>
+
+        <group position={[0, 0.4, 0.35]}>
+          <mesh position={[0, 0.18, -0.28]}><boxGeometry args={[0.7, 0.36, 0.55]} /><meshStandardMaterial color="#9a3412" /></mesh>
+          <mesh position={[0, 0.18, 0.3]}><boxGeometry args={[0.7, 0.36, 0.55]} /><meshStandardMaterial color="#b45309" /></mesh>
+          <mesh position={[0, 0.54, 0]}><boxGeometry args={[0.7, 0.36, 0.55]} /><meshStandardMaterial color="#c2410c" /></mesh>
+        </group>
+
+        <group position={[0, 1.65, 1.35]}>
+          <mesh rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[0.34, 0.06, 10, 24]} /><meshStandardMaterial color="#111827" /></mesh>
+          <mesh position={[0, 0.02, 0.04]} rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[0.22, 0.05, 10, 24]} /><meshStandardMaterial color="#111827" /></mesh>
+        </group>
       </group>
 
       <group position={[4.3, 0, 0]}>
@@ -377,6 +406,26 @@ function HardwareDress() {
           <mesh position={[0, 0, -0.56]}><boxGeometry args={[0.12, 1.12, 0.12]} /><meshStandardMaterial color="#5b4636" /></mesh>
           <mesh position={[0, 0, 0.56]}><boxGeometry args={[0.12, 1.12, 0.12]} /><meshStandardMaterial color="#5b4636" /></mesh>
         </group>
+
+        <mesh position={[0, 0.45, -4.2]}><cylinderGeometry args={[0.23, 0.23, 0.58, 16]} /><meshStandardMaterial color="#d6d3d1" /></mesh>
+        <mesh position={[0, 0.45, -3.75]}><cylinderGeometry args={[0.23, 0.23, 0.58, 16]} /><meshStandardMaterial color="#e7e5e4" /></mesh>
+        <mesh position={[0, 0.45, -3.3]}><cylinderGeometry args={[0.23, 0.23, 0.58, 16]} /><meshStandardMaterial color="#cfc6b8" /></mesh>
+
+        <group position={[0, 2.65, -2.8]} rotation={[0, Math.PI / 2, 0]}>
+          <mesh rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[0.38, 0.09, 12, 28]} /><meshStandardMaterial color="#f5f5f4" /></mesh>
+        </group>
+
+        <mesh position={[0, 0.52, 0.55]}><boxGeometry args={[0.82, 0.9, 0.7]} /><meshStandardMaterial color="#475569" /></mesh>
+        <mesh position={[0, 0.74, 0.92]}><boxGeometry args={[0.48, 0.3, 0.04]} /><meshStandardMaterial color="#0f172a" /></mesh>
+
+        <group position={[0, 2.15, 1.75]}>
+          <mesh position={[0, 0.72, 0]}><boxGeometry args={[0.12, 0.12, 1.5]} /><meshStandardMaterial color="#a8a29e" /></mesh>
+          <mesh position={[0, 0.24, 0]}><boxGeometry args={[0.12, 0.12, 1.5]} /><meshStandardMaterial color="#a8a29e" /></mesh>
+          <mesh position={[0, -0.24, 0]}><boxGeometry args={[0.12, 0.12, 1.5]} /><meshStandardMaterial color="#a8a29e" /></mesh>
+          <mesh position={[0, -0.72, 0]}><boxGeometry args={[0.12, 0.12, 1.5]} /><meshStandardMaterial color="#a8a29e" /></mesh>
+          <mesh position={[0, 0, -0.62]}><boxGeometry args={[0.12, 1.58, 0.12]} /><meshStandardMaterial color="#78716c" /></mesh>
+          <mesh position={[0, 0, 0.62]}><boxGeometry args={[0.12, 1.58, 0.12]} /><meshStandardMaterial color="#78716c" /></mesh>
+        </group>
       </group>
 
       {[
@@ -386,6 +435,13 @@ function HardwareDress() {
         [3.72, 0.98, -3.42, "Close enough to white."],
         [3.72, 2.72, -2.0, "You supply the house."],
         [3.72, 2.72, -0.55, "Position available. Bring tools."],
+        [-3.72, 2.05, -0.55, "Safety meeting. Nobody came."],
+        [-3.72, 1.12, 0.35, "Load-bearing. Emotionally."],
+        [-3.72, 2.08, 1.35, "Pre-tangled. Saves time."],
+        [3.72, 1.02, -3.75, "Beige. Beiger. Illegal beige."],
+        [3.72, 3.15, -2.8, "Aisle 3. Don't ask."],
+        [3.72, 1.08, 0.55, "Sucks. That's the point."],
+        [3.72, 3.18, 1.75, "Falls included."],
       ].map(([x, y, z, label]) => (
         <group key={label as string} position={[x as number, y as number, z as number]}>
           <mesh>
