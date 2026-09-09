@@ -31,23 +31,15 @@ const PROFILES: Record<string, Profile> = {
 };
 
 const UNDER_CONSTRUCTION_IDS = new Set([
-  "LB-GROCERY-001",
-  "LB-PHARMACY-001",
-  "LB-FIREHALL-001",
-  "LB-POST-001",
-  "LB-DENTIST-001",
-  "LB-VET-001",
-  "LB-FUNERAL-001",
-  "LB-LAUNDRY-001",
-  "LB-BAKERY-001",
-  "LB-COFFEE-001",
-  "LB-PIZZA-001",
-  "LB-BURGER-001",
+  "LB-GROCERY-001", "LB-PHARMACY-001", "LB-FIREHALL-001", "LB-POST-001", "LB-DENTIST-001", "LB-VET-001",
+  "LB-FUNERAL-001", "LB-LAUNDRY-001", "LB-BAKERY-001", "LB-COFFEE-001", "LB-PIZZA-001", "LB-BURGER-001",
+  "LB-ICECREAM-001", "LB-CHINESE-001", "LB-BUTCHER-001", "LB-CLOTHING-001", "LB-SHOE-001", "LB-FURNITURE-001",
+  "LB-APPLIANCE-001", "LB-ELECTRONICS-001", "LB-OUTDOOR-001", "LB-AUTOPARTS-001", "LB-TIRE-001", "LB-CARWASH-001",
 ]);
 
-// Main Street is row 0 at z ~= 32 and faces south. Each row north flips.
-// The ~16-unit row spacing also correctly classifies the existing z=18 and z=2 rows.
 function rowFacesNorth(z: number) {
+  if (z <= -50) return false;
+  if (z <= -37) return true;
   const rowIndex = Math.round((32 - z) / 16);
   return Math.abs(rowIndex) % 2 === 1;
 }
@@ -55,23 +47,11 @@ function rowFacesNorth(z: number) {
 function Window({ x, y, z, width = 1.15, bars = false }: { x: number; y: number; z: number; width?: number; bars?: boolean }) {
   return (
     <group position={[x, y, z]}>
-      <mesh>
-        <boxGeometry args={[width, 1.15, 0.08]} />
-        <meshStandardMaterial color="#8fb5c7" emissive="#6b91a3" emissiveIntensity={0.16} />
-      </mesh>
-      <mesh position={[0, 0, 0.055]}>
-        <boxGeometry args={[0.055, 1.15, 0.035]} />
-        <meshStandardMaterial color="#ddd6ca" />
-      </mesh>
-      <mesh position={[0, 0, 0.055]}>
-        <boxGeometry args={[width, 0.055, 0.035]} />
-        <meshStandardMaterial color="#ddd6ca" />
-      </mesh>
+      <mesh><boxGeometry args={[width, 1.15, 0.08]} /><meshStandardMaterial color="#8fb5c7" emissive="#6b91a3" emissiveIntensity={0.16} /></mesh>
+      <mesh position={[0, 0, 0.055]}><boxGeometry args={[0.055, 1.15, 0.035]} /><meshStandardMaterial color="#ddd6ca" /></mesh>
+      <mesh position={[0, 0, 0.055]}><boxGeometry args={[width, 0.055, 0.035]} /><meshStandardMaterial color="#ddd6ca" /></mesh>
       {bars ? [-0.35, 0, 0.35].map((bx) => (
-        <mesh key={bx} position={[bx * width, 0, 0.09]}>
-          <boxGeometry args={[0.045, 1.15, 0.04]} />
-          <meshStandardMaterial color="#27272a" />
-        </mesh>
+        <mesh key={bx} position={[bx * width, 0, 0.09]}><boxGeometry args={[0.045, 1.15, 0.04]} /><meshStandardMaterial color="#27272a" /></mesh>
       )) : null}
     </group>
   );
@@ -79,68 +59,21 @@ function Window({ x, y, z, width = 1.15, bars = false }: { x: number; y: number;
 
 function SpecialFeature({ feature, width, height, frontZ }: { feature?: Profile["feature"]; width: number; height: number; frontZ: number }) {
   if (feature === "medical") {
-    return (
-      <group position={[width * 0.33, height * 0.72, frontZ + 0.08]}>
-        <mesh><boxGeometry args={[0.24, 0.95, 0.08]} /><meshStandardMaterial color="#dc2626" /></mesh>
-        <mesh><boxGeometry args={[0.95, 0.24, 0.08]} /><meshStandardMaterial color="#dc2626" /></mesh>
-      </group>
-    );
+    return <group position={[width * 0.33, height * 0.72, frontZ + 0.08]}><mesh><boxGeometry args={[0.24, 0.95, 0.08]} /><meshStandardMaterial color="#dc2626" /></mesh><mesh><boxGeometry args={[0.95, 0.24, 0.08]} /><meshStandardMaterial color="#dc2626" /></mesh></group>;
   }
   if (feature === "townhall" || feature === "bank") {
-    return (
-      <>
-        {[-width * 0.34, width * 0.34].map((x) => (
-          <mesh key={x} position={[x, height * 0.43, frontZ + 0.18]}>
-            <cylinderGeometry args={[0.18, 0.22, height * 0.72, 12]} />
-            <meshStandardMaterial color="#e7dfd2" />
-          </mesh>
-        ))}
-      </>
-    );
+    return <>{[-width * 0.34, width * 0.34].map((x) => <mesh key={x} position={[x, height * 0.43, frontZ + 0.18]}><cylinderGeometry args={[0.18, 0.22, height * 0.72, 12]} /><meshStandardMaterial color="#e7dfd2" /></mesh>)}</>;
   }
-  if (feature === "auto") {
-    return (
-      <mesh position={[-width * 0.16, 1.25, frontZ + 0.07]}>
-        <boxGeometry args={[width * 0.52, 2.25, 0.08]} />
-        <meshStandardMaterial color="#555b61" />
-      </mesh>
-    );
-  }
-  if (feature === "feed") {
-    return (
-      <mesh position={[-width * 0.18, 1.35, frontZ + 0.07]}>
-        <boxGeometry args={[width * 0.5, 2.5, 0.08]} />
-        <meshStandardMaterial color="#5b4635" />
-      </mesh>
-    );
-  }
-  if (feature === "motel") {
-    return (
-      <Text position={[width * 0.28, height * 0.55, frontZ + 0.12]} fontSize={0.28} color="#fde047" anchorX="center" anchorY="middle">
-        VACANCY
-      </Text>
-    );
-  }
+  if (feature === "auto") return <mesh position={[-width * 0.16, 1.25, frontZ + 0.07]}><boxGeometry args={[width * 0.52, 2.25, 0.08]} /><meshStandardMaterial color="#555b61" /></mesh>;
+  if (feature === "feed") return <mesh position={[-width * 0.18, 1.35, frontZ + 0.07]}><boxGeometry args={[width * 0.5, 2.5, 0.08]} /><meshStandardMaterial color="#5b4635" /></mesh>;
+  if (feature === "motel") return <Text position={[width * 0.28, height * 0.55, frontZ + 0.12]} fontSize={0.28} color="#fde047" anchorX="center" anchorY="middle">VACANCY</Text>;
   return null;
 }
 
-export default function TownBusinessBuilding({
-  building,
-  onPointerDown,
-  onPointerUp,
-}: {
-  building: BuildingData;
-  onPointerDown: Handler;
-  onPointerUp: Handler;
-}) {
+export default function TownBusinessBuilding({ building, onPointerDown, onPointerUp }: { building: BuildingData; onPointerDown: Handler; onPointerUp: Handler; }) {
   const [x, , z] = building.position;
   const [width, height, depth] = building.size;
-  const profile = PROFILES[building.id] ?? {
-    wall: building.color,
-    trim: "#d6d3d1",
-    door: "#3f3f46",
-    sign: building.name,
-  };
+  const profile = PROFILES[building.id] ?? { wall: building.color, trim: "#d6d3d1", door: "#3f3f46", sign: building.name };
   const frontZ = depth / 2 + 0.055;
   const doorX = width > 4.5 ? width * 0.28 : width * 0.25;
   const windowX = -width * 0.22;
@@ -151,98 +84,29 @@ export default function TownBusinessBuilding({
 
   return (
     <group position={[x, 0, z]} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
-      <mesh position={[0, height / 2, 0]}>
-        <boxGeometry args={[width, height, depth]} />
-        <meshStandardMaterial color={profile.wall} />
-      </mesh>
-
-      <mesh position={[0, height + 0.09, 0]}>
-        <boxGeometry args={[width + 0.28, 0.18, depth + 0.28]} />
-        <meshStandardMaterial color={profile.trim} />
-      </mesh>
-
-      {profile.feature === "police" ? (
-        <>
-          <mesh position={[-0.42, height + 0.18, 0]}><boxGeometry args={[0.55, 0.18, 0.35]} /><meshStandardMaterial color="#2563eb" emissive="#1d4ed8" emissiveIntensity={0.6} /></mesh>
-          <mesh position={[0.42, height + 0.18, 0]}><boxGeometry args={[0.55, 0.18, 0.35]} /><meshStandardMaterial color="#dc2626" emissive="#b91c1c" emissiveIntensity={0.6} /></mesh>
-        </>
-      ) : null}
+      <mesh position={[0, height / 2, 0]}><boxGeometry args={[width, height, depth]} /><meshStandardMaterial color={profile.wall} /></mesh>
+      <mesh position={[0, height + 0.09, 0]}><boxGeometry args={[width + 0.28, 0.18, depth + 0.28]} /><meshStandardMaterial color={profile.trim} /></mesh>
+      {profile.feature === "police" ? <><mesh position={[-0.42, height + 0.18, 0]}><boxGeometry args={[0.55, 0.18, 0.35]} /><meshStandardMaterial color="#2563eb" emissive="#1d4ed8" emissiveIntensity={0.6} /></mesh><mesh position={[0.42, height + 0.18, 0]}><boxGeometry args={[0.55, 0.18, 0.35]} /><meshStandardMaterial color="#dc2626" emissive="#b91c1c" emissiveIntensity={0.6} /></mesh></> : null}
 
       <group rotation={[0, faceNorth ? Math.PI : 0, 0]}>
-        <mesh position={[doorX, 1.15, frontZ]}>
-          <boxGeometry args={[0.92, 2.3, 0.1]} />
-          <meshStandardMaterial color={profile.door} />
-        </mesh>
-        <mesh position={[doorX + 0.28, 1.15, frontZ + 0.065]}>
-          <sphereGeometry args={[0.055, 10, 10]} />
-          <meshStandardMaterial color="#d6b36a" />
-        </mesh>
-
+        <mesh position={[doorX, 1.15, frontZ]}><boxGeometry args={[0.92, 2.3, 0.1]} /><meshStandardMaterial color={profile.door} /></mesh>
+        <mesh position={[doorX + 0.28, 1.15, frontZ + 0.065]}><sphereGeometry args={[0.055, 10, 10]} /><meshStandardMaterial color="#d6b36a" /></mesh>
         <Window x={windowX} y={height * 0.48} z={frontZ} width={Math.min(1.35, width * 0.3)} bars={barred} />
         {width >= 5 ? <Window x={secondWindowX} y={height * 0.48} z={frontZ} width={1.05} bars={barred} /> : null}
 
-        <mesh position={[0, height * 0.82, frontZ + 0.04]}>
-          <boxGeometry args={[Math.min(width * 0.9, 5.5), 0.72, 0.09]} />
-          <meshStandardMaterial color="#252525" />
-        </mesh>
-        <Text
-          position={[0, height * 0.82, frontZ + 0.1]}
-          fontSize={Math.min(0.32, width / Math.max(profile.sign.length, 12) * 0.95)}
-          maxWidth={Math.min(width * 0.82, 5.1)}
-          textAlign="center"
-          anchorX="center"
-          anchorY="middle"
-          color={profile.signColor ?? "#f8fafc"}
-        >
-          {profile.sign}
-        </Text>
+        <mesh position={[0, height * 0.82, frontZ + 0.04]}><boxGeometry args={[Math.min(width * 0.9, 5.5), 0.72, 0.09]} /><meshStandardMaterial color="#252525" /></mesh>
+        <Text position={[0, height * 0.82, frontZ + 0.1]} fontSize={Math.min(0.32, width / Math.max(profile.sign.length, 12) * 0.95)} maxWidth={Math.min(width * 0.82, 5.1)} textAlign="center" anchorX="center" anchorY="middle" color={profile.signColor ?? "#f8fafc"}>{profile.sign}</Text>
 
         {underConstruction ? (
           <group position={[0, height * 0.34, frontZ + 0.12]}>
-            <mesh>
-              <boxGeometry args={[2.25, 0.72, 0.05]} />
-              <meshStandardMaterial color="#f5e7c8" />
-            </mesh>
-            <Text
-              position={[0, 0, 0.035]}
-              fontSize={0.16}
-              maxWidth={2.0}
-              lineHeight={1.12}
-              textAlign="center"
-              anchorX="center"
-              anchorY="middle"
-              color="#1f2937"
-            >
-              {"UNDER CONSTRUCTION\ncheck back soon"}
-            </Text>
+            <mesh><boxGeometry args={[2.25, 0.72, 0.05]} /><meshStandardMaterial color="#f5e7c8" /></mesh>
+            <Text position={[0, 0, 0.035]} fontSize={0.16} maxWidth={2.0} lineHeight={1.12} textAlign="center" anchorX="center" anchorY="middle" color="#1f2937">{"UNDER CONSTRUCTION\ncheck back soon"}</Text>
           </group>
         ) : null}
 
-        {profile.awning ? (
-          <mesh position={[0, height * 0.63, frontZ + 0.38]} rotation={[0.18, 0, 0]}>
-            <boxGeometry args={[width * 0.9, 0.12, 0.8]} />
-            <meshStandardMaterial color={profile.awning} />
-          </mesh>
-        ) : null}
-
-        {profile.feature === "realty" ? (
-          <group position={[-width * 0.24, height * 0.42, frontZ + 0.11]}>
-            {[-0.35, 0, 0.35].map((dx, index) => (
-              <mesh key={dx} position={[dx, index % 2 ? -0.22 : 0.2, 0]}>
-                <boxGeometry args={[0.28, 0.34, 0.035]} />
-                <meshStandardMaterial color="#f5f5dc" />
-              </mesh>
-            ))}
-          </group>
-        ) : null}
-
-        {profile.feature === "diner" ? (
-          <mesh position={[-width * 0.28, 0.92, frontZ + 0.07]}>
-            <boxGeometry args={[width * 0.42, 1.35, 0.08]} />
-            <meshStandardMaterial color="#a8d4de" emissive="#79aebb" emissiveIntensity={0.12} />
-          </mesh>
-        ) : null}
-
+        {profile.awning ? <mesh position={[0, height * 0.63, frontZ + 0.38]} rotation={[0.18, 0, 0]}><boxGeometry args={[width * 0.9, 0.12, 0.8]} /><meshStandardMaterial color={profile.awning} /></mesh> : null}
+        {profile.feature === "realty" ? <group position={[-width * 0.24, height * 0.42, frontZ + 0.11]}>{[-0.35, 0, 0.35].map((dx, index) => <mesh key={dx} position={[dx, index % 2 ? -0.22 : 0.2, 0]}><boxGeometry args={[0.28, 0.34, 0.035]} /><meshStandardMaterial color="#f5f5dc" /></mesh>)}</group> : null}
+        {profile.feature === "diner" ? <mesh position={[-width * 0.28, 0.92, frontZ + 0.07]}><boxGeometry args={[width * 0.42, 1.35, 0.08]} /><meshStandardMaterial color="#a8d4de" emissive="#79aebb" emissiveIntensity={0.12} /></mesh> : null}
         <SpecialFeature feature={profile.feature} width={width} height={height} frontZ={frontZ} />
       </group>
     </group>

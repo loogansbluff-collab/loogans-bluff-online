@@ -70,11 +70,28 @@ const NORTH_EXPANSION_BUILDINGS: BuildingData[] = [
   { id: "LB-COFFEE-001", name: "Coffee Shop", type: "business", status: "coming_soon", owner: null, position: [5, 0, -29], size: [5, 3.5, 4], color: "#705a46", description: "Future coffee shop." },
   { id: "LB-PIZZA-001", name: "Pizza Shop", type: "business", status: "coming_soon", owner: null, position: [15, 0, -29], size: [5, 3.5, 4], color: "#8a5b45", description: "Future pizza shop." },
   { id: "LB-BURGER-001", name: "Burger Joint", type: "business", status: "coming_soon", owner: null, position: [25, 0, -29], size: [5, 3.5, 4], color: "#806447", description: "Future burger joint." },
+  { id: "LB-ICECREAM-001", name: "Ice Cream Shop", type: "business", status: "coming_soon", owner: null, position: [-25, 0, -45], size: [5, 3.5, 4], color: "#9b7f91", description: "Future ice cream shop." },
+  { id: "LB-CHINESE-001", name: "Chinese Takeout", type: "business", status: "coming_soon", owner: null, position: [-15, 0, -45], size: [5, 3.5, 4], color: "#8c5c54", description: "Future Chinese takeout." },
+  { id: "LB-BUTCHER-001", name: "Butcher Shop", type: "business", status: "coming_soon", owner: null, position: [-5, 0, -45], size: [5, 3.5, 4], color: "#7a4d4d", description: "Future butcher shop." },
+  { id: "LB-CLOTHING-001", name: "Clothing Store", type: "business", status: "coming_soon", owner: null, position: [5, 0, -45], size: [5, 3.5, 4], color: "#6d6b8c", description: "Future clothing store." },
+  { id: "LB-SHOE-001", name: "Shoe Store", type: "business", status: "coming_soon", owner: null, position: [15, 0, -45], size: [5, 3.5, 4], color: "#74685a", description: "Future shoe store." },
+  { id: "LB-FURNITURE-001", name: "Furniture Store", type: "business", status: "coming_soon", owner: null, position: [25, 0, -45], size: [5, 3.7, 4], color: "#78664e", description: "Future furniture store." },
+  { id: "LB-APPLIANCE-001", name: "Appliance Store", type: "business", status: "coming_soon", owner: null, position: [-25, 0, -56], size: [5, 3.6, 3.6], color: "#687782", description: "Future appliance store." },
+  { id: "LB-ELECTRONICS-001", name: "Electronics Store", type: "business", status: "coming_soon", owner: null, position: [-15, 0, -56], size: [5, 3.6, 3.6], color: "#59677f", description: "Future electronics store." },
+  { id: "LB-OUTDOOR-001", name: "Outdoor Store", type: "business", status: "coming_soon", owner: null, position: [-5, 0, -56], size: [5, 3.6, 3.6], color: "#627152", description: "Future outdoor store." },
+  { id: "LB-AUTOPARTS-001", name: "Auto Parts Store", type: "business", status: "coming_soon", owner: null, position: [5, 0, -56], size: [5, 3.6, 3.6], color: "#765947", description: "Future auto parts store." },
+  { id: "LB-TIRE-001", name: "Tire Shop", type: "business", status: "coming_soon", owner: null, position: [15, 0, -56], size: [5, 3.6, 3.6], color: "#55575b", description: "Future tire shop." },
+  { id: "LB-CARWASH-001", name: "Car Wash", type: "business", status: "coming_soon", owner: null, position: [25, 0, -56], size: [5, 3.6, 3.6], color: "#5f7f86", description: "Future car wash." },
 ];
 
 const NORTH_EXPANSION_ROADS: RoadData[] = [
   { id: "LB-ALLEY-002", position: [0, 0.025, -3.5], size: [58, 0.03, 1.6] },
   { id: "LB-ROAD-EW-003", position: [0, 0.02, -19], size: [66, 0.04, 3] },
+  { id: "LB-ALLEY-003", position: [0, 0.025, -36.5], size: [58, 0.03, 1.6] },
+  { id: "LB-ROAD-EW-004", position: [0, 0.02, -51], size: [66, 0.04, 3] },
+  { id: "LB-ROAD-NS-NORTH-001", position: [0, 0.02, -49], size: [3, 0.04, 20] },
+  { id: "LB-ROAD-OUTER-W-NORTH-001", position: [-34, 0.02, -45], size: [3, 0.04, 12] },
+  { id: "LB-ROAD-OUTER-E-NORTH-001", position: [34, 0.02, -45], size: [3, 0.04, 12] },
 ];
 
 const OUTER_RING_ROADS: RoadData[] = [
