@@ -367,147 +367,153 @@ function PawnshopDress() {
         </Text>
       </group>
 
-      <group position={[-4.56, 0, 0]} rotation={[0, Math.PI / 2, 0]}>
-        <mesh position={[1.9, 0.62, 0]}>
-          <boxGeometry args={[1.5, 0.16, 0.62]} />
+      <group position={[-4.28, 0, 0]} rotation={[0, Math.PI / 2, 0]}>
+        <mesh position={[3.55, 0.58, 0]}>
+          <boxGeometry args={[1.15, 0.14, 0.54]} />
           <meshStandardMaterial color="#76563d" />
         </mesh>
-        <mesh position={[1.55, 0.9, 0.01]} rotation={[0.05, 0.1, -0.02]}>
-          <boxGeometry args={[0.72, 0.34, 0.3]} />
+        <mesh position={[3.75, 0.82, 0.01]} rotation={[0.05, 0.1, -0.02]}>
+          <boxGeometry args={[0.58, 0.28, 0.26]} />
           <meshStandardMaterial color="#d4af37" metalness={0.4} roughness={0.35} />
         </mesh>
-        <mesh position={[2.15, 1.02, 0]}>
-          <cylinderGeometry args={[0.12, 0.12, 0.55, 12]} />
+        <mesh position={[3.05, 0.92, 0]}>
+          <cylinderGeometry args={[0.1, 0.1, 0.46, 12]} />
           <meshStandardMaterial color="#cbd5e1" />
         </mesh>
-        <mesh position={[2.15, 1.33, 0]}>
-          <boxGeometry args={[0.16, 0.08, 0.12]} />
+        <mesh position={[3.05, 1.19, 0]}>
+          <boxGeometry args={[0.14, 0.07, 0.1]} />
           <meshStandardMaterial color="#111827" />
         </mesh>
 
-        <mesh position={[0.25, 0.72, 0]}>
-          <boxGeometry args={[1.75, 1.4, 0.72]} />
+        <mesh position={[2.05, 0.55, 0]}>
+          <boxGeometry args={[1.12, 0.9, 0.54]} />
           <meshStandardMaterial color="#4b5563" />
         </mesh>
-        <mesh position={[0.25, 0.8, 0.39]}>
-          <boxGeometry args={[1.4, 0.92, 0.05]} />
+        <mesh position={[2.05, 0.6, 0.3]}>
+          <boxGeometry args={[0.86, 0.58, 0.04]} />
           <meshStandardMaterial color="#111827" />
         </mesh>
 
-        <mesh position={[-1.15, 0.5, 0]}>
-          <boxGeometry args={[1.2, 0.95, 0.62]} />
+        <mesh position={[1.05, 0.4, 0]}>
+          <boxGeometry args={[0.82, 0.68, 0.5]} />
           <meshStandardMaterial color="#6b7280" />
         </mesh>
-        <mesh position={[-1.15, 0.55, 0.34]}>
-          <boxGeometry args={[0.92, 0.62, 0.05]} />
+        <mesh position={[1.05, 0.44, 0.27]}>
+          <boxGeometry args={[0.62, 0.42, 0.04]} />
           <meshStandardMaterial color="#1f2937" />
         </mesh>
 
-        <mesh position={[-2.25, 0.55, 0]}>
-          <boxGeometry args={[0.72, 0.78, 0.6]} />
+        <mesh position={[0.18, 0.45, 0]}>
+          <boxGeometry args={[0.54, 0.62, 0.48]} />
           <meshStandardMaterial color="#d1d5db" />
         </mesh>
-        <mesh position={[-2.25, 1.03, 0]}>
-          <boxGeometry args={[0.34, 0.18, 0.34]} />
+        <mesh position={[0.18, 0.82, 0]}>
+          <boxGeometry args={[0.28, 0.15, 0.28]} />
           <meshStandardMaterial color="#9ca3af" />
         </mesh>
-        <mesh position={[-2.25, 1.16, 0]}>
-          <boxGeometry args={[0.08, 0.16, 0.08]} />
+        <mesh position={[0.18, 0.93, 0]}>
+          <boxGeometry args={[0.07, 0.13, 0.07]} />
           <meshStandardMaterial color="#374151" />
         </mesh>
 
-        <mesh position={[-3.25, 0.45, 0]}>
-          <boxGeometry args={[0.5, 0.72, 0.48]} />
+        <mesh position={[-0.55, 0.34, 0]}>
+          <boxGeometry args={[0.4, 0.54, 0.4]} />
           <meshStandardMaterial color="#a78bfa" />
         </mesh>
       </group>
 
-      <group position={[4.56, 0, 0]} rotation={[0, -Math.PI / 2, 0]}>
-        <group position={[2.25, 1.08, 0]}>
+      <group position={[4.28, 0, 0]} rotation={[0, -Math.PI / 2, 0]}>
+        <group position={[-2.85, 0.6, 0]}>
           <mesh>
-            <boxGeometry args={[1.75, 0.12, 0.7]} />
-            <meshStandardMaterial color="#6b4f3a" />
-          </mesh>
-          <mesh position={[0, 0.5, 0.18]}>
-            <boxGeometry args={[1.5, 0.72, 0.08]} />
-            <meshStandardMaterial color="#3f3a32" />
-          </mesh>
-        </group>
-
-        <group position={[1.15, 0.68, 0]}>
-          <mesh>
-            <boxGeometry args={[0.42, 0.76, 0.18]} />
+            <boxGeometry args={[0.38, 0.68, 0.16]} />
             <meshStandardMaterial color="#374151" />
           </mesh>
-          <mesh position={[0, 0, 0.12]}><boxGeometry args={[0.5, 0.06, 0.04]} /><meshStandardMaterial color="#111827" /></mesh>
-          <mesh position={[0, 0.24, 0.12]}><boxGeometry args={[0.5, 0.06, 0.04]} /><meshStandardMaterial color="#111827" /></mesh>
-          <mesh position={[0, -0.24, 0.12]}><boxGeometry args={[0.5, 0.06, 0.04]} /><meshStandardMaterial color="#111827" /></mesh>
-          <mesh position={[-0.2, 0, 0.12]}><boxGeometry args={[0.05, 0.82, 0.04]} /><meshStandardMaterial color="#111827" /></mesh>
-          <mesh position={[0.2, 0, 0.12]}><boxGeometry args={[0.05, 0.82, 0.04]} /><meshStandardMaterial color="#111827" /></mesh>
+          <mesh position={[0, 0, 0.11]}><boxGeometry args={[0.46, 0.05, 0.04]} /><meshStandardMaterial color="#111827" /></mesh>
+          <mesh position={[0, 0.2, 0.11]}><boxGeometry args={[0.46, 0.05, 0.04]} /><meshStandardMaterial color="#111827" /></mesh>
+          <mesh position={[0, -0.2, 0.11]}><boxGeometry args={[0.46, 0.05, 0.04]} /><meshStandardMaterial color="#111827" /></mesh>
+          <mesh position={[-0.18, 0, 0.11]}><boxGeometry args={[0.04, 0.74, 0.04]} /><meshStandardMaterial color="#111827" /></mesh>
+          <mesh position={[0.18, 0, 0.11]}><boxGeometry args={[0.04, 0.74, 0.04]} /><meshStandardMaterial color="#111827" /></mesh>
         </group>
 
-        <mesh position={[0.05, 0.5, 0]}>
-          <boxGeometry args={[1.25, 0.88, 0.45]} />
+        <mesh position={[-1.95, 0.42, 0]}>
+          <boxGeometry args={[0.9, 0.66, 0.4]} />
           <meshStandardMaterial color="#312e2b" />
         </mesh>
-        <mesh position={[0.05, 0.94, 0]}>
-          <boxGeometry args={[0.82, 0.12, 0.36]} />
+        <mesh position={[-1.95, 0.76, 0]}>
+          <boxGeometry args={[0.62, 0.1, 0.32]} />
           <meshStandardMaterial color="#57534e" />
         </mesh>
 
-        <mesh position={[-1.2, 0.42, 0]}>
-          <boxGeometry args={[0.9, 0.38, 0.58]} />
+        <mesh position={[-1.05, 0.34, 0]}>
+          <boxGeometry args={[0.7, 0.3, 0.5]} />
           <meshStandardMaterial color="#52525b" />
         </mesh>
-        <mesh position={[-1.2, 0.84, 0]}>
-          <boxGeometry args={[0.9, 0.38, 0.58]} />
+        <mesh position={[-1.05, 0.66, 0]}>
+          <boxGeometry args={[0.7, 0.3, 0.5]} />
           <meshStandardMaterial color="#71717a" />
         </mesh>
 
-        <mesh position={[-2.3, 0.52, 0]}>
-          <boxGeometry args={[0.9, 0.88, 0.66]} />
+        <mesh position={[-0.18, 0.42, 0]}>
+          <boxGeometry args={[0.72, 0.7, 0.54]} />
           <meshStandardMaterial color="#d6d3d1" />
         </mesh>
-        <mesh position={[-2.3, 0.6, 0.36]}>
-          <boxGeometry args={[0.58, 0.3, 0.04]} />
+        <mesh position={[-0.18, 0.48, 0.3]}>
+          <boxGeometry args={[0.46, 0.24, 0.04]} />
           <meshStandardMaterial color="#27272a" />
         </mesh>
 
-        <group position={[-3.35, 0.52, 0]}>
+        <group position={[0.65, 0.42, 0]}>
           <mesh>
-            <boxGeometry args={[0.9, 0.72, 0.62]} />
+            <boxGeometry args={[0.72, 0.58, 0.52]} />
             <meshStandardMaterial color="#2563eb" />
           </mesh>
-          <mesh position={[-0.2, 0.15, 0.34]} rotation={[0, 0, 0.45]}><boxGeometry args={[0.08, 0.58, 0.05]} /><meshStandardMaterial color="#111827" /></mesh>
-          <mesh position={[0.12, 0.08, 0.34]} rotation={[0, 0, -0.55]}><boxGeometry args={[0.08, 0.62, 0.05]} /><meshStandardMaterial color="#111827" /></mesh>
-          <mesh position={[0.26, -0.14, 0.34]} rotation={[0, 0, 0.2]}><boxGeometry args={[0.08, 0.5, 0.05]} /><meshStandardMaterial color="#111827" /></mesh>
+          <mesh position={[-0.16, 0.12, 0.29]} rotation={[0, 0, 0.45]}><boxGeometry args={[0.06, 0.46, 0.04]} /><meshStandardMaterial color="#111827" /></mesh>
+          <mesh position={[0.1, 0.06, 0.29]} rotation={[0, 0, -0.55]}><boxGeometry args={[0.06, 0.48, 0.04]} /><meshStandardMaterial color="#111827" /></mesh>
+          <mesh position={[0.2, -0.1, 0.29]} rotation={[0, 0, 0.2]}><boxGeometry args={[0.06, 0.4, 0.04]} /><meshStandardMaterial color="#111827" /></mesh>
         </group>
       </group>
 
+      <group position={[3.7, 1.22, -4.15]}>
+        <mesh>
+          <boxGeometry args={[1.35, 0.58, 0.08]} />
+          <meshStandardMaterial color="#3f3a32" />
+        </mesh>
+        <mesh position={[0, -0.46, 0]}>
+          <boxGeometry args={[0.1, 0.58, 0.1]} />
+          <meshStandardMaterial color="#6b4f3a" />
+        </mesh>
+        <mesh position={[0, -0.72, 0]}>
+          <boxGeometry args={[0.72, 0.08, 0.42]} />
+          <meshStandardMaterial color="#6b4f3a" />
+        </mesh>
+        <Text position={[0, 0, 0.05]} fontSize={0.11} maxWidth={1.2} lineHeight={1.05} textAlign="center" anchorX="center" anchorY="middle" color="#fef08a">
+          Stolen items 50% off
+        </Text>
+      </group>
+
       {[
-        [-4.05, 1.24, -1.55, "24K. Probably."],
-        [-4.05, 1.58, -2.15, "Proven 24K process."],
-        [-4.05, 1.62, -0.25, "Works if you hit it. Tail-light guarantee."],
-        [-4.05, 1.14, 1.15, "Vintage. You haul it."],
-        [-4.05, 1.5, 2.25, "Used blender. Salsa not included."],
-        [-4.05, 1.0, 3.25, "Used bath salts. Don't ask."],
-        [4.05, 1.68, 2.25, "Stolen items 50% off"],
-        [4.05, 1.34, 1.15, "Display model. It rings if you believe."],
-        [4.05, 1.3, 0.05, "Mom still thinks this is at school."],
-        [4.05, 1.24, -1.2, "Rewind not included."],
-        [4.05, 1.22, -2.3, "May still be under recall."],
-        [4.05, 1.12, -3.35, "Chargers for phones that don't exist."],
+        [-3.72, 1.08, -3.75, "24K. Probably."],
+        [-3.72, 1.35, -3.05, "Proven 24K process."],
+        [-3.72, 1.12, -2.05, "Works if you hit it. Tail-light guarantee."],
+        [-3.72, 0.92, -1.05, "Vintage. You haul it."],
+        [-3.72, 1.12, -0.18, "Used blender. Salsa not included."],
+        [-3.72, 0.78, 0.55, "Used bath salts. Don't ask."],
+        [3.72, 1.08, -2.85, "Display model. It rings if you believe."],
+        [3.72, 0.98, -1.95, "Mom still thinks this is at school."],
+        [3.72, 0.98, -1.05, "Rewind not included."],
+        [3.72, 1.02, -0.18, "May still be under recall."],
+        [3.72, 0.9, 0.65, "Chargers for phones that don't exist."],
       ].map(([x, y, z, label]) => (
         <group key={label as string} position={[x as number, y as number, z as number]}>
           <mesh>
-            <boxGeometry args={[0.98, 0.3, 0.05]} />
+            <boxGeometry args={[0.9, 0.28, 0.05]} />
             <meshStandardMaterial color="#f5e7c8" />
           </mesh>
           <Text
             position={[0, 0, 0.03]}
-            fontSize={0.09}
-            maxWidth={0.88}
-            lineHeight={1.08}
+            fontSize={0.085}
+            maxWidth={0.8}
+            lineHeight={1.06}
             textAlign="center"
             anchorX="center"
             anchorY="middle"
