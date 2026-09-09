@@ -15,6 +15,29 @@ function LeafClump({ position, scale, color }: { position: [number, number, numb
   );
 }
 
+function ParkBench({ position }: { position: [number, number, number] }) {
+  return (
+    <group position={position}>
+      <mesh position={[-0.5, 0.23, 0]}>
+        <boxGeometry args={[0.14, 0.46, 0.34]} />
+        <meshStandardMaterial color="#4a3424" />
+      </mesh>
+      <mesh position={[0.5, 0.23, 0]}>
+        <boxGeometry args={[0.14, 0.46, 0.34]} />
+        <meshStandardMaterial color="#4a3424" />
+      </mesh>
+      <mesh position={[0, 0.45, 0]}>
+        <boxGeometry args={[1.5, 0.14, 0.42]} />
+        <meshStandardMaterial color="#6b4f32" />
+      </mesh>
+      <mesh position={[0, 0.82, 0.19]}>
+        <boxGeometry args={[1.5, 0.5, 0.12]} />
+        <meshStandardMaterial color="#6b4f32" />
+      </mesh>
+    </group>
+  );
+}
+
 function SouthTree({ index, position }: { index: number; position: [number, number, number] }) {
   const swayRef = useRef<Group>(null);
   const height = 2.45 + (index % 4) * 0.28;
@@ -65,6 +88,19 @@ function SouthTree({ index, position }: { index: number; position: [number, numb
 
 export default function SouthTrees() {
   const treeLots = townData.lots.filter((lot) => isSouthTreeLotId(lot.id));
+  const sortedTreeLots = [...treeLots].sort((a, b) => a.position[0] - b.position[0]);
+  const benchPositions: [number, number, number][] = [];
+
+  for (let index = 0; index < sortedTreeLots.length - 1; index += 1) {
+    const [leftX, , leftZ] = sortedTreeLots[index].position;
+    const [rightX, , rightZ] = sortedTreeLots[index + 1].position;
+    const gap = rightX - leftX;
+    const benchX = (leftX + rightX) / 2;
+    const benchZ = (leftZ + rightZ) / 2;
+
+    if (gap < 3 || Math.abs(benchX) < 1.5) continue;
+    benchPositions.push([benchX, 0, benchZ]);
+  }
 
   return (
     <group>
@@ -72,6 +108,10 @@ export default function SouthTrees() {
         const [x, , z] = lot.position;
         return <SouthTree key={lot.id} index={index} position={[x, 0, z]} />;
       })}
+
+      {benchPositions.map((position) => (
+        <ParkBench key={`bench-${position[0]}`} position={position} />
+      ))}
     </group>
   );
 }
