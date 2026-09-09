@@ -30,6 +30,21 @@ const PROFILES: Record<string, Profile> = {
   "LB-HOME-004": { wall: "#b65f62", trim: "#f6d6d7", door: "#6b2f33", sign: "LOOGANS MOTEL", signColor: "#fde68a", feature: "motel" },
 };
 
+const UNDER_CONSTRUCTION_IDS = new Set([
+  "LB-GROCERY-001",
+  "LB-PHARMACY-001",
+  "LB-FIREHALL-001",
+  "LB-POST-001",
+  "LB-DENTIST-001",
+  "LB-VET-001",
+  "LB-FUNERAL-001",
+  "LB-LAUNDRY-001",
+  "LB-BAKERY-001",
+  "LB-COFFEE-001",
+  "LB-PIZZA-001",
+  "LB-BURGER-001",
+]);
+
 // Main Street is row 0 at z ~= 32 and faces south. Each row north flips.
 // The ~16-unit row spacing also correctly classifies the existing z=18 and z=2 rows.
 function rowFacesNorth(z: number) {
@@ -132,6 +147,7 @@ export default function TownBusinessBuilding({
   const secondWindowX = width > 4.2 ? -width * 0.38 : -width * 0.2;
   const barred = profile.feature === "bail" || profile.feature === "police";
   const faceNorth = rowFacesNorth(z);
+  const underConstruction = UNDER_CONSTRUCTION_IDS.has(building.id);
 
   return (
     <group position={[x, 0, z]} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
@@ -180,6 +196,27 @@ export default function TownBusinessBuilding({
         >
           {profile.sign}
         </Text>
+
+        {underConstruction ? (
+          <group position={[0, height * 0.34, frontZ + 0.12]}>
+            <mesh>
+              <boxGeometry args={[2.25, 0.72, 0.05]} />
+              <meshStandardMaterial color="#f5e7c8" />
+            </mesh>
+            <Text
+              position={[0, 0, 0.035]}
+              fontSize={0.16}
+              maxWidth={2.0}
+              lineHeight={1.12}
+              textAlign="center"
+              anchorX="center"
+              anchorY="middle"
+              color="#1f2937"
+            >
+              {"UNDER CONSTRUCTION\ncheck back soon"}
+            </Text>
+          </group>
+        ) : null}
 
         {profile.awning ? (
           <mesh position={[0, height * 0.63, frontZ + 0.38]} rotation={[0.18, 0, 0]}>
