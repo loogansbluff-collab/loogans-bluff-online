@@ -7,6 +7,7 @@ import { enterStreetInFront } from "@/lib/enterBuildingStreet";
 import { useGameStore } from "@/state/gameStore";
 import DoorWalkway from "@/components/scene/DoorWalkway";
 import MainStreetBuilding from "@/components/scene/buildings/MainStreetBuilding";
+import TownBusinessBuilding from "@/components/scene/buildings/TownBusinessBuilding";
 
 const MAIN_STREET_IDS = new Set([
   "LB-BARBER-001",
@@ -17,12 +18,28 @@ const MAIN_STREET_IDS = new Set([
   "LB-REPAIR-001",
 ]);
 
+const TOWN_BUSINESS_IDS = new Set([
+  "LB-COPSHOP-001",
+  "LB-JAIL-001",
+  "LB-MEDICAL-001",
+  "LB-TOWNHALL-001",
+  "LB-HOME-001",
+  "LB-HOME-002",
+  "LB-DUMPHOUSE-001",
+  "LB-BARN-001",
+  "LB-BARN-002",
+  "LB-HOME-003",
+  "LB-HOME-004",
+]);
+
 export default function Building({ building }: { building: BuildingData }) {
   const start = useRef<[number, number] | null>(null);
   const mode = useGameStore((state) => state.mode);
   const [x, , z] = building.position;
   const [width, height, depth] = building.size;
   const isMainStreet = MAIN_STREET_IDS.has(building.id);
+  const isTownBusiness = TOWN_BUSINESS_IDS.has(building.id);
+  const hasDetailedFront = isMainStreet || isTownBusiness;
 
   const onPointerDown = (event: ThreeEvent<PointerEvent>) => {
     event.stopPropagation();
@@ -44,10 +61,12 @@ export default function Building({ building }: { building: BuildingData }) {
         <meshStandardMaterial color="#262626" />
       </mesh>
 
-      {isMainStreet ? <DoorWalkway building={building} /> : null}
+      {hasDetailedFront ? <DoorWalkway building={building} /> : null}
 
       {isMainStreet ? (
         <MainStreetBuilding building={building} onPointerDown={onPointerDown} onPointerUp={onPointerUp} />
+      ) : isTownBusiness ? (
+        <TownBusinessBuilding building={building} onPointerDown={onPointerDown} onPointerUp={onPointerUp} />
       ) : (
         <mesh position={[x, height / 2, z]} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
           <boxGeometry args={[width, height, depth]} />
