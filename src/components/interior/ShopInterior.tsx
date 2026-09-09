@@ -342,11 +342,95 @@ function HardwareDress() {
   );
 }
 
+function PawnshopDress() {
+  return (
+    <>
+      <group position={[0, 2.05, -5.82]}>
+        <mesh>
+          <boxGeometry args={[6.6, 3.5, 0.14]} />
+          <meshStandardMaterial color="#3b2f2f" />
+        </mesh>
+        <Text position={[0, 0.92, 0.09]} fontSize={0.38} maxWidth={5.9} lineHeight={1.18} textAlign="center" anchorX="center" anchorY="middle" color="#f8fafc">
+          {"NEED CASH?\nBRING SOMETHING YOU'LL MISS."}
+        </Text>
+        <Text position={[0, -0.12, 0.09]} fontSize={0.24} maxWidth={5.9} textAlign="center" anchorX="center" anchorY="middle" color="#f8fafc">
+          0.1 SOL worth of $LOOGANS
+        </Text>
+        <Text position={[0, -0.55, 0.09]} fontSize={0.22} maxWidth={5.9} textAlign="center" anchorX="center" anchorY="middle" color="#f8fafc">
+          Connect Phantom wallet to:
+        </Text>
+        <Text position={[0, -1.03, 0.09]} fontSize={0.36} maxWidth={5.9} textAlign="center" anchorX="center" anchorY="middle" color="#22c55e">
+          $Buy Regret
+        </Text>
+        <Text position={[0, -1.44, 0.09]} fontSize={0.36} maxWidth={5.9} textAlign="center" anchorX="center" anchorY="middle" color="#ef4444">
+          Refund
+        </Text>
+      </group>
+
+      <group position={[-4.62, 1.1, 2.35]} rotation={[0, Math.PI / 2, 0]}>
+        <mesh position={[0, -0.42, 0]}>
+          <boxGeometry args={[2.35, 0.16, 0.62]} />
+          <meshStandardMaterial color="#7c5a3b" />
+        </mesh>
+        <mesh position={[-0.55, 0.02, 0.02]} rotation={[0.08, 0.15, -0.03]}>
+          <boxGeometry args={[0.78, 0.38, 0.32]} />
+          <meshStandardMaterial color="#d4af37" metalness={0.45} roughness={0.35} />
+        </mesh>
+        <Text position={[-0.55, 0.36, 0.2]} fontSize={0.22} anchorX="center" anchorY="middle" color="#fef3c7">
+          24K. Probably.
+        </Text>
+        <mesh position={[0.58, 0.05, 0]}>
+          <boxGeometry args={[0.95, 0.72, 0.58]} />
+          <meshStandardMaterial color="#4b5563" />
+        </mesh>
+        <mesh position={[0.58, 0.08, 0.31]}>
+          <boxGeometry args={[0.68, 0.46, 0.04]} />
+          <meshStandardMaterial color="#111827" />
+        </mesh>
+        <Text position={[0.58, 0.56, 0.2]} fontSize={0.18} maxWidth={1.25} textAlign="center" anchorX="center" anchorY="middle" color="#f8fafc">
+          Vintage. You haul it.
+        </Text>
+      </group>
+
+      <group position={[4.62, 1.2, 2.45]} rotation={[0, -Math.PI / 2, 0]}>
+        <group position={[-0.68, 0, 0]}>
+          <mesh>
+            <boxGeometry args={[0.42, 0.76, 0.18]} />
+            <meshStandardMaterial color="#374151" />
+          </mesh>
+          <mesh position={[0, 0, 0.12]}><boxGeometry args={[0.5, 0.06, 0.04]} /><meshStandardMaterial color="#111827" /></mesh>
+          <mesh position={[0, 0.24, 0.12]}><boxGeometry args={[0.5, 0.06, 0.04]} /><meshStandardMaterial color="#111827" /></mesh>
+          <mesh position={[0, -0.24, 0.12]}><boxGeometry args={[0.5, 0.06, 0.04]} /><meshStandardMaterial color="#111827" /></mesh>
+          <mesh position={[-0.2, 0, 0.12]}><boxGeometry args={[0.05, 0.82, 0.04]} /><meshStandardMaterial color="#111827" /></mesh>
+          <mesh position={[0.2, 0, 0.12]}><boxGeometry args={[0.05, 0.82, 0.04]} /><meshStandardMaterial color="#111827" /></mesh>
+        </group>
+        <Text position={[-0.68, 0.62, 0.2]} fontSize={0.14} maxWidth={1.5} textAlign="center" anchorX="center" anchorY="middle" color="#f8fafc">
+          Display model. It rings if you believe.
+        </Text>
+      </group>
+
+      <group position={[4.42, 0.72, -2.85]}>
+        <mesh position={[0, 0.08, 0]}>
+          <boxGeometry args={[0.9, 1.15, 2.35]} />
+          <meshStandardMaterial color="#6b4f3a" />
+        </mesh>
+        <mesh position={[-0.1, 0.78, -0.72]} rotation={[0.08, 0.18, 0.04]}><boxGeometry args={[0.58, 0.5, 0.42]} /><meshStandardMaterial color="#9ca3af" /></mesh>
+        <mesh position={[0.1, 0.82, 0]} rotation={[-0.04, -0.12, -0.08]}><boxGeometry args={[0.62, 0.46, 0.48]} /><meshStandardMaterial color="#b45309" /></mesh>
+        <mesh position={[-0.08, 0.76, 0.72]} rotation={[0.05, 0.1, 0.09]}><boxGeometry args={[0.54, 0.52, 0.46]} /><meshStandardMaterial color="#475569" /></mesh>
+        <Text position={[-0.52, 1.55, 0]} rotation={[0, -Math.PI / 2, 0]} fontSize={0.3} maxWidth={2.7} textAlign="center" anchorX="center" anchorY="middle" color="#fef08a">
+          Stolen items 50% off
+        </Text>
+      </group>
+    </>
+  );
+}
+
 export default function ShopInterior() {
   const interiorId = useGameStore((state) => state.interiorId);
   const isBarber = interiorId === "LB-BARBER-001";
   const isLiquor = interiorId === "LB-LIQUOR-001";
   const isHardware = interiorId === "LB-HARDWARE-001";
+  const isPawnshop = interiorId === "LB-REPAIR-001";
   const wallColor = isBarber ? "#f3ead7" : "#d6d3d1";
   const floorColor = "#78716c";
   const ceilingColor = "#e7e5e4";
@@ -382,6 +466,7 @@ export default function ShopInterior() {
       {isBarber ? <BarberDress /> : null}
       {isLiquor ? <LiquorDress /> : null}
       {isHardware ? <HardwareDress /> : null}
+      {isPawnshop ? <PawnshopDress /> : null}
 
       <InteriorControls />
     </>
