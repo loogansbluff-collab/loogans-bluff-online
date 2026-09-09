@@ -94,6 +94,18 @@ const NORTH_EXPANSION_BUILDINGS: BuildingData[] = [
   { id: "LB-JEWELRY-001", name: "Jewelry Store", type: "business", status: "coming_soon", owner: null, position: [5, 0, -89.55], size: [4.3, 3.9, 5.1], color: "#826f68", description: "Future jewelry store." },
   { id: "LB-FLORIST-001", name: "Florist", type: "business", status: "coming_soon", owner: null, position: [15, 0, -89.85], size: [4.7, 3.7, 5.7], color: "#6f7f62", description: "Future florist." },
   { id: "LB-PHOTO-001", name: "Photography Studio", type: "business", status: "coming_soon", owner: null, position: [25, 0, -90.15], size: [5.7, 4.5, 6.3], color: "#695f72", description: "Future photography studio." },
+  { id: "LB-PRINT-001", name: "Print & Copy Shop", type: "business", status: "coming_soon", owner: null, position: [-25, 0, -108.3], size: [4.6, 4.0, 5.4], color: "#66717d", description: "Future print and copy shop." },
+  { id: "LB-BUILDSUPPLY-001", name: "Building Supply", type: "business", status: "coming_soon", owner: null, position: [-15, 0, -107.8], size: [5.8, 4.5, 6.4], color: "#78664d", description: "Future building supply store." },
+  { id: "LB-PLUMBING-001", name: "Plumbing Supply", type: "business", status: "coming_soon", owner: null, position: [-5, 0, -108.4], size: [4.3, 3.8, 5.2], color: "#557883", description: "Future plumbing supply store." },
+  { id: "LB-ELECTRICAL-001", name: "Electrical Supply", type: "business", status: "coming_soon", owner: null, position: [5, 0, -108.1], size: [5.1, 4.2, 5.8], color: "#77704f", description: "Future electrical supply store." },
+  { id: "LB-GARDEN-001", name: "Garden Center", type: "business", status: "coming_soon", owner: null, position: [15, 0, -107.95], size: [5.6, 4.4, 6.1], color: "#607653", description: "Future garden center." },
+  { id: "LB-PET-001", name: "Pet Store", type: "business", status: "coming_soon", owner: null, position: [25, 0, -108.5], size: [4.2, 3.6, 5.0], color: "#766477", description: "Future pet store." },
+  { id: "LB-SMOKE-001", name: "Smoke Shop", type: "business", status: "coming_soon", owner: null, position: [-25, 0, -121.65], size: [4.5, 3.7, 5.3], color: "#5c5a61", description: "Future smoke shop parody storefront." },
+  { id: "LB-ARCADE-001", name: "Arcade", type: "business", status: "coming_soon", owner: null, position: [-15, 0, -121.95], size: [5.2, 4.3, 5.9], color: "#5e6686", description: "Future arcade." },
+  { id: "LB-BOWLING-001", name: "Bowling Alley", type: "business", status: "coming_soon", owner: null, position: [-5, 0, -122.2], size: [5.8, 4.6, 6.4], color: "#715c63", description: "Future bowling alley." },
+  { id: "LB-POOL-001", name: "Pool Hall", type: "business", status: "coming_soon", owner: null, position: [5, 0, -121.55], size: [4.4, 3.9, 5.1], color: "#586f64", description: "Future pool hall." },
+  { id: "LB-THEATER-001", name: "Movie Theater", type: "business", status: "coming_soon", owner: null, position: [15, 0, -122.1], size: [5.7, 4.5, 6.2], color: "#68566f", description: "Future movie theater." },
+  { id: "LB-BINGO-001", name: "Bingo Hall", type: "business", status: "coming_soon", owner: null, position: [25, 0, -121.8], size: [4.8, 4.0, 5.6], color: "#7b6658", description: "Future bingo hall." },
 ];
 
 const NORTH_EXPANSION_ROADS: RoadData[] = [
@@ -103,22 +115,24 @@ const NORTH_EXPANSION_ROADS: RoadData[] = [
   { id: "LB-ROAD-EW-004", position: [0, 0.02, -51], size: [66, 0.04, 3] },
   { id: "LB-ALLEY-004", position: [0, 0.025, -68.5], size: [58, 0.03, 1.6] },
   { id: "LB-ROAD-EW-005", position: [0, 0.02, -83], size: [66, 0.04, 3] },
-  { id: "LB-ROAD-NS-NORTH-001", position: [0, 0.02, -67.5], size: [3, 0.04, 57] },
-  { id: "LB-ROAD-OUTER-W-NORTH-001", position: [-34, 0.02, -67.5], size: [3, 0.04, 57] },
-  { id: "LB-ROAD-OUTER-E-NORTH-001", position: [34, 0.02, -67.5], size: [3, 0.04, 57] },
+  { id: "LB-ALLEY-005", position: [0, 0.025, -100.5], size: [58, 0.03, 1.6] },
+  { id: "LB-ROAD-EW-006", position: [0, 0.02, -115], size: [66, 0.04, 3] },
+  { id: "LB-ROAD-NS-NORTH-001", position: [0, 0.02, -83], size: [3, 0.04, 88] },
+  { id: "LB-ROAD-OUTER-W-NORTH-001", position: [-34, 0.02, -83], size: [3, 0.04, 88] },
+  { id: "LB-ROAD-OUTER-E-NORTH-001", position: [34, 0.02, -83], size: [3, 0.04, 88] },
 ];
 
 const OUTER_RING_ROADS: RoadData[] = [
   { id: "LB-ROAD-OUTER-W-001", position: [-34, 0.02, 0], size: [3, 0.04, 78] },
   { id: "LB-ROAD-OUTER-E-001", position: [34, 0.02, 0], size: [3, 0.04, 78] },
-  { id: "LB-ROAD-OUTER-N-001", position: [0, 0.02, -96], size: [68, 0.04, 3] },
+  { id: "LB-ROAD-OUTER-N-001", position: [0, 0.02, -127], size: [68, 0.04, 3] },
 ];
 
 const rawTown = townJson as TownData;
 
 export const townData: TownData = {
   ...rawTown,
-  groundSize: 200,
+  groundSize: 260,
   roads: [...rawTown.roads, ...NORTH_EXPANSION_ROADS, ...OUTER_RING_ROADS],
   buildings: [
     ...rawTown.buildings.map((building) => {
