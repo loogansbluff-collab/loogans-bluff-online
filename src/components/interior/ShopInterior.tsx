@@ -231,71 +231,112 @@ function HardwareDress() {
           <boxGeometry args={[6.6, 3.5, 0.14]} />
           <meshStandardMaterial color="#3f3a32" />
         </mesh>
-        <Text position={[0, 0.88, 0.09]} fontSize={0.34} maxWidth={5.9} lineHeight={1.2} textAlign="center" anchorX="center" anchorY="middle" color="#f8fafc">
+        <Text
+          position={[0, 0.88, 0.09]}
+          fontSize={0.34}
+          maxWidth={5.9}
+          lineHeight={1.2}
+          textAlign="center"
+          anchorX="center"
+          anchorY="middle"
+          color="#f8fafc"
+        >
           {"WE SELL ALL KINDS OF TOOLS\nSome even function."}
         </Text>
-        <Text position={[0, -0.15, 0.09]} fontSize={0.24} maxWidth={5.9} textAlign="center" anchorX="center" anchorY="middle" color="#f8fafc">
+        <Text
+          position={[0, -0.15, 0.09]}
+          fontSize={0.24}
+          maxWidth={5.9}
+          textAlign="center"
+          anchorX="center"
+          anchorY="middle"
+          color="#f8fafc"
+        >
           0.1 SOL worth of $LOOGANS
         </Text>
-        <Text position={[0, -0.58, 0.09]} fontSize={0.22} maxWidth={5.9} textAlign="center" anchorX="center" anchorY="middle" color="#f8fafc">
+        <Text
+          position={[0, -0.58, 0.09]}
+          fontSize={0.22}
+          maxWidth={5.9}
+          textAlign="center"
+          anchorX="center"
+          anchorY="middle"
+          color="#f8fafc"
+        >
           Connect Phantom wallet to:
         </Text>
-        <Text position={[0, -1.05, 0.09]} fontSize={0.36} maxWidth={5.9} textAlign="center" anchorX="center" anchorY="middle" color="#22c55e">
+        <Text
+          position={[0, -1.05, 0.09]}
+          fontSize={0.36}
+          maxWidth={5.9}
+          textAlign="center"
+          anchorX="center"
+          anchorY="middle"
+          color="#22c55e"
+        >
           $Buy Toolbag
         </Text>
-        <Text position={[0, -1.45, 0.09]} fontSize={0.36} maxWidth={5.9} textAlign="center" anchorX="center" anchorY="middle" color="#ef4444">
+        <Text
+          position={[0, -1.45, 0.09]}
+          fontSize={0.36}
+          maxWidth={5.9}
+          textAlign="center"
+          anchorX="center"
+          anchorY="middle"
+          color="#ef4444"
+        >
           Refund
         </Text>
       </group>
 
       <group position={[4.35, 0, -0.6]}>
-        <mesh position={[0, 0.92, 0]}><boxGeometry args={[0.9, 0.18, 3.4]} /><meshStandardMaterial color="#8b5e3c" /></mesh>
-        <mesh position={[-0.32, 0.43, -1.25]}><boxGeometry args={[0.18, 0.86, 0.18]} /><meshStandardMaterial color="#5b4636" /></mesh>
-        <mesh position={[-0.32, 0.43, 1.25]}><boxGeometry args={[0.18, 0.86, 0.18]} /><meshStandardMaterial color="#5b4636" /></mesh>
-        <mesh position={[0.32, 0.43, -1.25]}><boxGeometry args={[0.18, 0.86, 0.18]} /><meshStandardMaterial color="#5b4636" /></mesh>
-        <mesh position={[0.32, 0.43, 1.25]}><boxGeometry args={[0.18, 0.86, 0.18]} /><meshStandardMaterial color="#5b4636" /></mesh>
+        <mesh position={[0, 0.92, 0]}>
+          <boxGeometry args={[0.9, 0.18, 3.4]} />
+          <meshStandardMaterial color="#8b5e3c" />
+        </mesh>
+        <mesh position={[-0.32, 0.43, -1.25]}>
+          <boxGeometry args={[0.18, 0.86, 0.18]} />
+          <meshStandardMaterial color="#5b4636" />
+        </mesh>
+        <mesh position={[-0.32, 0.43, 1.25]}>
+          <boxGeometry args={[0.18, 0.86, 0.18]} />
+          <meshStandardMaterial color="#5b4636" />
+        </mesh>
+        <mesh position={[0.32, 0.43, -1.25]}>
+          <boxGeometry args={[0.18, 0.86, 0.18]} />
+          <meshStandardMaterial color="#5b4636" />
+        </mesh>
+        <mesh position={[0.32, 0.43, 1.25]}>
+          <boxGeometry args={[0.18, 0.86, 0.18]} />
+          <meshStandardMaterial color="#5b4636" />
+        </mesh>
       </group>
 
       <group position={[-4.84, 2.0, -1.25]} rotation={[0, Math.PI / 2, 0]}>
-        <mesh><boxGeometry args={[3.5, 2.4, 0.12]} /><meshStandardMaterial color="#8a7b68" /></mesh>
-        <mesh position={[-0.9, 0.35, 0.12]}><boxGeometry args={[0.18, 1.25, 0.16]} /><meshStandardMaterial color="#6b7280" /></mesh>
-        <mesh position={[-0.55, 0.78, 0.12]}><boxGeometry args={[0.85, 0.22, 0.16]} /><meshStandardMaterial color="#374151" /></mesh>
-        <mesh position={[0.45, 0.12, 0.12]} rotation={[0, 0, -0.55]}><boxGeometry args={[0.22, 1.35, 0.16]} /><meshStandardMaterial color="#6b7280" /></mesh>
-        <mesh position={[0.78, 0.62, 0.12]} rotation={[0, 0, -0.55]}><boxGeometry args={[0.7, 0.24, 0.16]} /><meshStandardMaterial color="#374151" /></mesh>
-        <mesh position={[1.15, -0.52, 0.12]}><boxGeometry args={[0.22, 0.9, 0.16]} /><meshStandardMaterial color="#6b7280" /></mesh>
-      </group>
-
-      <group position={[-4.62, 1.1, 2.45]} rotation={[0, Math.PI / 2, 0]}>
-        <mesh position={[0, -0.42, 0]}><boxGeometry args={[2.35, 0.16, 0.62]} /><meshStandardMaterial color="#7c5a3b" /></mesh>
-        <mesh position={[-0.55, 0.02, 0.02]} rotation={[0.08, 0.15, -0.03]}><boxGeometry args={[0.78, 0.38, 0.32]} /><meshStandardMaterial color="#d4af37" metalness={0.45} roughness={0.35} /></mesh>
-        <Text position={[-0.55, 0.36, 0.2]} fontSize={0.22} anchorX="center" anchorY="middle" color="#fef3c7">24K. Probably.</Text>
-        <mesh position={[0.58, 0.05, 0]}><boxGeometry args={[0.95, 0.72, 0.58]} /><meshStandardMaterial color="#4b5563" /></mesh>
-        <mesh position={[0.58, 0.08, 0.31]}><boxGeometry args={[0.68, 0.46, 0.04]} /><meshStandardMaterial color="#111827" /></mesh>
-        <Text position={[0.58, 0.56, 0.2]} fontSize={0.18} maxWidth={1.25} textAlign="center" anchorX="center" anchorY="middle" color="#f8fafc">Vintage. You haul it.</Text>
-      </group>
-
-      <group position={[4.62, 1.15, 2.5]} rotation={[0, -Math.PI / 2, 0]}>
-        <mesh position={[-0.7, 0.1, 0]}><boxGeometry args={[1.25, 0.38, 0.48]} /><meshStandardMaterial color="#1f2937" /></mesh>
-        <mesh position={[-0.7, 0.11, 0.26]}><boxGeometry args={[0.58, 0.18, 0.03]} /><meshStandardMaterial color="#22d3ee" emissive="#22d3ee" emissiveIntensity={1.2} /></mesh>
-        <Text position={[-0.7, 0.52, 0.2]} fontSize={0.16} maxWidth={1.4} textAlign="center" anchorX="center" anchorY="middle" color="#f8fafc">Not a tool. Still for sale.</Text>
-
-        <group position={[0.72, 0.02, 0]}>
-          <mesh><boxGeometry args={[0.42, 0.76, 0.18]} /><meshStandardMaterial color="#374151" /></mesh>
-          <mesh position={[0, 0, 0.12]}><boxGeometry args={[0.5, 0.06, 0.04]} /><meshStandardMaterial color="#111827" /></mesh>
-          <mesh position={[0, 0.24, 0.12]}><boxGeometry args={[0.5, 0.06, 0.04]} /><meshStandardMaterial color="#111827" /></mesh>
-          <mesh position={[0, -0.24, 0.12]}><boxGeometry args={[0.5, 0.06, 0.04]} /><meshStandardMaterial color="#111827" /></mesh>
-          <mesh position={[-0.2, 0, 0.12]}><boxGeometry args={[0.05, 0.82, 0.04]} /><meshStandardMaterial color="#111827" /></mesh>
-          <mesh position={[0.2, 0, 0.12]}><boxGeometry args={[0.05, 0.82, 0.04]} /><meshStandardMaterial color="#111827" /></mesh>
-        </group>
-        <Text position={[0.72, 0.62, 0.2]} fontSize={0.14} maxWidth={1.5} textAlign="center" anchorX="center" anchorY="middle" color="#f8fafc">Display model. It rings if you believe.</Text>
-      </group>
-
-      <group position={[4.42, 0.72, -3.0]}>
-        <mesh position={[0, 0.08, 0]}><boxGeometry args={[0.9, 1.15, 2.35]} /><meshStandardMaterial color="#6b4f3a" /></mesh>
-        <mesh position={[-0.1, 0.78, -0.72]} rotation={[0.08, 0.18, 0.04]}><boxGeometry args={[0.58, 0.5, 0.42]} /><meshStandardMaterial color="#9ca3af" /></mesh>
-        <mesh position={[0.1, 0.82, 0]} rotation={[-0.04, -0.12, -0.08]}><boxGeometry args={[0.62, 0.46, 0.48]} /><meshStandardMaterial color="#b45309" /></mesh>
-        <mesh position={[-0.08, 0.76, 0.72]} rotation={[0.05, 0.1, 0.09]}><boxGeometry args={[0.54, 0.52, 0.46]} /><meshStandardMaterial color="#475569" /></mesh>
-        <Text position={[-0.52, 1.55, 0]} rotation={[0, -Math.PI / 2, 0]} fontSize={0.3} maxWidth={2.7} textAlign="center" anchorX="center" anchorY="middle" color="#fef08a">Stolen items 50% off</Text>
+        <mesh>
+          <boxGeometry args={[3.5, 2.4, 0.12]} />
+          <meshStandardMaterial color="#8a7b68" />
+        </mesh>
+        <mesh position={[-0.9, 0.35, 0.12]}>
+          <boxGeometry args={[0.18, 1.25, 0.16]} />
+          <meshStandardMaterial color="#6b7280" />
+        </mesh>
+        <mesh position={[-0.55, 0.78, 0.12]}>
+          <boxGeometry args={[0.85, 0.22, 0.16]} />
+          <meshStandardMaterial color="#374151" />
+        </mesh>
+        <mesh position={[0.45, 0.12, 0.12]} rotation={[0, 0, -0.55]}>
+          <boxGeometry args={[0.22, 1.35, 0.16]} />
+          <meshStandardMaterial color="#6b7280" />
+        </mesh>
+        <mesh position={[0.78, 0.62, 0.12]} rotation={[0, 0, -0.55]}>
+          <boxGeometry args={[0.7, 0.24, 0.16]} />
+          <meshStandardMaterial color="#374151" />
+        </mesh>
+        <mesh position={[1.15, -0.52, 0.12]}>
+          <boxGeometry args={[0.22, 0.9, 0.16]} />
+          <meshStandardMaterial color="#6b7280" />
+        </mesh>
       </group>
     </>
   );
