@@ -106,6 +106,14 @@ const NORTH_EXPANSION_BUILDINGS: BuildingData[] = [
   { id: "LB-POOL-001", name: "Pool Hall", type: "business", status: "coming_soon", owner: null, position: [5, 0, -121.55], size: [4.4, 3.9, 5.1], color: "#586f64", description: "Future pool hall." },
   { id: "LB-THEATER-001", name: "Movie Theater", type: "business", status: "coming_soon", owner: null, position: [15, 0, -122.1], size: [5.7, 4.5, 6.2], color: "#68566f", description: "Future movie theater." },
   { id: "LB-BINGO-001", name: "Bingo Hall", type: "business", status: "coming_soon", owner: null, position: [25, 0, -121.8], size: [4.8, 4.0, 5.6], color: "#7b6658", description: "Future bingo hall." },
+  { id: "LB-GYM-001", name: "Gym", type: "business", status: "coming_soon", owner: null, position: [-25, 0, -139.9], size: [5.6, 4.4, 6.2], color: "#5d6974", description: "Future gym." },
+  { id: "LB-TATTOO-001", name: "Tattoo Shop", type: "business", status: "coming_soon", owner: null, position: [-15, 0, -140.4], size: [4.4, 3.8, 5.2], color: "#665564", description: "Future tattoo shop." },
+  { id: "LB-SPA-001", name: "Massage / Spa", type: "business", status: "coming_soon", owner: null, position: [-5, 0, -140.1], size: [5.1, 4.1, 5.8], color: "#6b7d78", description: "Future massage and spa." },
+  { id: "LB-TRAVEL-001", name: "Travel Agency", type: "business", status: "coming_soon", owner: null, position: [5, 0, -140.3], size: [4.7, 3.9, 5.4], color: "#61758a", description: "Future travel agency." },
+  { id: "LB-STORAGE-001", name: "Storage Rental Office", type: "business", status: "coming_soon", owner: null, position: [15, 0, -139.8], size: [5.8, 4.6, 6.4], color: "#756954", description: "Future storage rental office." },
+  { id: "LB-DONUTS-001", name: "Bluff Donuts", type: "business", status: "coming_soon", owner: null, position: [25, 0, -140.5], size: [4.3, 3.7, 5.0], color: "#8a6b72", description: "Future Bluff Donuts." },
+  { id: "LB-CHICKEN-001", name: "Chicken Shack", type: "business", status: "coming_soon", owner: null, position: [-5, 0, -153.95], size: [5.2, 4.2, 5.9], color: "#8a7048", description: "Future chicken shack." },
+  { id: "LB-FISH-001", name: "Fish & Chips", type: "business", status: "coming_soon", owner: null, position: [5, 0, -153.7], size: [4.6, 4.0, 5.4], color: "#587889", description: "Future fish and chips shop." },
 ];
 
 const NORTH_EXPANSION_ROADS: RoadData[] = [
@@ -117,22 +125,24 @@ const NORTH_EXPANSION_ROADS: RoadData[] = [
   { id: "LB-ROAD-EW-005", position: [0, 0.02, -83], size: [66, 0.04, 3] },
   { id: "LB-ALLEY-005", position: [0, 0.025, -100.5], size: [58, 0.03, 1.6] },
   { id: "LB-ROAD-EW-006", position: [0, 0.02, -115], size: [66, 0.04, 3] },
-  { id: "LB-ROAD-NS-NORTH-001", position: [0, 0.02, -83], size: [3, 0.04, 88] },
-  { id: "LB-ROAD-OUTER-W-NORTH-001", position: [-34, 0.02, -83], size: [3, 0.04, 88] },
-  { id: "LB-ROAD-OUTER-E-NORTH-001", position: [34, 0.02, -83], size: [3, 0.04, 88] },
+  { id: "LB-ALLEY-006", position: [0, 0.025, -132.5], size: [58, 0.03, 1.6] },
+  { id: "LB-ROAD-EW-007", position: [0, 0.02, -147], size: [66, 0.04, 3] },
+  { id: "LB-ROAD-NS-NORTH-001", position: [0, 0.02, -99.5], size: [3, 0.04, 121] },
+  { id: "LB-ROAD-OUTER-W-NORTH-001", position: [-34, 0.02, -99.5], size: [3, 0.04, 121] },
+  { id: "LB-ROAD-OUTER-E-NORTH-001", position: [34, 0.02, -99.5], size: [3, 0.04, 121] },
 ];
 
 const OUTER_RING_ROADS: RoadData[] = [
   { id: "LB-ROAD-OUTER-W-001", position: [-34, 0.02, 0], size: [3, 0.04, 78] },
   { id: "LB-ROAD-OUTER-E-001", position: [34, 0.02, 0], size: [3, 0.04, 78] },
-  { id: "LB-ROAD-OUTER-N-001", position: [0, 0.02, -127], size: [68, 0.04, 3] },
+  { id: "LB-ROAD-OUTER-N-001", position: [0, 0.02, -160], size: [68, 0.04, 3] },
 ];
 
 const rawTown = townJson as TownData;
 
 export const townData: TownData = {
   ...rawTown,
-  groundSize: 260,
+  groundSize: 330,
   roads: [...rawTown.roads, ...NORTH_EXPANSION_ROADS, ...OUTER_RING_ROADS],
   buildings: [
     ...rawTown.buildings.map((building) => {
