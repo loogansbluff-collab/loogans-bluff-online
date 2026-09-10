@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { townData } from "@/data/town";
 import { enterStreetInFront } from "@/lib/enterBuildingStreet";
 import { isSouthTreeLotId } from "@/lib/southDecor";
@@ -20,6 +20,26 @@ function getDirectoryBuildingId(id: string) {
 export default function TownDirectory() {
   const [expanded, setExpanded] = useState(false);
   const [filter, setFilter] = useState("");
+  const [touchCapable, setTouchCapable] = useState(false);
+  const [keyboardActive, setKeyboardActive] = useState(false);
+
+  useEffect(() => {
+    const updateInputMode = () => {
+      setTouchCapable(window.matchMedia("(pointer: coarse)").matches || navigator.maxTouchPoints > 0);
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.isTrusted) setKeyboardActive(true);
+    };
+
+    updateInputMode();
+    window.addEventListener("resize", updateInputMode);
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      window.removeEventListener("resize", updateInputMode);
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, []);
 
   const normalizedFilter = filter.trim().toLowerCase();
   const buildings = useMemo(
@@ -43,12 +63,25 @@ export default function TownDirectory() {
     [normalizedFilter],
   );
 
+  const mobileTouchOnly = touchCapable && !keyboardActive;
+  const mobileCollapsed = mobileTouchOnly && !expanded;
+
   return (
-    <aside className="fixed bottom-4 right-4 z-20 w-[min(19rem,calc(100vw-2rem))] rounded-xl border border-white/10 bg-slate-950/90 text-white shadow-2xl backdrop-blur-sm">
+    <aside
+      className={
+        mobileCollapsed
+          ? "fixed bottom-4 right-3 z-20 w-auto rounded-xl border border-white/10 bg-slate-950/90 text-white shadow-2xl backdrop-blur-sm"
+          : "fixed bottom-4 right-4 z-20 w-[min(19rem,calc(100vw-2rem))] rounded-xl border border-white/10 bg-slate-950/90 text-white shadow-2xl backdrop-blur-sm"
+      }
+    >
       <button
         type="button"
         onClick={() => setExpanded((value) => !value)}
-        className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-semibold"
+        className={
+          mobileCollapsed
+            ? "flex items-center justify-between gap-2 px-3 py-2 text-left text-xs font-semibold"
+            : "flex w-full items-center justify-between px-4 py-3 text-left text-sm font-semibold"
+        }
         aria-expanded={expanded}
       >
         <span>Town Directory</span>
