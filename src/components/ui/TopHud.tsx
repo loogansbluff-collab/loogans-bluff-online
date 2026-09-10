@@ -38,7 +38,7 @@ export default function TopHud() {
   const showDesktopWalkHelp = !touchCapable || keyboardActive;
 
   return (
-    <div className="pointer-events-none fixed bottom-6 left-1/2 z-50 -translate-x-1/2 text-center">
+    <div className="pointer-events-none fixed bottom-20 left-1/2 z-50 -translate-x-1/2 text-center sm:bottom-6">
       {mode === "aerial" ? (
         <button
           type="button"
