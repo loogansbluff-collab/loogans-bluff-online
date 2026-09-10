@@ -30,6 +30,15 @@ const PROFILES: Record<string, Profile> = {
   "LB-HOME-004": { wall: "#b65f62", trim: "#f6d6d7", door: "#6b2f33", sign: "LOOGANS MOTEL", signColor: "#fde68a", feature: "motel" },
 };
 
+const FIRST_SIX_NORTH_IDS = new Set([
+  "LB-GROCERY-001",
+  "LB-PHARMACY-001",
+  "LB-FIREHALL-001",
+  "LB-POST-001",
+  "LB-DENTIST-001",
+  "LB-VET-001",
+]);
+
 const UNDER_CONSTRUCTION_IDS = new Set([
   "LB-GROCERY-001", "LB-PHARMACY-001", "LB-FIREHALL-001", "LB-POST-001", "LB-DENTIST-001", "LB-VET-001",
   "LB-FUNERAL-001", "LB-LAUNDRY-001", "LB-BAKERY-001", "LB-COFFEE-001", "LB-PIZZA-001", "LB-BURGER-001",
@@ -89,6 +98,8 @@ export default function TownBusinessBuilding({ building, onPointerDown, onPointe
   const barred = profile.feature === "bail" || profile.feature === "police";
   const faceNorth = rowFacesNorth(z);
   const underConstruction = UNDER_CONSTRUCTION_IDS.has(building.id);
+  const firstSixNorth = FIRST_SIX_NORTH_IDS.has(building.id);
+  const doorColor = firstSixNorth ? building.color : profile.door;
 
   return (
     <group position={[x, 0, z]} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
@@ -97,7 +108,14 @@ export default function TownBusinessBuilding({ building, onPointerDown, onPointe
       {profile.feature === "police" ? <><mesh position={[-0.42, height + 0.18, 0]}><boxGeometry args={[0.55, 0.18, 0.35]} /><meshStandardMaterial color="#2563eb" emissive="#1d4ed8" emissiveIntensity={0.6} /></mesh><mesh position={[0.42, height + 0.18, 0]}><boxGeometry args={[0.55, 0.18, 0.35]} /><meshStandardMaterial color="#dc2626" emissive="#b91c1c" emissiveIntensity={0.6} /></mesh></> : null}
 
       <group rotation={[0, faceNorth ? Math.PI : 0, 0]}>
-        <mesh position={[doorX, 1.15, frontZ]}><boxGeometry args={[0.92, 2.3, 0.1]} /><meshStandardMaterial color={profile.door} /></mesh>
+        <mesh position={[doorX, 1.15, frontZ]}><boxGeometry args={[0.92, 2.3, 0.1]} /><meshStandardMaterial color={doorColor} /></mesh>
+        {firstSixNorth ? (
+          <>
+            <mesh position={[doorX - 0.5, 1.15, frontZ + 0.06]}><boxGeometry args={[0.08, 2.38, 0.06]} /><meshStandardMaterial color={profile.trim} /></mesh>
+            <mesh position={[doorX + 0.5, 1.15, frontZ + 0.06]}><boxGeometry args={[0.08, 2.38, 0.06]} /><meshStandardMaterial color={profile.trim} /></mesh>
+            <mesh position={[doorX, 2.34, frontZ + 0.06]}><boxGeometry args={[1.08, 0.08, 0.06]} /><meshStandardMaterial color={profile.trim} /></mesh>
+          </>
+        ) : null}
         <mesh position={[doorX + 0.28, 1.15, frontZ + 0.065]}><sphereGeometry args={[0.055, 10, 10]} /><meshStandardMaterial color="#d6b36a" /></mesh>
         <Window x={windowX} y={height * 0.48} z={frontZ} width={Math.min(1.35, width * 0.3)} bars={barred} />
         {width >= 5 ? <Window x={secondWindowX} y={height * 0.48} z={frontZ} width={1.05} bars={barred} /> : null}
