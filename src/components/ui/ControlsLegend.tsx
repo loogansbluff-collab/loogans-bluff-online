@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { townData } from "@/data/town";
 import { isInteriorShopId } from "@/lib/enterInterior";
 import { findNearestProperty } from "@/lib/proximity";
@@ -11,6 +12,7 @@ const PROXIMITY_RANGE = 4.5;
 export default function ControlsLegend() {
   const mode = useGameStore((state) => state.mode);
   const playerPosition = useGameStore((state) => state.playerPosition);
+  const [expanded, setExpanded] = useState(false);
 
   let controls: string[];
 
@@ -33,13 +35,26 @@ export default function ControlsLegend() {
   }
 
   return (
-    <div className="pointer-events-none fixed bottom-4 left-4 z-20 rounded bg-slate-950/75 px-3 py-2 text-xs text-white shadow-lg backdrop-blur-sm">
-      <div className="font-semibold uppercase tracking-wide text-slate-300">Controls</div>
-      <ul className="mt-1 space-y-0.5">
-        {controls.map((control) => (
-          <li key={control}>{control}</li>
-        ))}
-      </ul>
-    </div>
+    <aside className="fixed bottom-4 left-4 z-20 w-[min(22rem,calc(100vw-2rem))] rounded-xl border border-white/10 bg-slate-950/90 text-white shadow-2xl backdrop-blur-sm">
+      <button
+        type="button"
+        onClick={() => setExpanded((value) => !value)}
+        className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-semibold"
+        aria-expanded={expanded}
+      >
+        <span className="uppercase tracking-wide text-slate-300">Controls</span>
+        <span className="text-slate-400">{expanded ? "−" : "+"}</span>
+      </button>
+
+      {expanded ? (
+        <div className="border-t border-white/10 px-4 py-3 text-xs text-white">
+          <ul className="space-y-1">
+            {controls.map((control) => (
+              <li key={control}>{control}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+    </aside>
   );
 }
