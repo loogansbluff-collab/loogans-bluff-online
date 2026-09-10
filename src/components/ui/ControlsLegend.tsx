@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { townData } from "@/data/town";
 import { isInteriorShopId } from "@/lib/enterInterior";
 import { findNearestProperty } from "@/lib/proximity";
@@ -13,6 +13,30 @@ export default function ControlsLegend() {
   const mode = useGameStore((state) => state.mode);
   const playerPosition = useGameStore((state) => state.playerPosition);
   const [expanded, setExpanded] = useState(false);
+  const [touchOnly, setTouchOnly] = useState(false);
+  const [keyboardSeen, setKeyboardSeen] = useState(false);
+
+  useEffect(() => {
+    const updateInputMode = () => {
+      const coarse = window.matchMedia("(pointer: coarse)").matches || navigator.maxTouchPoints > 0;
+      const fine = window.matchMedia("(pointer: fine)").matches;
+      setTouchOnly(coarse && !fine);
+    };
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.isTrusted) setKeyboardSeen(true);
+    };
+
+    updateInputMode();
+    window.addEventListener("resize", updateInputMode);
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("resize", updateInputMode);
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, []);
+
+  if (touchOnly && !keyboardSeen) return null;
 
   let controls: string[];
 
