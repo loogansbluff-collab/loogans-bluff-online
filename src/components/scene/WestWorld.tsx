@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo } from "react";
-import { BufferGeometry, Float32BufferAttribute, Vector3 } from "three";
+import { useMemo, useRef } from "react";
+import { useFrame } from "@react-three/fiber";
+import { BufferGeometry, Float32BufferAttribute, ShaderMaterial, Vector3 } from "three";
 import {
   getWestRiverCurve,
   getWestRiverWidth,
@@ -40,7 +41,40 @@ function makeStripGeometry(points: StripPoint[], y: number) {
   return geometry;
 }
 
+const WATER_VERTEX_SHADER = `
+  varying vec3 vWorldPosition;
+
+  void main() {
+    vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+    vWorldPosition = worldPosition.xyz;
+    gl_Position = projectionMatrix * viewMatrix * worldPosition;
+  }
+`;
+
+const WATER_FRAGMENT_SHADER = `
+  uniform float uTime;
+  varying vec3 vWorldPosition;
+
+  void main() {
+    float flow = vWorldPosition.z * 0.23 - uTime * 1.25;
+    float rippleA = sin(flow + vWorldPosition.x * 0.55);
+    float rippleB = sin(flow * 1.7 - vWorldPosition.x * 0.34 + uTime * 0.32);
+    float ripple = smoothstep(1.15, 1.82, rippleA + rippleB);
+
+    vec3 deepWater = vec3(0.075, 0.22, 0.29);
+    vec3 riverBlue = vec3(0.11, 0.34, 0.41);
+    vec3 highlight = vec3(0.34, 0.58, 0.62);
+
+    float broadVariation = 0.5 + 0.5 * sin(vWorldPosition.z * 0.045 + uTime * 0.12);
+    vec3 baseColor = mix(deepWater, riverBlue, 0.42 + broadVariation * 0.12);
+    vec3 color = mix(baseColor, highlight, ripple * 0.26);
+
+    gl_FragColor = vec4(color, 0.94);
+  }
+`;
+
 export default function WestWorld() {
+  const waterMaterialRef = useRef<ShaderMaterial>(null);
   const extensionWidth = WEST_GROUND_MAX_X - WEST_GROUND_MIN_X;
   const extensionCenterX = (WEST_GROUND_MIN_X + WEST_GROUND_MAX_X) / 2;
 
@@ -74,6 +108,12 @@ export default function WestWorld() {
     };
   }, []);
 
+  useFrame((state) => {
+    if (waterMaterialRef.current) {
+      waterMaterialRef.current.uniforms.uTime.value = state.clock.elapsedTime;
+    }
+  });
+
   return (
     <group>
       <mesh position={[extensionCenterX, -0.012, 0]} rotation={[-Math.PI / 2, 0, 0]}>
@@ -82,13 +122,20 @@ export default function WestWorld() {
       </mesh>
 
       <mesh geometry={waterGeometry}>
-        <meshStandardMaterial color="#233b48" roughness={0.35} metalness={0.05} />
+        <shaderMaterial
+          ref={waterMaterialRef}
+          vertexShader={WATER_VERTEX_SHADER}
+          fragmentShader={WATER_FRAGMENT_SHADER}
+          uniforms={{ uTime: { value: 0 } }}
+          transparent
+          depthWrite={false}
+        />
       </mesh>
       <mesh geometry={westBankGeometry}>
-        <meshStandardMaterial color="#6a5b3d" />
+        <meshStandardMaterial color="#6a5b3d" roughness={0.9} />
       </mesh>
       <mesh geometry={eastBankGeometry}>
-        <meshStandardMaterial color="#6a5b3d" />
+        <meshStandardMaterial color="#6a5b3d" roughness={0.9} />
       </mesh>
     </group>
   );
