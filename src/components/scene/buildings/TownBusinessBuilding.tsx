@@ -75,24 +75,24 @@ function SpecialFeature({ feature, width, height, frontZ }: { feature?: Profile[
   return null;
 }
 
-function MotelUnit({ x, y, frontZ, number, office = false }: { x: number; y: number; frontZ: number; number: number; office?: boolean }) {
+function MotelUnit({ x, frontZ, number, office = false }: { x: number; frontZ: number; number: number; office?: boolean }) {
   return (
-    <group position={[x, y, frontZ]}>
+    <group position={[x, 1.15, frontZ]}>
       <mesh>
-        <boxGeometry args={[0.82, 1.9, 0.12]} />
+        <boxGeometry args={[0.9, 2.15, 0.12]} />
         <meshStandardMaterial color="#6b2f33" />
       </mesh>
-      <mesh position={[0.25, 0, 0.085]}>
-        <sphereGeometry args={[0.045, 10, 10]} />
+      <mesh position={[0.28, 0, 0.085]}>
+        <sphereGeometry args={[0.05, 10, 10]} />
         <meshStandardMaterial color="#d6b36a" />
       </mesh>
-      <mesh position={[-0.72, 0.08, 0.015]}>
-        <boxGeometry args={[0.72, 1.05, 0.09]} />
+      <mesh position={[-0.67, 0.08, 0.015]}>
+        <boxGeometry args={[0.62, 1.08, 0.09]} />
         <meshStandardMaterial color="#8fb5c7" emissive="#6b91a3" emissiveIntensity={0.12} />
       </mesh>
       <Text
-        position={[0, 1.16, 0.09]}
-        fontSize={office ? 0.18 : 0.21}
+        position={[0, 1.34, 0.09]}
+        fontSize={office ? 0.18 : 0.22}
         maxWidth={1.7}
         lineHeight={1.02}
         textAlign="center"
@@ -110,20 +110,16 @@ function LoogansMotel({ building, onPointerDown, onPointerUp }: { building: Buil
   const [x, , z] = building.position;
   const faceNorth = rowFacesNorth(z);
   const width = 12;
-  const height = 6.5;
+  const height = 3.9;
   const depth = 4.8;
   const frontZ = depth / 2 + 0.065;
-  const unitXs = [-4.8, -2.4, 0, 2.4, 4.8];
-  const upperY = 4.25;
-  const lowerY = 1.2;
-  const walkwayY = 3.08;
-  const walkwayOuterZ = frontZ + 0.82;
+  const unitXs = [-5, -3, -1, 1, 3, 5];
 
   return (
     <group position={[x, 0, z]} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
       <group rotation={[0, faceNorth ? Math.PI : 0, 0]}>
         <mesh position={[0, 0.08, 0]}>
-          <boxGeometry args={[width + 0.7, 0.16, depth + 1.7]} />
+          <boxGeometry args={[width + 0.7, 0.16, depth + 1.3]} />
           <meshStandardMaterial color="#262626" />
         </mesh>
         <mesh position={[0, height / 2, 0]}>
@@ -135,14 +131,14 @@ function LoogansMotel({ building, onPointerDown, onPointerUp }: { building: Buil
           <meshStandardMaterial color="#111111" />
         </mesh>
 
-        <mesh position={[-2.1, height - 0.42, frontZ + 0.04]}>
-          <boxGeometry args={[5.1, 0.62, 0.09]} />
+        <mesh position={[-2.25, height - 0.44, frontZ + 0.04]}>
+          <boxGeometry args={[4.8, 0.58, 0.09]} />
           <meshStandardMaterial color="#252525" />
         </mesh>
         <Text
-          position={[-2.1, height - 0.42, frontZ + 0.1]}
-          fontSize={0.34}
-          maxWidth={4.6}
+          position={[-2.25, height - 0.44, frontZ + 0.1]}
+          fontSize={0.32}
+          maxWidth={4.3}
           textAlign="center"
           anchorX="center"
           anchorY="middle"
@@ -152,42 +148,8 @@ function LoogansMotel({ building, onPointerDown, onPointerUp }: { building: Buil
         </Text>
 
         {unitXs.map((unitX, index) => (
-          <MotelUnit key={`upper-${index}`} x={unitX} y={upperY} frontZ={frontZ} number={index + 1} />
+          <MotelUnit key={index} x={unitX} frontZ={frontZ} number={index + 1} office={index === 5} />
         ))}
-        {unitXs.map((unitX, index) => (
-          <MotelUnit key={`lower-${index}`} x={unitX} y={lowerY} frontZ={frontZ} number={index + 6} office={index === 4} />
-        ))}
-
-        <mesh position={[0, walkwayY, frontZ + 0.72]}>
-          <boxGeometry args={[width + 0.4, 0.16, 1.45]} />
-          <meshStandardMaterial color="#4b4141" />
-        </mesh>
-        <mesh position={[0, walkwayY + 0.82, walkwayOuterZ + 0.62]}>
-          <boxGeometry args={[width + 0.25, 0.08, 0.08]} />
-          <meshStandardMaterial color="#e9c9ca" />
-        </mesh>
-        {[-5.8, -3.6, -1.2, 1.2, 3.6, 5.8].map((railX) => (
-          <mesh key={railX} position={[railX, walkwayY + 0.42, walkwayOuterZ + 0.62]}>
-            <boxGeometry args={[0.08, 0.84, 0.08]} />
-            <meshStandardMaterial color="#e9c9ca" />
-          </mesh>
-        ))}
-
-        <group position={[-6.05, 0, frontZ + 0.62]}>
-          {Array.from({ length: 10 }, (_, index) => {
-            const step = index;
-            return (
-              <mesh key={step} position={[-0.28 * step, 0.18 + step * 0.29, 0]}>
-                <boxGeometry args={[0.62, 0.18, 1.18]} />
-                <meshStandardMaterial color="#4b4141" />
-              </mesh>
-            );
-          })}
-          <mesh position={[-1.3, 1.6, 0.66]} rotation={[0, 0, -0.78]}>
-            <boxGeometry args={[0.08, 3.7, 0.08]} />
-            <meshStandardMaterial color="#e9c9ca" />
-          </mesh>
-        </group>
       </group>
     </group>
   );
