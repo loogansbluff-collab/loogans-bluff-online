@@ -20,6 +20,10 @@ export const WEST_BRIDGE_DECK_Y = 0.12;
 const WEST_BRIDGE_WALK_HALF_WIDTH = WEST_BRIDGE_WIDTH / 2 - 0.42;
 const WEST_BRIDGE_RAIL_BLOCK_DEPTH = 0.55;
 
+export const WEST_FAR_TRAIL_START_X = WEST_BRIDGE_WEST_X;
+export const WEST_FAR_TRAIL_END_X = -116;
+export const WEST_FAR_TRAIL_WIDTH = 3;
+
 export const WEST_RIVER_POINTS = [
   [-82, -209],
   [-79, -160],

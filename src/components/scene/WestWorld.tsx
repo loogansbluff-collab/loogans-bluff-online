@@ -11,6 +11,9 @@ import {
   WEST_APPROACH_START_X,
   WEST_APPROACH_WIDTH,
   WEST_EXIT_Z,
+  WEST_FAR_TRAIL_END_X,
+  WEST_FAR_TRAIL_START_X,
+  WEST_FAR_TRAIL_WIDTH,
   WEST_GROUND_MAX_X,
   WEST_GROUND_MIN_X,
   WEST_RIVER_BANK_WIDTH,
@@ -84,6 +87,8 @@ export default function WestWorld() {
   const extensionCenterX = (WEST_GROUND_MIN_X + WEST_GROUND_MAX_X) / 2;
   const approachLength = WEST_APPROACH_START_X - WEST_APPROACH_END_X;
   const approachCenterX = (WEST_APPROACH_START_X + WEST_APPROACH_END_X) / 2;
+  const farTrailLength = WEST_FAR_TRAIL_START_X - WEST_FAR_TRAIL_END_X;
+  const farTrailCenterX = (WEST_FAR_TRAIL_START_X + WEST_FAR_TRAIL_END_X) / 2;
 
   const { waterGeometry, westBankGeometry, eastBankGeometry } = useMemo(() => {
     const curve = getWestRiverCurve();
@@ -130,6 +135,11 @@ export default function WestWorld() {
 
       <mesh position={[approachCenterX, 0.024, WEST_EXIT_Z]}>
         <boxGeometry args={[approachLength, 0.045, WEST_APPROACH_WIDTH]} />
+        <meshStandardMaterial color="#4a3426" roughness={0.95} />
+      </mesh>
+
+      <mesh position={[farTrailCenterX, 0.024, WEST_EXIT_Z]}>
+        <boxGeometry args={[farTrailLength, 0.045, WEST_FAR_TRAIL_WIDTH]} />
         <meshStandardMaterial color="#4a3426" roughness={0.95} />
       </mesh>
 
