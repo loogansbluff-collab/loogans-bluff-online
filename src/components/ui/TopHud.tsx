@@ -15,7 +15,9 @@ export default function TopHud() {
     const updateInputMode = () => {
       setTouchCapable(window.matchMedia("(pointer: coarse)").matches || navigator.maxTouchPoints > 0);
     };
-    const onKeyDown = () => setKeyboardActive(true);
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.isTrusted) setKeyboardActive(true);
+    };
 
     updateInputMode();
     window.addEventListener("resize", updateInputMode);
