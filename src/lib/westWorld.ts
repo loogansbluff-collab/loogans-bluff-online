@@ -44,10 +44,10 @@ export const COUNTRY_WEST_DRIVEWAY_END: [number, number] = [-181.2, 3.8];
 export const COUNTRY_WEST_DRIVEWAY_WIDTH = 1.45;
 const COUNTRY_WEST_HOUSE_COLLISION_PADDING = 0.45;
 
-export const COUNTRY_WEST_ROADBLOCK_T = 0.09;
+export const COUNTRY_WEST_ROADBLOCK_T = 0.78;
 export const COUNTRY_WEST_ROADBLOCK_WIDTH = 5.2;
 export const COUNTRY_WEST_ROADBLOCK_DEPTH = 0.7;
-const COUNTRY_WEST_ROADBLOCK_COLLISION_PADDING = 0.35;
+const COUNTRY_WEST_ROADBLOCK_COLLISION_PADDING = 0.55;
 
 export const WEST_RIVER_POINTS = [
   [-82, -209],
@@ -78,12 +78,14 @@ export function getCountryWestRoadCurve() {
 }
 
 export function getCountryWestRoadblockPose() {
-  const curve = getCountryWestRoadCurve();
-  const point = curve.getPoint(COUNTRY_WEST_ROADBLOCK_T);
-  const tangent = curve.getTangent(COUNTRY_WEST_ROADBLOCK_T).normalize();
+  const [startX, startZ] = COUNTRY_WEST_DRIVEWAY_START;
+  const [endX, endZ] = COUNTRY_WEST_DRIVEWAY_END;
+  const x = startX + (endX - startX) * COUNTRY_WEST_ROADBLOCK_T;
+  const z = startZ + (endZ - startZ) * COUNTRY_WEST_ROADBLOCK_T;
+  const tangent = new Vector3(endX - startX, 0, endZ - startZ).normalize();
   return {
-    x: point.x,
-    z: point.z,
+    x,
+    z,
     rotationY: Math.atan2(tangent.x, tangent.z),
   };
 }

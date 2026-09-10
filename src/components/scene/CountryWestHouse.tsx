@@ -8,6 +8,10 @@ import {
   COUNTRY_WEST_HOUSE_SIZE,
 } from "@/lib/westWorld";
 
+const LOG_ROWS = 10;
+const LOG_RADIUS = 0.18;
+const LOG_SPACING = 0.29;
+
 export default function CountryWestHouse() {
   const [houseX, houseZ] = COUNTRY_WEST_HOUSE_CENTER;
   const [houseWidth, houseDepth] = COUNTRY_WEST_HOUSE_SIZE;
@@ -19,6 +23,7 @@ export default function CountryWestHouse() {
   const driveRotation = Math.atan2(driveDx, driveDz);
   const driveCenterX = (driveStartX + driveEndX) / 2;
   const driveCenterZ = (driveStartZ + driveEndZ) / 2;
+  const logRows = Array.from({ length: LOG_ROWS }, (_, index) => LOG_RADIUS + index * LOG_SPACING);
 
   return (
     <group>
@@ -30,8 +35,29 @@ export default function CountryWestHouse() {
       <group position={[houseX, 0, houseZ]}>
         <mesh position={[0, 1.45, 0]}>
           <boxGeometry args={[houseWidth, 2.9, houseDepth]} />
-          <meshStandardMaterial color="#8a765d" roughness={0.96} />
+          <meshStandardMaterial color="#6f5238" roughness={0.99} />
         </mesh>
+
+        {logRows.map((y, index) => (
+          <group key={`log-row-${index}`}>
+            <mesh position={[0, y, houseDepth / 2 + 0.02]} rotation={[0, 0, Math.PI / 2]}>
+              <cylinderGeometry args={[LOG_RADIUS, LOG_RADIUS * 1.05, houseWidth + 0.28, 8]} />
+              <meshStandardMaterial color="#78583a" roughness={1} />
+            </mesh>
+            <mesh position={[0, y, -houseDepth / 2 - 0.02]} rotation={[0, 0, Math.PI / 2]}>
+              <cylinderGeometry args={[LOG_RADIUS, LOG_RADIUS * 1.05, houseWidth + 0.28, 8]} />
+              <meshStandardMaterial color="#78583a" roughness={1} />
+            </mesh>
+            <mesh position={[houseWidth / 2 + 0.02, y, 0]} rotation={[Math.PI / 2, 0, 0]}>
+              <cylinderGeometry args={[LOG_RADIUS, LOG_RADIUS * 1.05, houseDepth + 0.28, 8]} />
+              <meshStandardMaterial color="#725236" roughness={1} />
+            </mesh>
+            <mesh position={[-houseWidth / 2 - 0.02, y, 0]} rotation={[Math.PI / 2, 0, 0]}>
+              <cylinderGeometry args={[LOG_RADIUS, LOG_RADIUS * 1.05, houseDepth + 0.28, 8]} />
+              <meshStandardMaterial color="#725236" roughness={1} />
+            </mesh>
+          </group>
+        ))}
 
         <mesh position={[0, 3.3, 0]} rotation={[0, Math.PI / 4, 0]}>
           <coneGeometry args={[5.05, 2.25, 4]} />

@@ -12,6 +12,9 @@ import {
 } from "three";
 import CountryWestHouse from "@/components/scene/CountryWestHouse";
 import {
+  COUNTRY_WEST_DRIVEWAY_END,
+  COUNTRY_WEST_DRIVEWAY_START,
+  COUNTRY_WEST_DRIVEWAY_WIDTH,
   COUNTRY_WEST_ROAD_SAMPLE_COUNT,
   COUNTRY_WEST_ROAD_WIDTH,
   COUNTRY_WEST_ROADBLOCK_DEPTH,
@@ -44,7 +47,8 @@ const FOREST_POCKETS: ForestPocket[] = [
   { centerX: -166, centerZ: -4, radiusX: 12, radiusZ: 12, count: 18 },
 ];
 
-const ROAD_CLEARANCE = COUNTRY_WEST_ROAD_WIDTH / 2 + 2.25;
+const ROAD_CLEARANCE = COUNTRY_WEST_ROAD_WIDTH / 2 + 2.75;
+const DRIVEWAY_CLEARANCE = COUNTRY_WEST_DRIVEWAY_WIDTH / 2 + 2.1;
 const CLEARING_CENTER = new Vector3(-182, 0, 8);
 const CLEARING_RADIUS_X = 12;
 const CLEARING_RADIUS_Z = 10;
@@ -70,6 +74,18 @@ function distanceToRoad(x: number, z: number) {
   return closest;
 }
 
+function distanceToDriveway(x: number, z: number) {
+  const [startX, startZ] = COUNTRY_WEST_DRIVEWAY_START;
+  const [endX, endZ] = COUNTRY_WEST_DRIVEWAY_END;
+  const dx = endX - startX;
+  const dz = endZ - startZ;
+  const lengthSq = dx * dx + dz * dz;
+  const t = Math.max(0, Math.min(1, ((x - startX) * dx + (z - startZ) * dz) / lengthSq));
+  const closestX = startX + dx * t;
+  const closestZ = startZ + dz * t;
+  return Math.hypot(x - closestX, z - closestZ);
+}
+
 function isInsideClearing(x: number, z: number) {
   const nx = (x - CLEARING_CENTER.x) / CLEARING_RADIUS_X;
   const nz = (z - CLEARING_CENTER.z) / CLEARING_RADIUS_Z;
@@ -93,6 +109,7 @@ function makeTreeSpecs() {
       const z = pocket.centerZ + Math.sin(angle) * pocket.radiusZ * radius * clusterPull + (random() - 0.5) * 2.8;
 
       if (distanceToRoad(x, z) < ROAD_CLEARANCE) continue;
+      if (distanceToDriveway(x, z) < DRIVEWAY_CLEARANCE) continue;
       if (isInsideClearing(x, z)) continue;
 
       const nearExisting = trees.some((tree) => Math.hypot(tree.x - x, tree.z - z) < 1.35);
