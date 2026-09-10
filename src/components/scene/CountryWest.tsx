@@ -18,56 +18,96 @@ import {
 type TreeSpec = {
   x: number;
   z: number;
-  scale: number;
+  scaleX: number;
+  scaleY: number;
   rotation: number;
 };
 
-const TREE_SPECS: TreeSpec[] = [
-  { x: -121, z: -59, scale: 1.0, rotation: 0.2 },
-  { x: -125, z: -61, scale: 1.15, rotation: 1.1 },
-  { x: -129, z: -59, scale: 0.9, rotation: 2.0 },
-  { x: -133, z: -57, scale: 1.2, rotation: 0.5 },
-  { x: -137, z: -55, scale: 1.05, rotation: 1.7 },
-  { x: -142, z: -53, scale: 1.18, rotation: 2.6 },
-  { x: -147, z: -49, scale: 0.95, rotation: 0.8 },
-  { x: -152, z: -45, scale: 1.12, rotation: 1.9 },
-  { x: -157, z: -40, scale: 1.24, rotation: 2.9 },
-  { x: -162, z: -35, scale: 1.02, rotation: 0.3 },
-  { x: -166, z: -30, scale: 1.2, rotation: 1.5 },
-  { x: -120, z: -43, scale: 0.92, rotation: 2.4 },
-  { x: -124, z: -40, scale: 1.1, rotation: 0.7 },
-  { x: -128, z: -38, scale: 1.22, rotation: 1.8 },
-  { x: -133, z: -35, scale: 0.98, rotation: 2.8 },
-  { x: -138, z: -31, scale: 1.14, rotation: 0.4 },
-  { x: -143, z: -27, scale: 1.05, rotation: 1.3 },
-  { x: -148, z: -23, scale: 1.2, rotation: 2.2 },
-  { x: -153, z: -18, scale: 0.94, rotation: 0.9 },
-  { x: -158, z: -13, scale: 1.16, rotation: 1.6 },
-  { x: -163, z: -8, scale: 1.05, rotation: 2.7 },
-  { x: -118, z: -66, scale: 1.08, rotation: 0.1 },
-  { x: -123, z: -69, scale: 0.96, rotation: 1.2 },
-  { x: -129, z: -67, scale: 1.18, rotation: 2.1 },
-  { x: -135, z: -65, scale: 1.04, rotation: 0.6 },
-  { x: -141, z: -62, scale: 1.23, rotation: 1.8 },
-  { x: -147, z: -58, scale: 1.0, rotation: 2.8 },
-  { x: -153, z: -54, scale: 1.12, rotation: 0.9 },
-  { x: -159, z: -49, scale: 0.92, rotation: 1.7 },
-  { x: -165, z: -43, scale: 1.18, rotation: 2.5 },
-  { x: -171, z: -35, scale: 1.05, rotation: 0.5 },
-  { x: -116, z: -36, scale: 1.14, rotation: 2.0 },
-  { x: -121, z: -31, scale: 0.96, rotation: 0.8 },
-  { x: -126, z: -27, scale: 1.2, rotation: 1.9 },
-  { x: -132, z: -22, scale: 1.08, rotation: 2.9 },
-  { x: -138, z: -17, scale: 0.94, rotation: 0.2 },
-  { x: -144, z: -12, scale: 1.16, rotation: 1.4 },
-  { x: -150, z: -7, scale: 1.02, rotation: 2.3 },
-  { x: -156, z: -3, scale: 1.19, rotation: 0.6 },
-  { x: -162, z: 2, scale: 0.98, rotation: 1.7 },
-  { x: -168, z: 6, scale: 1.12, rotation: 2.6 },
-  { x: -171, z: -49, scale: 1.22, rotation: 0.9 },
-  { x: -174, z: -42, scale: 1.0, rotation: 2.1 },
-  { x: -172, z: 4, scale: 1.18, rotation: 1.1 },
+type ForestPocket = {
+  centerX: number;
+  centerZ: number;
+  radiusX: number;
+  radiusZ: number;
+  count: number;
+};
+
+const FOREST_POCKETS: ForestPocket[] = [
+  { centerX: -126, centerZ: -59, radiusX: 13, radiusZ: 10, count: 18 },
+  { centerX: -143, centerZ: -47, radiusX: 17, radiusZ: 13, count: 26 },
+  { centerX: -157, centerZ: -27, radiusX: 18, radiusZ: 16, count: 30 },
+  { centerX: -142, centerZ: -14, radiusX: 17, radiusZ: 13, count: 22 },
+  { centerX: -166, centerZ: -4, radiusX: 12, radiusZ: 12, count: 18 },
 ];
+
+const ROAD_CLEARANCE = COUNTRY_WEST_ROAD_WIDTH / 2 + 2.25;
+const CLEARING_CENTER = new Vector3(-182, 0, 8);
+const CLEARING_RADIUS_X = 12;
+const CLEARING_RADIUS_Z = 10;
+
+function seededRandom(seed: number) {
+  let value = seed >>> 0;
+  return () => {
+    value = (value * 1664525 + 1013904223) >>> 0;
+    return value / 4294967296;
+  };
+}
+
+function distanceToRoad(x: number, z: number) {
+  const curve = getCountryWestRoadCurve();
+  let closest = Number.POSITIVE_INFINITY;
+
+  for (let i = 0; i <= COUNTRY_WEST_ROAD_SAMPLE_COUNT; i += 1) {
+    const point = curve.getPoint(i / COUNTRY_WEST_ROAD_SAMPLE_COUNT);
+    const distance = Math.hypot(x - point.x, z - point.z);
+    if (distance < closest) closest = distance;
+  }
+
+  return closest;
+}
+
+function isInsideClearing(x: number, z: number) {
+  const nx = (x - CLEARING_CENTER.x) / CLEARING_RADIUS_X;
+  const nz = (z - CLEARING_CENTER.z) / CLEARING_RADIUS_Z;
+  return nx * nx + nz * nz < 1;
+}
+
+function makeTreeSpecs() {
+  const random = seededRandom(0x10_0a_6a_6e);
+  const trees: TreeSpec[] = [];
+
+  FOREST_POCKETS.forEach((pocket, pocketIndex) => {
+    let placed = 0;
+    let attempts = 0;
+
+    while (placed < pocket.count && attempts < pocket.count * 20) {
+      attempts += 1;
+      const angle = random() * Math.PI * 2;
+      const radius = Math.sqrt(random());
+      const clusterPull = random() < 0.58 ? 0.62 : 1;
+      const x = pocket.centerX + Math.cos(angle) * pocket.radiusX * radius * clusterPull + (random() - 0.5) * 2.8;
+      const z = pocket.centerZ + Math.sin(angle) * pocket.radiusZ * radius * clusterPull + (random() - 0.5) * 2.8;
+
+      if (distanceToRoad(x, z) < ROAD_CLEARANCE) continue;
+      if (isInsideClearing(x, z)) continue;
+
+      const nearExisting = trees.some((tree) => Math.hypot(tree.x - x, tree.z - z) < 1.35);
+      if (nearExisting && random() > 0.22) continue;
+
+      const scaleX = 0.72 + random() * 0.58;
+      const scaleY = 0.76 + random() * 0.72;
+      trees.push({
+        x,
+        z,
+        scaleX,
+        scaleY,
+        rotation: random() * Math.PI * 2 + pocketIndex * 0.17,
+      });
+      placed += 1;
+    }
+  });
+
+  return trees;
+}
 
 function makeRoadGeometry() {
   const curve = getCountryWestRoadCurve();
@@ -104,6 +144,7 @@ export default function CountryWest() {
   const trunkRef = useRef<InstancedMesh>(null);
   const crownRef = useRef<InstancedMesh>(null);
   const roadGeometry = useMemo(() => makeRoadGeometry(), []);
+  const treeSpecs = useMemo(() => makeTreeSpecs(), []);
 
   useLayoutEffect(() => {
     const trunk = trunkRef.current;
@@ -114,20 +155,20 @@ export default function CountryWest() {
     const trunkMatrix = new Matrix4();
     const crownMatrix = new Matrix4();
 
-    TREE_SPECS.forEach((tree, index) => {
-      const height = 2.25 * tree.scale;
-      const trunkHeight = 1.25 * tree.scale;
+    treeSpecs.forEach((tree, index) => {
+      const trunkHeight = 1.25 * tree.scaleY;
+      const crownHeight = 2.25 * tree.scaleY;
 
       dummy.position.set(tree.x, trunkHeight / 2, tree.z);
       dummy.rotation.set(0, tree.rotation, 0);
-      dummy.scale.set(tree.scale, tree.scale, tree.scale);
+      dummy.scale.set(tree.scaleX, tree.scaleY, tree.scaleX);
       dummy.updateMatrix();
       trunkMatrix.copy(dummy.matrix);
       trunk.setMatrixAt(index, trunkMatrix);
 
-      dummy.position.set(tree.x, trunkHeight + height * 0.43, tree.z);
+      dummy.position.set(tree.x, trunkHeight + crownHeight * 0.43, tree.z);
       dummy.rotation.set(0, tree.rotation, 0);
-      dummy.scale.set(tree.scale, tree.scale, tree.scale);
+      dummy.scale.set(tree.scaleX, tree.scaleY, tree.scaleX);
       dummy.updateMatrix();
       crownMatrix.copy(dummy.matrix);
       crown.setMatrixAt(index, crownMatrix);
@@ -135,7 +176,7 @@ export default function CountryWest() {
 
     trunk.instanceMatrix.needsUpdate = true;
     crown.instanceMatrix.needsUpdate = true;
-  }, []);
+  }, [treeSpecs]);
 
   return (
     <group>
@@ -143,12 +184,12 @@ export default function CountryWest() {
         <meshStandardMaterial color="#4a3426" roughness={0.97} />
       </mesh>
 
-      <instancedMesh ref={trunkRef} args={[undefined, undefined, TREE_SPECS.length]}>
+      <instancedMesh ref={trunkRef} args={[undefined, undefined, treeSpecs.length]}>
         <cylinderGeometry args={[0.18, 0.26, 1.25, 6]} />
         <meshStandardMaterial color="#5b3a24" roughness={0.95} />
       </instancedMesh>
 
-      <instancedMesh ref={crownRef} args={[undefined, undefined, TREE_SPECS.length]}>
+      <instancedMesh ref={crownRef} args={[undefined, undefined, treeSpecs.length]}>
         <coneGeometry args={[1.05, 2.25, 7]} />
         <meshStandardMaterial color="#2f6b3b" roughness={0.95} />
       </instancedMesh>
