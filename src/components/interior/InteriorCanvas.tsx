@@ -2,6 +2,7 @@
 
 import { Canvas } from "@react-three/fiber";
 import GasDress from "@/components/interior/GasDress";
+import InteriorTouchLook from "@/components/interior/InteriorTouchLook";
 import ShopInterior from "@/components/interior/ShopInterior";
 import TavernDress from "@/components/interior/TavernDress";
 import { useGameStore } from "@/state/gameStore";
@@ -20,6 +21,7 @@ export default function InteriorCanvas() {
     >
       <color attach="background" args={["#111827"]} />
       <ShopInterior />
+      <InteriorTouchLook />
       {isTavern ? <TavernDress /> : null}
       {isGas ? <GasDress /> : null}
     </Canvas>
