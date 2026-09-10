@@ -36,14 +36,21 @@ export default function TopHud() {
   };
 
   const showDesktopWalkHelp = !touchCapable || keyboardActive;
+  const mobileTouchOnly = touchCapable && !keyboardActive;
 
   return (
-    <div className="pointer-events-none fixed bottom-20 left-1/2 z-50 -translate-x-1/2 text-center sm:bottom-6">
+    <div
+      className={
+        mode === "aerial" && mobileTouchOnly
+          ? "pointer-events-none fixed bottom-4 left-3 z-50 text-center"
+          : "pointer-events-none fixed bottom-6 left-1/2 z-50 -translate-x-1/2 text-center"
+      }
+    >
       {mode === "aerial" ? (
         <button
           type="button"
           onClick={() => setMode("street")}
-          className="pointer-events-auto rounded bg-slate-900/90 px-4 py-2 text-sm font-semibold text-white shadow-lg"
+          className="pointer-events-auto rounded bg-slate-900/90 px-3 py-2 text-xs font-semibold text-white shadow-lg sm:px-4 sm:text-sm"
         >
           WALK AROUND
         </button>
