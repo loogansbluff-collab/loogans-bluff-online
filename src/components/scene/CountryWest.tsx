@@ -1,5 +1,6 @@
 "use client";
 
+import { Text } from "@react-three/drei";
 import { useLayoutEffect, useMemo, useRef } from "react";
 import {
   BufferGeometry,
@@ -13,7 +14,10 @@ import CountryWestHouse from "@/components/scene/CountryWestHouse";
 import {
   COUNTRY_WEST_ROAD_SAMPLE_COUNT,
   COUNTRY_WEST_ROAD_WIDTH,
+  COUNTRY_WEST_ROADBLOCK_DEPTH,
+  COUNTRY_WEST_ROADBLOCK_WIDTH,
   getCountryWestRoadCurve,
+  getCountryWestRoadblockPose,
 } from "@/lib/westWorld";
 
 type TreeSpec = {
@@ -141,6 +145,45 @@ function makeRoadGeometry() {
   return geometry;
 }
 
+function CountryWestRoadblock() {
+  const pose = useMemo(() => getCountryWestRoadblockPose(), []);
+  const postOffset = COUNTRY_WEST_ROADBLOCK_WIDTH / 2 - 0.45;
+
+  return (
+    <group position={[pose.x, 0, pose.z]} rotation={[0, pose.rotationY, 0]}>
+      <mesh position={[-postOffset, 0.72, 0]} rotation={[0, 0, -0.035]}>
+        <boxGeometry args={[0.18, 1.44, 0.18]} />
+        <meshStandardMaterial color="#5b3a24" roughness={0.95} />
+      </mesh>
+      <mesh position={[postOffset, 0.72, 0]} rotation={[0, 0, 0.045]}>
+        <boxGeometry args={[0.18, 1.44, 0.18]} />
+        <meshStandardMaterial color="#5b3a24" roughness={0.95} />
+      </mesh>
+
+      <mesh position={[0, 1.02, 0]} rotation={[0, 0, -0.025]}>
+        <boxGeometry args={[COUNTRY_WEST_ROADBLOCK_WIDTH, 0.9, COUNTRY_WEST_ROADBLOCK_DEPTH]} />
+        <meshStandardMaterial color="#d46b2a" roughness={0.9} />
+      </mesh>
+
+      <mesh position={[0, 1.02, -COUNTRY_WEST_ROADBLOCK_DEPTH / 2 - 0.012]} rotation={[0, Math.PI, -0.025]}>
+        <Text
+          fontSize={0.28}
+          maxWidth={4.35}
+          lineHeight={1.12}
+          textAlign="center"
+          anchorX="center"
+          anchorY="middle"
+          color="#fff3d1"
+          outlineWidth={0.012}
+          outlineColor="#4a2416"
+        >
+          {"ROAD BLOCK:\nRural homes and properties\ncoming soon."}
+        </Text>
+      </mesh>
+    </group>
+  );
+}
+
 export default function CountryWest() {
   const trunkRef = useRef<InstancedMesh>(null);
   const crownRef = useRef<InstancedMesh>(null);
@@ -195,6 +238,7 @@ export default function CountryWest() {
         <meshStandardMaterial color="#2f6b3b" roughness={0.95} />
       </instancedMesh>
 
+      <CountryWestRoadblock />
       <CountryWestHouse />
     </group>
   );
