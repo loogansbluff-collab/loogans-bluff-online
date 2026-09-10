@@ -6,7 +6,7 @@ export default function TitleChrome() {
       <img
         src="/loogans-bluff.png"
         alt="Loogans Bluff"
-        className="h-[160px] w-[160px] object-contain drop-shadow-lg"
+        className="h-16 w-16 object-contain drop-shadow-lg sm:h-20 sm:w-20"
       />
     </div>
   );
