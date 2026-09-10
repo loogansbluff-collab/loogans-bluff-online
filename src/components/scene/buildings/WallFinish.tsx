@@ -24,6 +24,22 @@ function SkinBox({ position, size, color }: SkinBoxProps) {
   );
 }
 
+function MatchingFrontDoor({ depth, color, trim }: { depth: number; color: string; trim: string }) {
+  const doorZ = -depth / 2 - 0.125;
+  return (
+    <group>
+      <SkinBox position={[0, 1.15, doorZ]} size={[1.1, 2.3, 0.08]} color={color} />
+      <SkinBox position={[-0.58, 1.15, doorZ - 0.015]} size={[0.08, 2.4, 0.055]} color={trim} />
+      <SkinBox position={[0.58, 1.15, doorZ - 0.015]} size={[0.08, 2.4, 0.055]} color={trim} />
+      <SkinBox position={[0, 2.35, doorZ - 0.015]} size={[1.24, 0.08, 0.055]} color={trim} />
+      <mesh position={[0.34, 1.15, doorZ - 0.075]}>
+        <sphereGeometry args={[0.055, 10, 10]} />
+        <meshStandardMaterial color="#d6b36a" />
+      </mesh>
+    </group>
+  );
+}
+
 function SouthSkin({ width, height, depth, color }: { width: number; height: number; depth: number; color: string }) {
   return <SkinBox position={[0, height / 2, -depth / 2 - SKIN_OFFSET]} size={[width, height, SKIN_DEPTH]} color={color} />;
 }
@@ -49,6 +65,7 @@ export default function WallFinish({ building }: WallFinishProps) {
       <group>
         <SouthSkin width={width} height={height} depth={depth} color="#ddd2b9" />
         <SideSkins width={width} height={height} depth={depth} color="#ddd2b9" />
+        <MatchingFrontDoor depth={depth} color="#ddd2b9" trim="#b9ae96" />
         {bands.map((y) => (
           <group key={y}>
             <SkinBox position={[0, y, frontZ]} size={[width, 0.045, 0.025]} color="#b9ae96" />
@@ -67,6 +84,7 @@ export default function WallFinish({ building }: WallFinishProps) {
       <group>
         <SouthSkin width={width} height={height} depth={depth} color="#eee9df" />
         <SideSkins width={width} height={height} depth={depth} color="#eee9df" />
+        <MatchingFrontDoor depth={depth} color="#eee9df" trim="#c8c0b2" />
         {frontSlats.map((x) => <SkinBox key={`f-${x}`} position={[x, height / 2, frontZ]} size={[0.07, height, 0.025]} color="#c8c0b2" />)}
         {sideSlats.flatMap((z) => [
           <SkinBox key={`l-${z}`} position={[leftX, height / 2, z]} size={[0.025, height, 0.07]} color="#c8c0b2" />,
@@ -82,6 +100,7 @@ export default function WallFinish({ building }: WallFinishProps) {
       <group>
         <SouthSkin width={width} height={height} depth={depth} color="#786b59" />
         <SideSkins width={width} height={height} depth={depth} color="#786b59" />
+        <MatchingFrontDoor depth={depth} color="#786b59" trim="#564d42" />
         {boards.map((y, i) => (
           <group key={y}>
             <SkinBox position={[0, y, frontZ]} size={[width, 0.055, 0.025]} color={i % 2 === 0 ? "#564d42" : "#665c4e"} />
@@ -100,6 +119,7 @@ export default function WallFinish({ building }: WallFinishProps) {
       <group>
         <SouthSkin width={width} height={height} depth={depth} color="#2b7772" />
         <SideSkins width={width} height={height} depth={depth} color="#2b7772" />
+        <MatchingFrontDoor depth={depth} color="#2b7772" trim="#1f5e5b" />
         {panelX.map((x) => <SkinBox key={x} position={[x, height / 2, frontZ]} size={[0.045, height, 0.025]} color="#1f5e5b" />)}
         {panelZ.flatMap((z) => [
           <SkinBox key={`l-${z}`} position={[leftX, height / 2, z]} size={[0.025, height, 0.045]} color="#1f5e5b" />,
@@ -118,6 +138,7 @@ export default function WallFinish({ building }: WallFinishProps) {
       <group>
         <SouthSkin width={width} height={height} depth={depth} color="#8b4937" />
         <SideSkins width={width} height={height} depth={depth} color="#8b4937" />
+        <MatchingFrontDoor depth={depth} color="#8b4937" trim="#653428" />
         {rows.map((y, row) => (
           <group key={y}>
             {frontXs.map((x, i) => <SkinBox key={`${row}-${i}`} position={[x + (row % 2 ? width * 0.06 : 0), y, frontZ]} size={[width * 0.16, 0.16, 0.025]} color="#653428" />)}
@@ -140,6 +161,7 @@ export default function WallFinish({ building }: WallFinishProps) {
       <group>
         <SouthSkin width={width} height={height} depth={depth} color="#77818a" />
         <SideSkins width={width} height={height} depth={depth} color="#77818a" />
+        <MatchingFrontDoor depth={depth} color="#77818a" trim="#4f5963" />
         {frontStrips.map((x) => <SkinBox key={`f-${x}`} position={[x, height / 2, frontZ]} size={[0.035, height, 0.03]} color="#4f5963" />)}
         {sideStrips.flatMap((z) => [
           <SkinBox key={`l-${z}`} position={[leftX, height / 2, z]} size={[0.03, height, 0.035]} color="#4f5963" />,
