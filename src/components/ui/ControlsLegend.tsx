@@ -19,8 +19,8 @@ export default function ControlsLegend() {
   if (mode === "aerial") {
     controls = [
       "Aerial view: Drag to pan all or wheel north & south",
-      "3. Exit walk mode: Esc or wheel South",
-      "4. Tap a building to spawn in front view",
+      "Exit walk mode: Esc or wheel South",
+      "Tap a building to spawn in front view",
     ];
   } else if (mode === "interior") {
     controls = ["WASD move", "Mouse look", "R = leave shop"];
