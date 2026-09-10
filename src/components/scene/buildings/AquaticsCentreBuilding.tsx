@@ -14,7 +14,7 @@ const WINDOW_Y = [2.5, 5.25, 8.0];
 const STALL_X = [-11.5, -8.2, -4.9, 4.9, 8.2, 11.5];
 const STALL_ROW_Z = [9.7, 18.9];
 
-export default function CommunityHallBuilding({
+export default function AquaticsCentreBuilding({
   building,
   onPointerDown,
   onPointerUp,
@@ -105,19 +105,9 @@ export default function CommunityHallBuilding({
               outlineWidth={0.025}
               outlineColor="#0b3d91"
             >
-              TOWN HALL ENTER AT OWN RISK AND PERIL
+              BLUFF AQUATICS CENTRE - SWIM & PLAY AT OWN RISK
             </Text>
           </group>
-        </group>
-
-        <group position={[0, height + 0.55, 0]}>
-          <mesh>
-            <boxGeometry args={[16.5, 1.35, 0.34]} />
-            <meshStandardMaterial color="#171717" />
-          </mesh>
-          <Text position={[0, 0, 0.19]} fontSize={0.64} maxWidth={15.6} textAlign="center" anchorX="center" anchorY="middle" color="#f8fafc">
-            COMMUNITY HALL
-          </Text>
         </group>
       </group>
 
