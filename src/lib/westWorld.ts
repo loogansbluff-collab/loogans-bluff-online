@@ -8,6 +8,11 @@ export const WEST_WALK_MIN_X = -259;
 export const EAST_WALK_MAX_X = 197;
 export const NORTH_SOUTH_WALK_LIMIT = 197;
 
+export const WEST_EXIT_Z = -51;
+export const WEST_APPROACH_START_X = -35.5;
+export const WEST_APPROACH_END_X = -70.5;
+export const WEST_APPROACH_WIDTH = 3;
+
 export const WEST_RIVER_POINTS = [
   [-82, -209],
   [-79, -160],

@@ -6,6 +6,10 @@ import { BufferGeometry, Float32BufferAttribute, ShaderMaterial, Vector3 } from 
 import {
   getWestRiverCurve,
   getWestRiverWidth,
+  WEST_APPROACH_END_X,
+  WEST_APPROACH_START_X,
+  WEST_APPROACH_WIDTH,
+  WEST_EXIT_Z,
   WEST_GROUND_MAX_X,
   WEST_GROUND_MIN_X,
   WEST_RIVER_BANK_WIDTH,
@@ -77,6 +81,8 @@ export default function WestWorld() {
   const waterMaterialRef = useRef<ShaderMaterial>(null);
   const extensionWidth = WEST_GROUND_MAX_X - WEST_GROUND_MIN_X;
   const extensionCenterX = (WEST_GROUND_MIN_X + WEST_GROUND_MAX_X) / 2;
+  const approachLength = WEST_APPROACH_START_X - WEST_APPROACH_END_X;
+  const approachCenterX = (WEST_APPROACH_START_X + WEST_APPROACH_END_X) / 2;
 
   const { waterGeometry, westBankGeometry, eastBankGeometry } = useMemo(() => {
     const curve = getWestRiverCurve();
@@ -119,6 +125,11 @@ export default function WestWorld() {
       <mesh position={[extensionCenterX, -0.012, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[extensionWidth, 396]} />
         <meshStandardMaterial color="#314a35" />
+      </mesh>
+
+      <mesh position={[approachCenterX, 0.024, WEST_EXIT_Z]}>
+        <boxGeometry args={[approachLength, 0.045, WEST_APPROACH_WIDTH]} />
+        <meshStandardMaterial color="#4a3426" roughness={0.95} />
       </mesh>
 
       <mesh geometry={waterGeometry}>

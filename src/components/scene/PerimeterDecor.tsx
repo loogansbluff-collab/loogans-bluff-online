@@ -3,9 +3,11 @@
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import type { Group } from "three";
+import { WEST_EXIT_Z } from "@/lib/westWorld";
 
 const SIDE_Z = [30, 8, -14, -36, -58, -80, -102, -124, -146, -168];
 const NORTH_X = [-30, -18, 18, 30];
+const WEST_GATE_CLEARANCE = 9;
 
 type TreeSpec = {
   key: string;
@@ -19,14 +21,16 @@ type BenchSpec = {
   rotationY: number;
 };
 
+const WEST_SIDE_Z = SIDE_Z.filter((z) => Math.abs(z - WEST_EXIT_Z) > WEST_GATE_CLEARANCE);
+
 const TREES: TreeSpec[] = [
-  ...SIDE_Z.map((z, index) => ({ key: `west-${index}`, position: [-39.5, 0, z] as [number, number, number], variant: index })),
+  ...WEST_SIDE_Z.map((z, index) => ({ key: `west-${index}`, position: [-39.5, 0, z] as [number, number, number], variant: index })),
   ...SIDE_Z.map((z, index) => ({ key: `east-${index}`, position: [39.5, 0, z] as [number, number, number], variant: index + 10 })),
   ...NORTH_X.map((x, index) => ({ key: `north-${index}`, position: [x, 0, -190.5] as [number, number, number], variant: index + 20 })),
 ];
 
 const BENCHES: BenchSpec[] = [
-  ...SIDE_Z.filter((_, index) => index % 2 === 0).map((z, index) => ({
+  ...WEST_SIDE_Z.filter((_, index) => index % 2 === 0).map((z, index) => ({
     key: `west-bench-${index}`,
     position: [-37.5, 0, z] as [number, number, number],
     rotationY: -Math.PI / 2,
