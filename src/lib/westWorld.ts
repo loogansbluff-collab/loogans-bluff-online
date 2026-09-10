@@ -18,7 +18,6 @@ export const WEST_BRIDGE_WEST_X = -91.5;
 export const WEST_BRIDGE_WIDTH = 3.4;
 export const WEST_BRIDGE_DECK_Y = 0.12;
 const WEST_BRIDGE_WALK_HALF_WIDTH = WEST_BRIDGE_WIDTH / 2 - 0.42;
-const WEST_BRIDGE_RAIL_BLOCK_DEPTH = 0.55;
 
 export const WEST_FAR_TRAIL_START_X = WEST_BRIDGE_WEST_X;
 export const WEST_FAR_TRAIL_END_X = -116;
@@ -67,6 +66,26 @@ export const WEST_RIVER_BANK_WIDTH = 2.4;
 export const WEST_RIVER_SAMPLE_COUNT = 96;
 
 const RIVER_COLLISION_PADDING = 0.7;
+const WEST_RURAL_CORRIDOR_PADDING = 0.55;
+
+function distanceToSegment(
+  x: number,
+  z: number,
+  startX: number,
+  startZ: number,
+  endX: number,
+  endZ: number,
+) {
+  const dx = endX - startX;
+  const dz = endZ - startZ;
+  const lengthSq = dx * dx + dz * dz;
+  if (lengthSq === 0) return Math.hypot(x - startX, z - startZ);
+
+  const t = Math.max(0, Math.min(1, ((x - startX) * dx + (z - startZ) * dz) / lengthSq));
+  const closestX = startX + dx * t;
+  const closestZ = startZ + dz * t;
+  return Math.hypot(x - closestX, z - closestZ);
+}
 
 export function getCountryWestRoadCurve() {
   return new CatmullRomCurve3(
@@ -128,6 +147,31 @@ export function isInCountryWestRoadblock(x: number, z: number) {
   );
 }
 
+export function isOutsideWestRuralTravelCorridor(x: number, z: number) {
+  if (x > WEST_BRIDGE_WEST_X - 0.35) return false;
+
+  const onFarTrail =
+    x <= WEST_FAR_TRAIL_START_X + WEST_RURAL_CORRIDOR_PADDING &&
+    x >= WEST_FAR_TRAIL_END_X - WEST_RURAL_CORRIDOR_PADDING &&
+    Math.abs(z - WEST_EXIT_Z) <= WEST_FAR_TRAIL_WIDTH / 2 + WEST_RURAL_CORRIDOR_PADDING;
+  if (onFarTrail) return false;
+
+  const roadCurve = getCountryWestRoadCurve();
+  let roadDistance = Number.POSITIVE_INFINITY;
+  for (let i = 0; i <= COUNTRY_WEST_ROAD_SAMPLE_COUNT; i += 1) {
+    const point = roadCurve.getPoint(i / COUNTRY_WEST_ROAD_SAMPLE_COUNT);
+    roadDistance = Math.min(roadDistance, Math.hypot(x - point.x, z - point.z));
+  }
+  if (roadDistance <= COUNTRY_WEST_ROAD_WIDTH / 2 + WEST_RURAL_CORRIDOR_PADDING) return false;
+
+  const [driveStartX, driveStartZ] = COUNTRY_WEST_DRIVEWAY_START;
+  const [driveEndX, driveEndZ] = COUNTRY_WEST_DRIVEWAY_END;
+  const drivewayDistance = distanceToSegment(x, z, driveStartX, driveStartZ, driveEndX, driveEndZ);
+  if (drivewayDistance <= COUNTRY_WEST_DRIVEWAY_WIDTH / 2 + WEST_RURAL_CORRIDOR_PADDING) return false;
+
+  return true;
+}
+
 export function isOnWestBridgeDeck(x: number, z: number) {
   return (
     x <= WEST_BRIDGE_EAST_X + 0.35 &&
@@ -138,12 +182,7 @@ export function isOnWestBridgeDeck(x: number, z: number) {
 
 export function isInWestBridgeRailZone(x: number, z: number) {
   if (x > WEST_BRIDGE_EAST_X + 0.35 || x < WEST_BRIDGE_WEST_X - 0.35) return false;
-
-  const lateralDistance = Math.abs(z - WEST_EXIT_Z);
-  return (
-    lateralDistance > WEST_BRIDGE_WALK_HALF_WIDTH &&
-    lateralDistance < WEST_BRIDGE_WIDTH / 2 + WEST_BRIDGE_RAIL_BLOCK_DEPTH
-  );
+  return Math.abs(z - WEST_EXIT_Z) > WEST_BRIDGE_WALK_HALF_WIDTH;
 }
 
 export function isInWestRiverChannel(x: number, z: number) {

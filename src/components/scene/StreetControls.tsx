@@ -13,6 +13,7 @@ import {
   isInCountryWestRoadblock,
   isInWestBridgeRailZone,
   isInWestRiverChannel,
+  isOutsideWestRuralTravelCorridor,
 } from "@/lib/westWorld";
 import { useGameStore } from "@/state/gameStore";
 
@@ -31,6 +32,7 @@ function isBlocked(x: number, z: number) {
   if (isInCountryWestHouse(x, z)) return true;
   if (isInWestBridgeRailZone(x, z)) return true;
   if (isInWestRiverChannel(x, z)) return true;
+  if (isOutsideWestRuralTravelCorridor(x, z)) return true;
 
   return townData.buildings.some((building) => {
     const [buildingX, , buildingZ] = building.position;
