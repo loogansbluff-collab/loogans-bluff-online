@@ -22,7 +22,7 @@ export default function TopHud() {
           onClick={() => setMode("street")}
           className="pointer-events-auto rounded bg-slate-900/90 px-4 py-2 text-sm font-semibold text-white shadow-lg"
         >
-          WALK AROUND LOOGANS BLUFF
+          WALK AROUND
         </button>
       ) : (
         <div className="space-y-2">
