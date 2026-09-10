@@ -44,7 +44,7 @@ export default function TownDirectory() {
   );
 
   return (
-    <aside className="fixed right-4 top-20 z-20 w-[min(19rem,calc(100vw-2rem))] rounded-xl border border-white/10 bg-slate-950/90 text-white shadow-2xl backdrop-blur-sm">
+    <aside className="fixed bottom-4 right-4 z-20 w-[min(19rem,calc(100vw-2rem))] rounded-xl border border-white/10 bg-slate-950/90 text-white shadow-2xl backdrop-blur-sm">
       <button
         type="button"
         onClick={() => setExpanded((value) => !value)}

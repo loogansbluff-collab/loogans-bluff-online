@@ -15,7 +15,7 @@ export default function TopHud() {
   };
 
   return (
-    <div className="pointer-events-none fixed left-1/2 top-4 z-50 -translate-x-1/2 text-center">
+    <div className="pointer-events-none fixed bottom-4 left-1/2 z-50 -translate-x-1/2 text-center">
       {mode === "aerial" ? (
         <button
           type="button"
