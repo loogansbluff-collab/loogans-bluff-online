@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { townData } from "@/data/town";
 import { enterStreetInFront } from "@/lib/enterBuildingStreet";
 import { isSouthTreeLotId } from "@/lib/southDecor";
-import { useGameStore } from "@/state/gameStore";
 
 const AQUATICS_SOURCE_ID = "LB-COMMUNITY-001";
 const AQUATICS_DIRECTORY_ID = "LB-AQUATICS-001";
@@ -19,13 +18,8 @@ function getDirectoryBuildingId(id: string) {
 }
 
 export default function TownDirectory() {
-  const mode = useGameStore((state) => state.mode);
-  const [expanded, setExpanded] = useState(mode === "aerial");
+  const [expanded, setExpanded] = useState(false);
   const [filter, setFilter] = useState("");
-
-  useEffect(() => {
-    setExpanded(mode === "aerial");
-  }, [mode]);
 
   const normalizedFilter = filter.trim().toLowerCase();
   const buildings = useMemo(
