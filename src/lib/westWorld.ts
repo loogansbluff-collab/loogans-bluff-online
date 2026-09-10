@@ -13,6 +13,13 @@ export const WEST_APPROACH_START_X = -35.5;
 export const WEST_APPROACH_END_X = -70.5;
 export const WEST_APPROACH_WIDTH = 3;
 
+export const WEST_BRIDGE_EAST_X = WEST_APPROACH_END_X;
+export const WEST_BRIDGE_WEST_X = -91.5;
+export const WEST_BRIDGE_WIDTH = 3.4;
+export const WEST_BRIDGE_DECK_Y = 0.12;
+const WEST_BRIDGE_WALK_HALF_WIDTH = WEST_BRIDGE_WIDTH / 2 - 0.42;
+const WEST_BRIDGE_RAIL_BLOCK_DEPTH = 0.55;
+
 export const WEST_RIVER_POINTS = [
   [-82, -209],
   [-79, -160],
@@ -46,7 +53,27 @@ export function getWestRiverWidth(t: number) {
   return WEST_RIVER_MIN_WIDTH + (WEST_RIVER_MAX_WIDTH - WEST_RIVER_MIN_WIDTH) * wave;
 }
 
+export function isOnWestBridgeDeck(x: number, z: number) {
+  return (
+    x <= WEST_BRIDGE_EAST_X + 0.35 &&
+    x >= WEST_BRIDGE_WEST_X - 0.35 &&
+    Math.abs(z - WEST_EXIT_Z) <= WEST_BRIDGE_WALK_HALF_WIDTH
+  );
+}
+
+export function isInWestBridgeRailZone(x: number, z: number) {
+  if (x > WEST_BRIDGE_EAST_X + 0.35 || x < WEST_BRIDGE_WEST_X - 0.35) return false;
+
+  const lateralDistance = Math.abs(z - WEST_EXIT_Z);
+  return (
+    lateralDistance > WEST_BRIDGE_WALK_HALF_WIDTH &&
+    lateralDistance < WEST_BRIDGE_WIDTH / 2 + WEST_BRIDGE_RAIL_BLOCK_DEPTH
+  );
+}
+
 export function isInWestRiverChannel(x: number, z: number) {
+  if (isOnWestBridgeDeck(x, z)) return false;
+
   const curve = getWestRiverCurve();
   let closestDistanceSq = Number.POSITIVE_INFINITY;
   let closestT = 0;

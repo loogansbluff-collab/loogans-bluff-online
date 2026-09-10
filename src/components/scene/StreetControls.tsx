@@ -9,6 +9,7 @@ import {
   EAST_WALK_MAX_X,
   NORTH_SOUTH_WALK_LIMIT,
   WEST_WALK_MIN_X,
+  isInWestBridgeRailZone,
   isInWestRiverChannel,
 } from "@/lib/westWorld";
 import { useGameStore } from "@/state/gameStore";
@@ -24,6 +25,7 @@ function clamp(value: number, min: number, max: number) {
 }
 
 function isBlocked(x: number, z: number) {
+  if (isInWestBridgeRailZone(x, z)) return true;
   if (isInWestRiverChannel(x, z)) return true;
 
   return townData.buildings.some((building) => {

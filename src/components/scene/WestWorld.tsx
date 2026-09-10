@@ -3,6 +3,7 @@
 import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { BufferGeometry, Float32BufferAttribute, ShaderMaterial, Vector3 } from "three";
+import Bridge from "@/components/scene/Bridge";
 import {
   getWestRiverCurve,
   getWestRiverWidth,
@@ -148,6 +149,8 @@ export default function WestWorld() {
       <mesh geometry={eastBankGeometry}>
         <meshStandardMaterial color="#6a5b3d" roughness={0.9} />
       </mesh>
+
+      <Bridge />
     </group>
   );
 }
