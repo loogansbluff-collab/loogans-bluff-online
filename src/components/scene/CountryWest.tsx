@@ -177,7 +177,7 @@ function CountryWestRoadblock() {
         <meshStandardMaterial color="#5b3a24" roughness={0.95} />
       </mesh>
 
-      <mesh position={[0, 1.02, 0]} rotation={[0, 0, -0.025]}>
+      <mesh position={[0, 1.02, 0]} rotation={[0, 0, 0]}>
         <boxGeometry args={[COUNTRY_WEST_ROADBLOCK_WIDTH, 0.9, COUNTRY_WEST_ROADBLOCK_DEPTH]} />
         <meshStandardMaterial color="#d46b2a" roughness={0.9} />
       </mesh>
