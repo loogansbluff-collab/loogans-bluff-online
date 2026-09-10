@@ -2,9 +2,16 @@
 
 export default function TitleChrome() {
   return (
-    <div className="pointer-events-none fixed left-4 top-4 z-20 rounded bg-slate-950/75 px-4 py-3 text-white shadow-lg backdrop-blur-sm">
-      <h1 className="text-lg font-bold tracking-[0.18em] sm:text-xl">LOOGANS BLUFF ONLINE</h1>
-      <p className="mt-1 text-xs text-slate-300 sm:text-sm">A town on the rise.</p>
+    <div className="pointer-events-none fixed left-4 top-4 z-20 flex items-center gap-3">
+      <img
+        src="/loogans-bluff.png"
+        alt="Loogans Bluff"
+        className="h-16 w-16 object-contain drop-shadow-lg sm:h-20 sm:w-20"
+      />
+      <div className="leading-none drop-shadow-lg">
+        <div className="text-xl font-black tracking-wide text-red-900 sm:text-2xl">LOOGANS</div>
+        <div className="mt-1 text-xl font-black tracking-wide text-blue-950 sm:text-2xl">BLUFF</div>
+      </div>
     </div>
   );
 }
