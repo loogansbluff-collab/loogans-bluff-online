@@ -4,6 +4,7 @@ import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { BufferGeometry, Float32BufferAttribute, ShaderMaterial, Vector3 } from "three";
 import Bridge from "@/components/scene/Bridge";
+import CountryWest from "@/components/scene/CountryWest";
 import {
   getWestRiverCurve,
   getWestRiverWidth,
@@ -142,6 +143,8 @@ export default function WestWorld() {
         <boxGeometry args={[farTrailLength, 0.045, WEST_FAR_TRAIL_WIDTH]} />
         <meshStandardMaterial color="#4a3426" roughness={0.95} />
       </mesh>
+
+      <CountryWest />
 
       <mesh geometry={waterGeometry}>
         <shaderMaterial

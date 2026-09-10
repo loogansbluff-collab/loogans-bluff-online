@@ -24,6 +24,19 @@ export const WEST_FAR_TRAIL_START_X = WEST_BRIDGE_WEST_X;
 export const WEST_FAR_TRAIL_END_X = -116;
 export const WEST_FAR_TRAIL_WIDTH = 3;
 
+export const COUNTRY_WEST_ROAD_POINTS = [
+  [-116, -51],
+  [-126, -50],
+  [-138, -46],
+  [-149, -39],
+  [-159, -29],
+  [-168, -18],
+] as const;
+export const COUNTRY_WEST_ROAD_WIDTH = 3.2;
+export const COUNTRY_WEST_ROAD_SAMPLE_COUNT = 48;
+export const COUNTRY_WEST_CLEARING_CENTER: [number, number] = [-181, -14];
+export const COUNTRY_WEST_CLEARING_RADIUS = 11;
+
 export const WEST_RIVER_POINTS = [
   [-82, -209],
   [-79, -160],
@@ -42,6 +55,15 @@ export const WEST_RIVER_BANK_WIDTH = 2.4;
 export const WEST_RIVER_SAMPLE_COUNT = 96;
 
 const RIVER_COLLISION_PADDING = 0.7;
+
+export function getCountryWestRoadCurve() {
+  return new CatmullRomCurve3(
+    COUNTRY_WEST_ROAD_POINTS.map(([x, z]) => new Vector3(x, 0, z)),
+    false,
+    "catmullrom",
+    0.5,
+  );
+}
 
 export function getWestRiverCurve() {
   return new CatmullRomCurve3(
