@@ -16,8 +16,7 @@ export default function ControlsLegend() {
 
   if (mode === "aerial") {
     controls = [
-      "1. Drag to pan all directions",
-      "2. Arial View: Wheel North & South",
+      "Aerial view: Drag to pan all or wheel north & south",
       "3. Exit walk mode: Esc or wheel South",
       "4. Tap a building to spawn in front view",
     ];
