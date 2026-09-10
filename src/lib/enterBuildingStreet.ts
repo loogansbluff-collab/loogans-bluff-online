@@ -15,22 +15,35 @@ function isBlocked(x: number, z: number) {
   });
 }
 
+function rowFacesNorth(z: number) {
+  if (z < 0) {
+    const phase = ((-z - 12) % 32 + 32) % 32;
+    return phase < 8 || phase > 24;
+  }
+  const rowIndex = Math.round((32 - z) / 16);
+  return Math.abs(rowIndex) % 2 === 1;
+}
+
 export function enterStreetInFront(propertyId: string) {
   if (isSouthTreeLotId(propertyId)) return false;
 
-  const property =
-    townData.buildings.find((item) => item.id === propertyId) ??
-    townData.lots.find((item) => item.id === propertyId);
+  const building = townData.buildings.find((item) => item.id === propertyId);
+  const property = building ?? townData.lots.find((item) => item.id === propertyId);
 
   if (!property) return false;
 
   const [x, , z] = property.position;
   const [, , depth] = property.size;
   const mapLimit = townData.groundSize / 2 - 1;
-  let spawnZ = Math.min(mapLimit, z + depth / 2 + FRONT_CLEARANCE);
+  const faceNorth = building ? rowFacesNorth(z) : false;
+  const direction = faceNorth ? -1 : 1;
+  let spawnZ = Math.max(
+    -mapLimit,
+    Math.min(mapLimit, z + direction * (depth / 2 + FRONT_CLEARANCE)),
+  );
 
-  while (spawnZ < mapLimit && isBlocked(x, spawnZ)) {
-    spawnZ = Math.min(mapLimit, spawnZ + 1);
+  while (spawnZ > -mapLimit && spawnZ < mapLimit && isBlocked(x, spawnZ)) {
+    spawnZ = Math.max(-mapLimit, Math.min(mapLimit, spawnZ + direction));
   }
 
   if (typeof document !== "undefined" && document.pointerLockElement) {
