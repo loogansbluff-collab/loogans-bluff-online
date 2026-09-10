@@ -9,6 +9,7 @@ import {
   EAST_WALK_MAX_X,
   NORTH_SOUTH_WALK_LIMIT,
   WEST_WALK_MIN_X,
+  isInCountryWestHouse,
   isInWestBridgeRailZone,
   isInWestRiverChannel,
 } from "@/lib/westWorld";
@@ -25,6 +26,7 @@ function clamp(value: number, min: number, max: number) {
 }
 
 function isBlocked(x: number, z: number) {
+  if (isInCountryWestHouse(x, z)) return true;
   if (isInWestBridgeRailZone(x, z)) return true;
   if (isInWestRiverChannel(x, z)) return true;
 

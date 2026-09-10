@@ -34,8 +34,15 @@ export const COUNTRY_WEST_ROAD_POINTS = [
 ] as const;
 export const COUNTRY_WEST_ROAD_WIDTH = 3.2;
 export const COUNTRY_WEST_ROAD_SAMPLE_COUNT = 48;
-export const COUNTRY_WEST_CLEARING_CENTER: [number, number] = [-181, -14];
+export const COUNTRY_WEST_CLEARING_CENTER: [number, number] = [-182, 8];
 export const COUNTRY_WEST_CLEARING_RADIUS = 11;
+
+export const COUNTRY_WEST_HOUSE_CENTER: [number, number] = [-183, 7];
+export const COUNTRY_WEST_HOUSE_SIZE: [number, number] = [7, 5.5];
+export const COUNTRY_WEST_DRIVEWAY_START: [number, number] = [-168, -18];
+export const COUNTRY_WEST_DRIVEWAY_END: [number, number] = [-181.2, 3.8];
+export const COUNTRY_WEST_DRIVEWAY_WIDTH = 1.45;
+const COUNTRY_WEST_HOUSE_COLLISION_PADDING = 0.45;
 
 export const WEST_RIVER_POINTS = [
   [-82, -209],
@@ -77,6 +84,15 @@ export function getWestRiverCurve() {
 export function getWestRiverWidth(t: number) {
   const wave = 0.5 + 0.5 * Math.sin(t * Math.PI * 4.2 + 0.65);
   return WEST_RIVER_MIN_WIDTH + (WEST_RIVER_MAX_WIDTH - WEST_RIVER_MIN_WIDTH) * wave;
+}
+
+export function isInCountryWestHouse(x: number, z: number) {
+  const [houseX, houseZ] = COUNTRY_WEST_HOUSE_CENTER;
+  const [width, depth] = COUNTRY_WEST_HOUSE_SIZE;
+  return (
+    Math.abs(x - houseX) < width / 2 + COUNTRY_WEST_HOUSE_COLLISION_PADDING &&
+    Math.abs(z - houseZ) < depth / 2 + COUNTRY_WEST_HOUSE_COLLISION_PADDING
+  );
 }
 
 export function isOnWestBridgeDeck(x: number, z: number) {

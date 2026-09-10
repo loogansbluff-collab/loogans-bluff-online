@@ -9,6 +9,7 @@ import {
   Object3D,
   Vector3,
 } from "three";
+import CountryWestHouse from "@/components/scene/CountryWestHouse";
 import {
   COUNTRY_WEST_ROAD_SAMPLE_COUNT,
   COUNTRY_WEST_ROAD_WIDTH,
@@ -193,6 +194,8 @@ export default function CountryWest() {
         <coneGeometry args={[1.05, 2.25, 7]} />
         <meshStandardMaterial color="#2f6b3b" roughness={0.95} />
       </instancedMesh>
+
+      <CountryWestHouse />
     </group>
   );
 }
