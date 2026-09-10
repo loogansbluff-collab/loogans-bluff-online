@@ -59,15 +59,20 @@ export default function MobileControls() {
 
   const canEnter = mode === "street" && nearest && isInteriorShopId(nearest.id);
 
+  const moveButtonClass =
+    "h-10 w-10 rounded-md bg-slate-950/80 text-lg font-bold text-white shadow-lg backdrop-blur-sm active:bg-slate-700/90";
+  const actionButtonClass =
+    "min-w-[3.5rem] rounded-md bg-slate-950/85 px-3 py-2 text-[11px] font-bold text-white shadow-lg backdrop-blur-sm active:bg-slate-700/90";
+
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-16 z-[70] px-3">
-      <div className="flex items-end justify-between gap-3">
-        <div className="pointer-events-auto grid grid-cols-3 grid-rows-2 gap-1 select-none touch-none">
+    <div className="pointer-events-none fixed bottom-14 left-2 right-2 z-[70]">
+      <div className="flex w-full items-end justify-between gap-2">
+        <div className="pointer-events-auto grid shrink-0 grid-cols-3 grid-rows-2 gap-1 select-none touch-none">
           <div />
           <button
             type="button"
             aria-label="Move forward"
-            className="h-12 w-12 rounded-lg bg-slate-950/80 text-xl font-bold text-white shadow-lg backdrop-blur-sm active:bg-slate-700/90"
+            className={moveButtonClass}
             {...holdHandlers("KeyW")}
           >
             ▲
@@ -76,7 +81,7 @@ export default function MobileControls() {
           <button
             type="button"
             aria-label="Move left"
-            className="h-12 w-12 rounded-lg bg-slate-950/80 text-xl font-bold text-white shadow-lg backdrop-blur-sm active:bg-slate-700/90"
+            className={moveButtonClass}
             {...holdHandlers("KeyA")}
           >
             ◀
@@ -84,7 +89,7 @@ export default function MobileControls() {
           <button
             type="button"
             aria-label="Move backward"
-            className="h-12 w-12 rounded-lg bg-slate-950/80 text-xl font-bold text-white shadow-lg backdrop-blur-sm active:bg-slate-700/90"
+            className={moveButtonClass}
             {...holdHandlers("KeyS")}
           >
             ▼
@@ -92,14 +97,14 @@ export default function MobileControls() {
           <button
             type="button"
             aria-label="Move right"
-            className="h-12 w-12 rounded-lg bg-slate-950/80 text-xl font-bold text-white shadow-lg backdrop-blur-sm active:bg-slate-700/90"
+            className={moveButtonClass}
             {...holdHandlers("KeyD")}
           >
             ▶
           </button>
         </div>
 
-        <div className="pointer-events-auto flex flex-col items-end gap-2">
+        <div className="pointer-events-auto flex shrink-0 flex-col items-end gap-1.5">
           {mode === "street" && nearest ? (
             <button
               type="button"
@@ -107,7 +112,7 @@ export default function MobileControls() {
                 fireKey("KeyE", "keydown");
                 fireKey("KeyE", "keyup");
               }}
-              className="rounded-lg bg-slate-950/80 px-4 py-3 text-xs font-bold text-white shadow-lg backdrop-blur-sm active:bg-slate-700/90"
+              className={actionButtonClass}
             >
               INFO
             </button>
@@ -120,7 +125,7 @@ export default function MobileControls() {
                 fireKey("KeyF", "keydown");
                 fireKey("KeyF", "keyup");
               }}
-              className="rounded-lg bg-slate-950/90 px-4 py-3 text-xs font-bold text-white shadow-lg backdrop-blur-sm active:bg-slate-700/90"
+              className={actionButtonClass}
             >
               ENTER
             </button>
@@ -133,7 +138,7 @@ export default function MobileControls() {
                 fireKey("KeyR", "keydown");
                 fireKey("KeyR", "keyup");
               }}
-              className="rounded-lg bg-slate-950/90 px-4 py-3 text-xs font-bold text-white shadow-lg backdrop-blur-sm active:bg-slate-700/90"
+              className={actionButtonClass}
             >
               LEAVE
             </button>
