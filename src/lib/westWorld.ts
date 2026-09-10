@@ -44,6 +44,11 @@ export const COUNTRY_WEST_DRIVEWAY_END: [number, number] = [-181.2, 3.8];
 export const COUNTRY_WEST_DRIVEWAY_WIDTH = 1.45;
 const COUNTRY_WEST_HOUSE_COLLISION_PADDING = 0.45;
 
+export const COUNTRY_WEST_ROADBLOCK_T = 0.09;
+export const COUNTRY_WEST_ROADBLOCK_WIDTH = 5.2;
+export const COUNTRY_WEST_ROADBLOCK_DEPTH = 0.7;
+const COUNTRY_WEST_ROADBLOCK_COLLISION_PADDING = 0.35;
+
 export const WEST_RIVER_POINTS = [
   [-82, -209],
   [-79, -160],
@@ -72,6 +77,17 @@ export function getCountryWestRoadCurve() {
   );
 }
 
+export function getCountryWestRoadblockPose() {
+  const curve = getCountryWestRoadCurve();
+  const point = curve.getPoint(COUNTRY_WEST_ROADBLOCK_T);
+  const tangent = curve.getTangent(COUNTRY_WEST_ROADBLOCK_T).normalize();
+  return {
+    x: point.x,
+    z: point.z,
+    rotationY: Math.atan2(tangent.x, tangent.z),
+  };
+}
+
 export function getWestRiverCurve() {
   return new CatmullRomCurve3(
     WEST_RIVER_POINTS.map(([x, z]) => new Vector3(x, 0, z)),
@@ -92,6 +108,21 @@ export function isInCountryWestHouse(x: number, z: number) {
   return (
     Math.abs(x - houseX) < width / 2 + COUNTRY_WEST_HOUSE_COLLISION_PADDING &&
     Math.abs(z - houseZ) < depth / 2 + COUNTRY_WEST_HOUSE_COLLISION_PADDING
+  );
+}
+
+export function isInCountryWestRoadblock(x: number, z: number) {
+  const pose = getCountryWestRoadblockPose();
+  const dx = x - pose.x;
+  const dz = z - pose.z;
+  const cos = Math.cos(pose.rotationY);
+  const sin = Math.sin(pose.rotationY);
+  const localX = dx * cos - dz * sin;
+  const localZ = dx * sin + dz * cos;
+
+  return (
+    Math.abs(localX) < COUNTRY_WEST_ROADBLOCK_WIDTH / 2 + COUNTRY_WEST_ROADBLOCK_COLLISION_PADDING &&
+    Math.abs(localZ) < COUNTRY_WEST_ROADBLOCK_DEPTH / 2 + COUNTRY_WEST_ROADBLOCK_COLLISION_PADDING
   );
 }
 
