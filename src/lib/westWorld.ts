@@ -1,10 +1,4 @@
-export type RiverSegment = {
-  x: number;
-  z: number;
-  width: number;
-  length: number;
-  rotationY: number;
-};
+import { CatmullRomCurve3, Vector3 } from "three";
 
 export const WEST_GROUND_MIN_X = -260;
 export const WEST_GROUND_MAX_X = -198;
@@ -14,28 +8,56 @@ export const WEST_WALK_MIN_X = -259;
 export const EAST_WALK_MAX_X = 197;
 export const NORTH_SOUTH_WALK_LIMIT = 197;
 
-export const WEST_RIVER_SEGMENTS: RiverSegment[] = [
-  { x: -82, z: -168, width: 10, length: 82, rotationY: 0.06 },
-  { x: -78, z: -92, width: 11.5, length: 76, rotationY: -0.08 },
-  { x: -84, z: -20, width: 9.5, length: 74, rotationY: 0.09 },
-  { x: -79, z: 52, width: 12, length: 74, rotationY: -0.07 },
-  { x: -85, z: 132, width: 10.5, length: 92, rotationY: 0.05 },
-];
+export const WEST_RIVER_POINTS = [
+  [-82, -209],
+  [-79, -160],
+  [-84, -112],
+  [-78, -62],
+  [-83, -12],
+  [-79, 40],
+  [-85, 92],
+  [-81, 138],
+  [-84, 178],
+] as const;
 
-const RIVER_COLLISION_PADDING = 0.65;
+export const WEST_RIVER_MIN_WIDTH = 9.5;
+export const WEST_RIVER_MAX_WIDTH = 12;
+export const WEST_RIVER_BANK_WIDTH = 2.4;
+export const WEST_RIVER_SAMPLE_COUNT = 96;
+
+const RIVER_COLLISION_PADDING = 0.7;
+
+export function getWestRiverCurve() {
+  return new CatmullRomCurve3(
+    WEST_RIVER_POINTS.map(([x, z]) => new Vector3(x, 0, z)),
+    false,
+    "catmullrom",
+    0.5,
+  );
+}
+
+export function getWestRiverWidth(t: number) {
+  const wave = 0.5 + 0.5 * Math.sin(t * Math.PI * 4.2 + 0.65);
+  return WEST_RIVER_MIN_WIDTH + (WEST_RIVER_MAX_WIDTH - WEST_RIVER_MIN_WIDTH) * wave;
+}
 
 export function isInWestRiverChannel(x: number, z: number) {
-  return WEST_RIVER_SEGMENTS.some((segment) => {
-    const dx = x - segment.x;
-    const dz = z - segment.z;
-    const cos = Math.cos(-segment.rotationY);
-    const sin = Math.sin(-segment.rotationY);
-    const localX = dx * cos - dz * sin;
-    const localZ = dx * sin + dz * cos;
+  const curve = getWestRiverCurve();
+  let closestDistanceSq = Number.POSITIVE_INFINITY;
+  let closestT = 0;
 
-    return (
-      Math.abs(localX) < segment.width / 2 + RIVER_COLLISION_PADDING &&
-      Math.abs(localZ) < segment.length / 2 + RIVER_COLLISION_PADDING
-    );
-  });
+  for (let i = 0; i <= WEST_RIVER_SAMPLE_COUNT; i += 1) {
+    const t = i / WEST_RIVER_SAMPLE_COUNT;
+    const point = curve.getPoint(t);
+    const dx = x - point.x;
+    const dz = z - point.z;
+    const distanceSq = dx * dx + dz * dz;
+    if (distanceSq < closestDistanceSq) {
+      closestDistanceSq = distanceSq;
+      closestT = t;
+    }
+  }
+
+  const collisionRadius = getWestRiverWidth(closestT) / 2 + RIVER_COLLISION_PADDING;
+  return closestDistanceSq < collisionRadius * collisionRadius;
 }
