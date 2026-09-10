@@ -14,6 +14,7 @@ import TitleChrome from "@/components/ui/TitleChrome";
 import ControlsLegend from "@/components/ui/ControlsLegend";
 import ProximityPrompt from "@/components/ui/ProximityPrompt";
 import TownDirectory from "@/components/ui/TownDirectory";
+import LegalLinks from "@/components/ui/LegalLinks";
 
 const TownCanvas = dynamic(() => import("@/components/scene/TownCanvas"), {
   ssr: false,
@@ -74,6 +75,7 @@ export default function HomePage() {
       <ControlsLegend />
       <ProximityPrompt />
       {mode !== "interior" ? <BuildingPanel /> : null}
+      <LegalLinks />
       <ModeFade />
     </main>
   );
