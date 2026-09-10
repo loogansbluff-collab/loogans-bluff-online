@@ -5,20 +5,27 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import { MathUtils, PerspectiveCamera, Vector3 } from "three";
 import { townData } from "@/data/town";
+import {
+  EAST_WALK_MAX_X,
+  NORTH_SOUTH_WALK_LIMIT,
+  WEST_WALK_MIN_X,
+  isInWestRiverChannel,
+} from "@/lib/westWorld";
 import { useGameStore } from "@/state/gameStore";
 
 const SPEED = 8;
 const PLAYER_RADIUS = 0.4;
-const EDGE_PADDING = 1;
 const TOUCH_LOOK_SPEED = 0.004;
 const MAX_LOOK_UP = MathUtils.degToRad(80);
 const MOVE_KEYS = new Set(["KeyW", "KeyA", "KeyS", "KeyD"]);
 
-function clampToLimit(value: number, limit: number) {
-  return Math.max(-limit, Math.min(limit, value));
+function clamp(value: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, value));
 }
 
 function isBlocked(x: number, z: number) {
+  if (isInWestRiverChannel(x, z)) return true;
+
   return townData.buildings.some((building) => {
     const [buildingX, , buildingZ] = building.position;
     const [width, , depth] = building.size;
@@ -39,7 +46,6 @@ export default function StreetControls() {
   const returningToAerial = useRef(false);
   const wasPointerLocked = useRef(false);
   const touchLook = useRef<{ id: number; x: number; y: number } | null>(null);
-  const limit = townData.groundSize / 2 - EDGE_PADDING;
 
   useEffect(() => {
     const streetY = townData.streetSpawn[1];
@@ -169,16 +175,20 @@ export default function StreetControls() {
       if (movement.current.lengthSq() > 0) {
         movement.current.normalize().multiplyScalar(SPEED * delta);
 
-        const proposedX = clampToLimit(camera.position.x + movement.current.x, limit);
+        const proposedX = clamp(camera.position.x + movement.current.x, WEST_WALK_MIN_X, EAST_WALK_MAX_X);
         if (!isBlocked(proposedX, camera.position.z)) camera.position.x = proposedX;
 
-        const proposedZ = clampToLimit(camera.position.z + movement.current.z, limit);
+        const proposedZ = clamp(
+          camera.position.z + movement.current.z,
+          -NORTH_SOUTH_WALK_LIMIT,
+          NORTH_SOUTH_WALK_LIMIT,
+        );
         if (!isBlocked(camera.position.x, proposedZ)) camera.position.z = proposedZ;
       }
     }
 
-    camera.position.x = clampToLimit(camera.position.x, limit);
-    camera.position.z = clampToLimit(camera.position.z, limit);
+    camera.position.x = clamp(camera.position.x, WEST_WALK_MIN_X, EAST_WALK_MAX_X);
+    camera.position.z = clamp(camera.position.z, -NORTH_SOUTH_WALK_LIMIT, NORTH_SOUTH_WALK_LIMIT);
     camera.position.y = townData.streetSpawn[1];
 
     setPlayerPosition([camera.position.x, camera.position.y, camera.position.z]);

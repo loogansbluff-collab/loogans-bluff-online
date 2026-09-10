@@ -5,10 +5,10 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import type { ElementRef } from "react";
 import { townData } from "@/data/town";
+import { EAST_AERIAL_MAX_X, WEST_AERIAL_MIN_X } from "@/lib/westWorld";
 import { useGameStore } from "@/state/gameStore";
 
 const LANDING_TARGET: [number, number, number] = [0, 0, 32];
-const PAN_X_LIMIT = 36;
 const NORTH_TARGET_Z = -197;
 const SOUTH_TARGET_Z = 32;
 const CAMERA_HEIGHT = 14;
@@ -33,7 +33,7 @@ export default function AerialControls() {
   const resetNonce = useGameStore((state) => state.resetNonce);
   const requestedTarget = mode === "aerial" && focusPosition ? focusPosition : LANDING_TARGET;
   const target: [number, number, number] = [
-    clamp(requestedTarget[0], -PAN_X_LIMIT, PAN_X_LIMIT),
+    clamp(requestedTarget[0], WEST_AERIAL_MIN_X, EAST_AERIAL_MAX_X),
     0,
     clamp(requestedTarget[2], NORTH_TARGET_Z, SOUTH_TARGET_Z),
   ];
@@ -52,7 +52,7 @@ export default function AerialControls() {
     const controls = controlsRef.current;
     if (!controls) return;
 
-    const clampedX = clamp(targetX, -PAN_X_LIMIT, PAN_X_LIMIT);
+    const clampedX = clamp(targetX, WEST_AERIAL_MIN_X, EAST_AERIAL_MAX_X);
     const clampedZ = clamp(targetZ, NORTH_TARGET_Z, SOUTH_TARGET_Z);
     lockedTargetZ.current = clampedZ;
     controls.target.set(clampedX, 0, clampedZ);
@@ -117,7 +117,7 @@ export default function AerialControls() {
   useFrame(() => {
     if (!returnFramePending.current || !returningAbovePlayer) return;
 
-    const targetX = clamp(playerPosition[0], -PAN_X_LIMIT, PAN_X_LIMIT);
+    const targetX = clamp(playerPosition[0], WEST_AERIAL_MIN_X, EAST_AERIAL_MAX_X);
     const targetZ = clamp(playerPosition[2], NORTH_TARGET_Z, SOUTH_TARGET_Z);
     setAerialPose(targetX, targetZ);
     returnFramePending.current = false;
@@ -127,7 +127,7 @@ export default function AerialControls() {
     const controls = controlsRef.current;
     if (!controls) return;
 
-    const targetX = clamp(controls.target.x, -PAN_X_LIMIT, PAN_X_LIMIT);
+    const targetX = clamp(controls.target.x, WEST_AERIAL_MIN_X, EAST_AERIAL_MAX_X);
     const targetZ = clamp(controls.target.z, NORTH_TARGET_Z, SOUTH_TARGET_Z);
     lockedTargetZ.current = targetZ;
     controls.target.set(targetX, 0, targetZ);

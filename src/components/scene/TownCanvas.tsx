@@ -7,6 +7,7 @@ import { townData } from "@/data/town";
 import { isSouthTreeLotId } from "@/lib/southDecor";
 import { useGameStore } from "@/state/gameStore";
 import Ground from "@/components/scene/Ground";
+import WestWorld from "@/components/scene/WestWorld";
 import Building from "@/components/scene/Building";
 import Lot from "@/components/scene/Lot";
 import Roads from "@/components/scene/Roads";
@@ -47,6 +48,7 @@ function TownScene() {
       <directionalLight position={[20, 30, 10]} intensity={1} />
 
       <Ground size={townData.groundSize} />
+      <WestWorld />
       <Roads />
       <SouthTrees />
       <PerimeterDecor />
