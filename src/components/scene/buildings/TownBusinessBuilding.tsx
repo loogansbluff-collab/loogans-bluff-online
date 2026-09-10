@@ -72,8 +72,6 @@ function SpecialFeature({ feature, width, height, frontZ }: { feature?: Profile[
   if (feature === "townhall" || feature === "bank") {
     return <>{[-width * 0.34, width * 0.34].map((x) => <mesh key={x} position={[x, height * 0.43, frontZ + 0.18]}><cylinderGeometry args={[0.18, 0.22, height * 0.72, 12]} /><meshStandardMaterial color="#e7dfd2" /></mesh>)}</>;
   }
-  if (feature === "auto") return <mesh position={[-width * 0.16, 1.25, frontZ + 0.07]}><boxGeometry args={[width * 0.52, 2.25, 0.08]} /><meshStandardMaterial color="#555b61" /></mesh>;
-  if (feature === "feed") return <mesh position={[-width * 0.18, 1.35, frontZ + 0.07]}><boxGeometry args={[width * 0.5, 2.5, 0.08]} /><meshStandardMaterial color="#5b4635" /></mesh>;
   if (feature === "motel") return <Text position={[width * 0.28, height * 0.55, frontZ + 0.12]} fontSize={0.28} color="#fde047" anchorX="center" anchorY="middle">VACANCY</Text>;
   return null;
 }
