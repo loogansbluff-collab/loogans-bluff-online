@@ -12,6 +12,7 @@ import TopHud from "@/components/ui/TopHud";
 import ModeFade from "@/components/ui/ModeFade";
 import TitleChrome from "@/components/ui/TitleChrome";
 import ControlsLegend from "@/components/ui/ControlsLegend";
+import MobileControls from "@/components/ui/MobileControls";
 import ProximityPrompt from "@/components/ui/ProximityPrompt";
 import TownDirectory from "@/components/ui/TownDirectory";
 import LegalLinks from "@/components/ui/LegalLinks";
@@ -73,6 +74,7 @@ export default function HomePage() {
       <TopHud />
       {mode !== "interior" ? <TownDirectory /> : null}
       <ControlsLegend />
+      <MobileControls />
       <ProximityPrompt />
       {mode !== "interior" ? <BuildingPanel /> : null}
       <LegalLinks />
