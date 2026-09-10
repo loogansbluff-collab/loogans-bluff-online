@@ -165,7 +165,7 @@ function CountryWestRoadblock() {
         <meshStandardMaterial color="#d46b2a" roughness={0.9} />
       </mesh>
 
-      <mesh position={[0, 1.02, -COUNTRY_WEST_ROADBLOCK_DEPTH / 2 - 0.012]} rotation={[0, Math.PI, -0.025]}>
+      <mesh position={[0, 1.02, -COUNTRY_WEST_ROADBLOCK_DEPTH / 2 - 0.012]} rotation={[0, Math.PI, 0]}>
         <Text
           fontSize={0.28}
           maxWidth={4.35}
