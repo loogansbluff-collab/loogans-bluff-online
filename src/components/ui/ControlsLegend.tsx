@@ -15,7 +15,12 @@ export default function ControlsLegend() {
   let controls: string[];
 
   if (mode === "aerial") {
-    controls = ["1. Drag to pan all directions", "2. Arial View: Wheel North & South"];
+    controls = [
+      "1. Drag to pan all directions",
+      "2. Arial View: Wheel North & South",
+      "3. Exit walk mode: Esc or wheel South",
+      "4. Tap a building to spawn in front view",
+    ];
   } else if (mode === "interior") {
     controls = ["WASD move", "Mouse look", "R = leave shop"];
   } else {
