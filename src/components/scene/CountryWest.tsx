@@ -21,6 +21,15 @@ import {
   COUNTRY_WEST_ROADBLOCK_WIDTH,
   getCountryWestRoadCurve,
   getCountryWestRoadblockPose,
+  getWestRiverCurve,
+  getWestRiverWidth,
+  WEST_EXIT_Z,
+  WEST_FAR_TRAIL_END_X,
+  WEST_FAR_TRAIL_START_X,
+  WEST_FAR_TRAIL_WIDTH,
+  WEST_GROUND_MIN_X,
+  WEST_RIVER_BANK_WIDTH,
+  WEST_RIVER_SAMPLE_COUNT,
 } from "@/lib/westWorld";
 
 type TreeSpec = {
@@ -31,27 +40,19 @@ type TreeSpec = {
   rotation: number;
 };
 
-type ForestPocket = {
-  centerX: number;
-  centerZ: number;
-  radiusX: number;
-  radiusZ: number;
-  count: number;
-};
-
-const FOREST_POCKETS: ForestPocket[] = [
-  { centerX: -126, centerZ: -59, radiusX: 13, radiusZ: 10, count: 18 },
-  { centerX: -143, centerZ: -47, radiusX: 17, radiusZ: 13, count: 26 },
-  { centerX: -157, centerZ: -27, radiusX: 18, radiusZ: 16, count: 30 },
-  { centerX: -142, centerZ: -14, radiusX: 17, radiusZ: 13, count: 22 },
-  { centerX: -166, centerZ: -4, radiusX: 12, radiusZ: 12, count: 18 },
-];
-
 const ROAD_CLEARANCE = COUNTRY_WEST_ROAD_WIDTH / 2 + 2.75;
 const DRIVEWAY_CLEARANCE = COUNTRY_WEST_DRIVEWAY_WIDTH / 2 + 2.1;
+const FAR_TRAIL_CLEARANCE = WEST_FAR_TRAIL_WIDTH / 2 + 2.75;
+const RIVER_TREE_CLEARANCE = 2.25;
 const CLEARING_CENTER = new Vector3(-182, 0, 8);
 const CLEARING_RADIUS_X = 12;
 const CLEARING_RADIUS_Z = 10;
+const FOREST_MIN_X = WEST_GROUND_MIN_X + 2.5;
+const FOREST_MAX_X = -88;
+const FOREST_MIN_Z = -195;
+const FOREST_MAX_Z = 195;
+const FOREST_STEP_X = 6.15;
+const FOREST_STEP_Z = 6.05;
 
 function seededRandom(seed: number) {
   let value = seed >>> 0;
@@ -86,47 +87,71 @@ function distanceToDriveway(x: number, z: number) {
   return Math.hypot(x - closestX, z - closestZ);
 }
 
+function distanceToFarTrail(x: number, z: number) {
+  const closestX = Math.max(WEST_FAR_TRAIL_END_X, Math.min(WEST_FAR_TRAIL_START_X, x));
+  return Math.hypot(x - closestX, z - WEST_EXIT_Z);
+}
+
 function isInsideClearing(x: number, z: number) {
   const nx = (x - CLEARING_CENTER.x) / CLEARING_RADIUS_X;
   const nz = (z - CLEARING_CENTER.z) / CLEARING_RADIUS_Z;
   return nx * nx + nz * nz < 1;
 }
 
+function isSafelyWestOfRiver(x: number, z: number) {
+  const curve = getWestRiverCurve();
+  let closestT = 0;
+  let closestZDistance = Number.POSITIVE_INFINITY;
+
+  for (let i = 0; i <= WEST_RIVER_SAMPLE_COUNT; i += 1) {
+    const t = i / WEST_RIVER_SAMPLE_COUNT;
+    const point = curve.getPoint(t);
+    const zDistance = Math.abs(z - point.z);
+    if (zDistance < closestZDistance) {
+      closestZDistance = zDistance;
+      closestT = t;
+    }
+  }
+
+  const riverPoint = curve.getPoint(closestT);
+  const westTreeLimit =
+    riverPoint.x - getWestRiverWidth(closestT) / 2 - WEST_RIVER_BANK_WIDTH - RIVER_TREE_CLEARANCE;
+  return x <= westTreeLimit;
+}
+
 function makeTreeSpecs() {
   const random = seededRandom(0x10_0a_6a_6e);
   const trees: TreeSpec[] = [];
+  let rowIndex = 0;
 
-  FOREST_POCKETS.forEach((pocket, pocketIndex) => {
-    let placed = 0;
-    let attempts = 0;
+  for (let baseZ = FOREST_MIN_Z; baseZ <= FOREST_MAX_Z; baseZ += FOREST_STEP_Z) {
+    const rowOffset = rowIndex % 2 === 0 ? 0 : FOREST_STEP_X * 0.5;
 
-    while (placed < pocket.count && attempts < pocket.count * 20) {
-      attempts += 1;
-      const angle = random() * Math.PI * 2;
-      const radius = Math.sqrt(random());
-      const clusterPull = random() < 0.58 ? 0.62 : 1;
-      const x = pocket.centerX + Math.cos(angle) * pocket.radiusX * radius * clusterPull + (random() - 0.5) * 2.8;
-      const z = pocket.centerZ + Math.sin(angle) * pocket.radiusZ * radius * clusterPull + (random() - 0.5) * 2.8;
+    for (let baseX = FOREST_MIN_X + rowOffset; baseX <= FOREST_MAX_X; baseX += FOREST_STEP_X) {
+      if (random() < 0.08) continue;
 
+      const x = baseX + (random() - 0.5) * 3.1;
+      const z = baseZ + (random() - 0.5) * 3.0;
+
+      if (!isSafelyWestOfRiver(x, z)) continue;
+      if (distanceToFarTrail(x, z) < FAR_TRAIL_CLEARANCE) continue;
       if (distanceToRoad(x, z) < ROAD_CLEARANCE) continue;
       if (distanceToDriveway(x, z) < DRIVEWAY_CLEARANCE) continue;
       if (isInsideClearing(x, z)) continue;
 
-      const nearExisting = trees.some((tree) => Math.hypot(tree.x - x, tree.z - z) < 1.35);
-      if (nearExisting && random() > 0.22) continue;
-
-      const scaleX = 0.72 + random() * 0.58;
-      const scaleY = 0.76 + random() * 0.72;
+      const scaleX = 0.7 + random() * 0.62;
+      const scaleY = 0.75 + random() * 0.78;
       trees.push({
         x,
         z,
         scaleX,
         scaleY,
-        rotation: random() * Math.PI * 2 + pocketIndex * 0.17,
+        rotation: random() * Math.PI * 2,
       });
-      placed += 1;
     }
-  });
+
+    rowIndex += 1;
+  }
 
   return trees;
 }
