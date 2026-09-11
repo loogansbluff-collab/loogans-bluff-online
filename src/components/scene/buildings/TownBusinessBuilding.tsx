@@ -91,7 +91,7 @@ function MotelUnit({ x, frontZ, number, office = false }: { x: number; frontZ: n
         <meshStandardMaterial color="#8fb5c7" emissive="#6b91a3" emissiveIntensity={0.12} />
       </mesh>
       <Text
-        position={[0, 1.34, 0.09]}
+        position={[0, 0.38, 0.09]}
         fontSize={office ? 0.18 : 0.22}
         maxWidth={1.7}
         lineHeight={1.02}
