@@ -114,6 +114,7 @@ function LoogansMotel({ building, onPointerDown, onPointerUp }: { building: Buil
   const depth = 4.8;
   const frontZ = depth / 2 + 0.065;
   const unitXs = [-5, -3, -1, 1, 3, 5];
+  const parkingLineXs = [7.2, 8.6, 10, 11.4, 12.8];
 
   return (
     <group position={[x, 0, z]} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
@@ -130,6 +131,17 @@ function LoogansMotel({ building, onPointerDown, onPointerUp }: { building: Buil
           <boxGeometry args={[width + 0.32, 0.2, depth + 0.32]} />
           <meshStandardMaterial color="#111111" />
         </mesh>
+
+        <mesh position={[10, 0.045, 0.25]}>
+          <boxGeometry args={[6.2, 0.08, 5.8]} />
+          <meshStandardMaterial color="#35383c" roughness={0.95} />
+        </mesh>
+        {parkingLineXs.map((lineX) => (
+          <mesh key={lineX} position={[lineX, 0.095, 0.2]}>
+            <boxGeometry args={[0.06, 0.025, 4.7]} />
+            <meshStandardMaterial color="#d9d6c8" />
+          </mesh>
+        ))}
 
         <mesh position={[-2.25, height - 0.44, frontZ + 0.04]}>
           <boxGeometry args={[4.8, 0.58, 0.09]} />
