@@ -6,6 +6,14 @@ import { useGameStore } from "@/state/gameStore";
 
 const FRONT_CLEARANCE = 3.2;
 const PLAYER_RADIUS = 0.4;
+const SOUTH_FRONT_IDS = new Set([
+  "LB-COPSHOP-001",
+  "LB-JAIL-001",
+  "LB-MEDICAL-001",
+  "LB-TOWNHALL-001",
+  "LB-HOME-001",
+  "LB-HOME-002",
+]);
 
 function isBlocked(x: number, z: number) {
   return townData.buildings.some((building) => {
@@ -35,7 +43,11 @@ export function enterStreetInFront(propertyId: string) {
   const [x, , z] = property.position;
   const [, , depth] = property.size;
   const mapLimit = townData.groundSize / 2 - 1;
-  const faceNorth = building ? rowFacesNorth(z) : false;
+  const faceNorth = building
+    ? SOUTH_FRONT_IDS.has(building.id)
+      ? false
+      : rowFacesNorth(z)
+    : false;
   const direction = faceNorth ? -1 : 1;
   let spawnZ = Math.max(
     -mapLimit,
