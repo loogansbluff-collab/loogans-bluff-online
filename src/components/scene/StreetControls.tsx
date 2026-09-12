@@ -5,7 +5,11 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import { MathUtils, PerspectiveCamera, Vector3 } from "three";
 import { townData } from "@/data/town";
-import { isInEastLake } from "@/lib/eastLake";
+import {
+  getEastBridgeDeckHeight,
+  isInEastBridgeRailZone,
+  isInEastLake,
+} from "@/lib/eastLake";
 import {
   EAST_WALK_MAX_X,
   NORTH_SOUTH_WALK_LIMIT,
@@ -29,6 +33,7 @@ function clamp(value: number, min: number, max: number) {
 }
 
 function isBlocked(x: number, z: number) {
+  if (isInEastBridgeRailZone(x, z)) return true;
   if (isInEastLake(x, z)) return true;
   if (isInCountryWestRoadblock(x, z)) return true;
   if (isInCountryWestHouse(x, z)) return true;
@@ -199,7 +204,8 @@ export default function StreetControls() {
 
     camera.position.x = clamp(camera.position.x, WEST_WALK_MIN_X, EAST_WALK_MAX_X);
     camera.position.z = clamp(camera.position.z, -NORTH_SOUTH_WALK_LIMIT, NORTH_SOUTH_WALK_LIMIT);
-    camera.position.y = townData.streetSpawn[1];
+    camera.position.y =
+      townData.streetSpawn[1] + getEastBridgeDeckHeight(camera.position.x, camera.position.z);
 
     setPlayerPosition([camera.position.x, camera.position.y, camera.position.z]);
   });
