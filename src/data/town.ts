@@ -85,7 +85,7 @@ const NORTH_EXPANSION_BUILDINGS: BuildingData[] = [
   { id: "LB-USEDCAR-001", name: "Used Car Lot", type: "business", status: "coming_soon", owner: null, position: [-25, 0, -75.8], size: [5.8, 4.3, 6.4], color: "#6f6458", description: "Future used car lot." },
   { id: "LB-TAXI-001", name: "Taxi Office", type: "business", status: "coming_soon", owner: null, position: [-15, 0, -76.4], size: [4.4, 3.7, 5.2], color: "#8a7a3f", description: "Future taxi office." },
   { id: "LB-BUSDEPOT-001", name: "Bus Depot", type: "business", status: "coming_soon", owner: null, position: [-5, 0, -75.95], size: [5.6, 4.5, 6.1], color: "#596a73", description: "Future bus depot." },
-  { id: "LB-HOTEL-001", name: "Hotel", type: "business", status: "coming_soon", owner: null, position: [5, 0, -76.1], size: [5.2, 4.6, 5.8], color: "#7b657d", description: "Future hotel." },
+  { id: "LB-HOTEL-001", name: "Dollar Store", type: "business", status: "coming_soon", owner: null, position: [5, 0, -76.1], size: [5.2, 4.6, 5.8], color: "#7b657d", description: "Future dollar store." },
   { id: "LB-INSURANCE-001", name: "Insurance Office", type: "business", status: "coming_soon", owner: null, position: [15, 0, -76.5], size: [4.2, 3.6, 5.0], color: "#5f7280", description: "Future insurance office." },
   { id: "LB-ACCOUNTANT-001", name: "Accountant / Tax Office", type: "business", status: "coming_soon", owner: null, position: [25, 0, -76.25], size: [4.8, 4.0, 5.5], color: "#6d6f66", description: "Future accountant and tax office." },
   { id: "LB-LAWYER-001", name: "Lawyer’s Office", type: "business", status: "coming_soon", owner: null, position: [-25, 0, -89.65], size: [4.5, 3.8, 5.3], color: "#655b6d", description: "Future lawyer office." },
