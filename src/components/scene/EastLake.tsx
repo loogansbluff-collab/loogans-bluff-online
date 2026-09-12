@@ -18,7 +18,7 @@ const LAKE_VERTEX_SHADER = `
   varying float vCrestSignal;
 
   void main() {
-    // UVs are immutable and completely independent from mesh rotation/displacement.
+    // UVs stay fixed forever so the shoreline mask cannot move.
     vUvStatic = uv;
 
     vec4 worldPosition = modelMatrix * vec4(position, 1.0);
@@ -36,9 +36,10 @@ const LAKE_VERTEX_SHADER = `
     float phaseB = dot(xz, dirB) * freqB - uTime * 0.44;
     float phaseC = dot(xz, dirC) * freqC + uTime * 0.61;
 
-    float ampA = 0.070;
-    float ampB = 0.045;
-    float ampC = 0.025;
+    // Calm visible waves. Total possible trough is about -0.085 world units.
+    float ampA = 0.045;
+    float ampB = 0.025;
+    float ampC = 0.015;
 
     float sineA = sin(phaseA);
     float sineB = sin(phaseB);
@@ -55,7 +56,8 @@ const LAKE_VERTEX_SHADER = `
       cos(phaseB) * ampB * freqB * dirB.y +
       cos(phaseC) * ampC * freqC * dirC.y;
 
-    // Vertical movement only. Never alter horizontal lake bounds or UVs.
+    // Vertical movement only. The mesh itself is lifted high enough that even
+    // the deepest trough never falls through the green terrain underneath.
     worldPosition.y += waveHeight;
 
     vWaveNormal = normalize(vec3(-dHdx, 1.0, -dHdz));
@@ -86,11 +88,12 @@ const LAKE_FRAGMENT_SHADER = `
   }
 
   void main() {
-    // Derive the lake mask ONLY from static UVs, converted back to lake-local units.
     vec2 lakeLocal = vec2(
       (vUvStatic.x - 0.5) * ${EAST_LAKE_WIDTH.toFixed(1)},
       (vUvStatic.y - 0.5) * ${EAST_LAKE_DEPTH.toFixed(1)}
     );
+
+    // Permanently fixed UV shoreline. This never depends on time or displacement.
     if (lakeField(lakeLocal) > 1.0) discard;
 
     vec3 normal = normalize(vWaveNormal);
@@ -98,12 +101,13 @@ const LAKE_FRAGMENT_SHADER = `
     vec3 viewDir = normalize(cameraPosition - vWorldPosition);
     vec3 halfDir = normalize(lightDir + viewDir);
 
+    // High-floor blue water; normals only add light and never darken the base.
     vec3 baseColor = vec3(0.085, 0.285, 0.355);
     vec3 crestColor = vec3(0.38, 0.64, 0.69);
 
-    float specular = pow(max(dot(normal, halfDir), 0.0), 72.0) * 0.20;
-    float crestPeak = smoothstep(0.82, 0.95, vCrestSignal);
-    float thinCrest = pow(crestPeak, 7.0) * 0.24;
+    float specular = pow(max(dot(normal, halfDir), 0.0), 72.0) * 0.18;
+    float crestPeak = smoothstep(0.84, 0.96, vCrestSignal);
+    float thinCrest = pow(crestPeak, 8.0) * 0.20;
 
     vec3 color = baseColor;
     color += crestColor * thinCrest;
@@ -165,7 +169,7 @@ export default function EastLake() {
         <shaderMaterial vertexShader={SHORE_VERTEX_SHADER} fragmentShader={SHORE_FRAGMENT_SHADER} />
       </mesh>
 
-      <mesh position={[0, 0.032, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh position={[0, 0.105, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[EAST_LAKE_WIDTH, EAST_LAKE_DEPTH, 96, 96]} />
         <shaderMaterial
           ref={waterMaterialRef}
