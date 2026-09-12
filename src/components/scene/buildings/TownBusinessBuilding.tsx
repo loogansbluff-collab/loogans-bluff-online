@@ -17,7 +17,7 @@ type Profile = {
   feature?: "police" | "bail" | "medical" | "townhall" | "bank" | "general" | "realty" | "auto" | "feed" | "diner" | "motel";
 };
 
-type SidingKind = "police" | "bail" | "medical" | "townhall" | "bank" | "general" | "realty" | "auto" | "feed" | "diner" | "grocery" | "pharmacy" | "firehall" | "post" | "dentist" | "vet" | "funeral" | "laundry" | "bakery" | "coffee" | "pizza" | "burger" | "icecream" | "chinese" | "butcher" | "clothing" | "shoe" | "furniture" | "appliance" | "electronics";
+type SidingKind = "police" | "bail" | "medical" | "townhall" | "bank" | "general" | "realty" | "auto" | "feed" | "diner" | "grocery" | "pharmacy" | "firehall" | "post" | "dentist" | "vet" | "funeral" | "laundry" | "bakery" | "coffee" | "pizza" | "burger" | "icecream" | "chinese" | "butcher" | "clothing" | "shoe" | "furniture" | "appliance" | "electronics" | "outdoor" | "autoparts" | "tire" | "carwash" | "usedcar" | "taxi";
 
 const PROFILES: Record<string, Profile> = {
   "LB-COPSHOP-001": { wall: "#5d6875", trim: "#d5dde5", door: "#27323d", sign: "POLICE DEPARTMENT", feature: "police" },
@@ -64,6 +64,12 @@ const SIDING_KINDS: Partial<Record<string, SidingKind>> = {
   "LB-FURNITURE-001": "furniture",
   "LB-APPLIANCE-001": "appliance",
   "LB-ELECTRONICS-001": "electronics",
+  "LB-OUTDOOR-001": "outdoor",
+  "LB-AUTOPARTS-001": "autoparts",
+  "LB-TIRE-001": "tire",
+  "LB-CARWASH-001": "carwash",
+  "LB-USEDCAR-001": "usedcar",
+  "LB-TAXI-001": "taxi",
 };
 
 const UNDER_CONSTRUCTION_IDS = new Set([
@@ -281,6 +287,42 @@ function BusinessSiding({ width, height, depth, wall, kind }: { width: number; h
     const frontXs = Array.from({ length: 8 }, (_, i) => -width / 2 + 0.3 + i * ((width - 0.6) / 7));
     const sideZs = Array.from({ length: 8 }, (_, i) => -depth / 2 + 0.3 + i * ((depth - 0.6) / 7));
     return <group>{rows.flatMap((y, row) => frontXs.map((x, i) => <SidingStrip key={`elf-${row}-${i}`} position={[x, y, frontZ]} size={[0.045, 0.045, 0.02]} color={seam} />))}{rows.flatMap((y, row) => sideZs.flatMap((z, i) => [<SidingStrip key={`ell-${row}-${i}`} position={[leftX, y, z]} size={[0.02, 0.045, 0.045]} color={seam} />, <SidingStrip key={`elr-${row}-${i}`} position={[rightX, y, z]} size={[0.02, 0.045, 0.045]} color={seam} />]))}</group>;
+  }
+
+  if (kind === "outdoor") {
+    const rows = Array.from({ length: 4 }, (_, i) => 0.62 + i * 0.78).filter((y) => y < height - 0.16);
+    return <group>{rows.map((y, row) => <group key={`od-${row}`}><SidingStrip position={[0, y, frontZ]} size={[width, 0.055, 0.02]} color={seam} />{Array.from({ length: 4 }, (_, i) => -width / 2 + 0.58 + i * ((width - 1.16) / 3) + (row % 2 ? 0.3 : 0)).filter((x) => x < width / 2 - 0.14).map((x, i) => <SidingStrip key={`odf-${row}-${i}`} position={[x, y - 0.28, frontZ]} size={[0.055, 0.46, 0.02]} color={seam} />)}{Array.from({ length: 4 }, (_, i) => -depth / 2 + 0.58 + i * ((depth - 1.16) / 3) + (row % 2 ? 0.3 : 0)).filter((z) => z < depth / 2 - 0.14).flatMap((z, i) => [<SidingStrip key={`odl-${row}-${i}`} position={[leftX, y - 0.28, z]} size={[0.02, 0.46, 0.055]} color={seam} />, <SidingStrip key={`odr-${row}-${i}`} position={[rightX, y - 0.28, z]} size={[0.02, 0.46, 0.055]} color={seam} />])}</group>)}</group>;
+  }
+
+  if (kind === "autoparts") {
+    const rows = Array.from({ length: 6 }, (_, i) => 0.46 + i * 0.56).filter((y) => y < height - 0.16);
+    const xs = Array.from({ length: 6 }, (_, i) => -width / 2 + 0.4 + i * ((width - 0.8) / 5));
+    const zs = Array.from({ length: 6 }, (_, i) => -depth / 2 + 0.4 + i * ((depth - 0.8) / 5));
+    return <group>{rows.flatMap((y, row) => xs.map((x, i) => <SidingStrip key={`auf-${row}-${i}`} position={[x, y, frontZ]} rotation={[0, 0, (row + i) % 2 ? 0.56 : -0.56]} size={[0.038, 0.54, 0.02]} color={seam} />))}{rows.flatMap((y, row) => zs.flatMap((z, i) => [<SidingStrip key={`aul-${row}-${i}`} position={[leftX, y, z]} rotation={[(row + i) % 2 ? 0.56 : -0.56, 0, 0]} size={[0.02, 0.54, 0.038]} color={seam} />, <SidingStrip key={`aur-${row}-${i}`} position={[rightX, y, z]} rotation={[(row + i) % 2 ? -0.56 : 0.56, 0, 0]} size={[0.02, 0.54, 0.038]} color={seam} />]))}</group>;
+  }
+
+  if (kind === "tire") {
+    const bands = [0.72, 1.62, 2.52, 3.42].filter((y) => y < height - 0.16);
+    return <group>{bands.map((y, i) => <group key={`tr-${i}`}><SidingStrip position={[0, y, frontZ]} size={[width, i % 2 ? 0.12 : 0.16, 0.02]} color={seam} /><SidingStrip position={[leftX, y, 0]} size={[0.02, i % 2 ? 0.12 : 0.16, depth]} color={seam} /><SidingStrip position={[rightX, y, 0]} size={[0.02, i % 2 ? 0.12 : 0.16, depth]} color={seam} /></group>)}</group>;
+  }
+
+  if (kind === "carwash") {
+    const frontXs = Array.from({ length: 5 }, (_, i) => -width / 2 + 0.55 + i * ((width - 1.1) / 4));
+    const sideZs = Array.from({ length: 5 }, (_, i) => -depth / 2 + 0.55 + i * ((depth - 1.1) / 4));
+    return <group>{frontXs.map((x, i) => <SidingStrip key={`cwf-${i}`} position={[x, height / 2, frontZ]} size={[0.12, height, 0.02]} color={seam} />)}{sideZs.flatMap((z, i) => [<SidingStrip key={`cwl-${i}`} position={[leftX, height / 2, z]} size={[0.02, height, 0.12]} color={seam} />, <SidingStrip key={`cwr-${i}`} position={[rightX, height / 2, z]} size={[0.02, height, 0.12]} color={seam} />])}</group>;
+  }
+
+  if (kind === "usedcar") {
+    const rowYs = [1.12, 2.42].filter((y) => y < height - 0.18);
+    const colXs = [-width * 0.22, width * 0.22];
+    const sideZs = [-depth * 0.22, depth * 0.22];
+    return <group>{rowYs.map((y) => <SidingStrip key={`uch-${y}`} position={[0, y, frontZ]} size={[width, 0.09, 0.02]} color={seam} />)}{colXs.map((x) => <SidingStrip key={`ucv-${x}`} position={[x, height / 2, frontZ]} size={[0.09, height, 0.02]} color={seam} />)}{rowYs.flatMap((y) => [<SidingStrip key={`uclh-${y}`} position={[leftX, y, 0]} size={[0.02, 0.09, depth]} color={seam} />, <SidingStrip key={`ucrh-${y}`} position={[rightX, y, 0]} size={[0.02, 0.09, depth]} color={seam} />])}{sideZs.flatMap((z) => [<SidingStrip key={`uclv-${z}`} position={[leftX, height / 2, z]} size={[0.02, height, 0.09]} color={seam} />, <SidingStrip key={`ucrv-${z}`} position={[rightX, height / 2, z]} size={[0.02, height, 0.09]} color={seam} />])}</group>;
+  }
+
+  if (kind === "taxi") {
+    const frontPairs = [-width * 0.28, 0, width * 0.28];
+    const sidePairs = [-depth * 0.28, 0, depth * 0.28];
+    return <group>{frontPairs.flatMap((x, i) => [<SidingStrip key={`txf-a-${i}`} position={[x - 0.035, height / 2, frontZ]} size={[0.028, height, 0.02]} color={seam} />, <SidingStrip key={`txf-b-${i}`} position={[x + 0.035, height / 2, frontZ]} size={[0.028, height, 0.02]} color={seam} />])}{sidePairs.flatMap((z, i) => [<SidingStrip key={`txl-a-${i}`} position={[leftX, height / 2, z - 0.035]} size={[0.02, height, 0.028]} color={seam} />, <SidingStrip key={`txl-b-${i}`} position={[leftX, height / 2, z + 0.035]} size={[0.02, height, 0.028]} color={seam} />, <SidingStrip key={`txr-a-${i}`} position={[rightX, height / 2, z - 0.035]} size={[0.02, height, 0.028]} color={seam} />, <SidingStrip key={`txr-b-${i}`} position={[rightX, height / 2, z + 0.035]} size={[0.02, height, 0.028]} color={seam} />])}</group>;
   }
 
   const rows = Array.from({ length: Math.max(4, Math.floor(height / 0.52)) }, (_, i) => 0.42 + i * 0.52).filter((y) => y < height - 0.15);
