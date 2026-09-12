@@ -5,6 +5,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import { MathUtils, PerspectiveCamera, Vector3 } from "three";
 import { townData } from "@/data/town";
+import { isInEastLake } from "@/lib/eastLake";
 import {
   EAST_WALK_MAX_X,
   NORTH_SOUTH_WALK_LIMIT,
@@ -28,6 +29,7 @@ function clamp(value: number, min: number, max: number) {
 }
 
 function isBlocked(x: number, z: number) {
+  if (isInEastLake(x, z)) return true;
   if (isInCountryWestRoadblock(x, z)) return true;
   if (isInCountryWestHouse(x, z)) return true;
   if (isInWestBridgeRailZone(x, z)) return true;

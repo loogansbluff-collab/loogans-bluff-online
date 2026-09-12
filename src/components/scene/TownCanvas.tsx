@@ -8,6 +8,7 @@ import { isSouthTreeLotId } from "@/lib/southDecor";
 import { useGameStore } from "@/state/gameStore";
 import Ground from "@/components/scene/Ground";
 import WestWorld from "@/components/scene/WestWorld";
+import EastLake from "@/components/scene/EastLake";
 import Building from "@/components/scene/Building";
 import Lot from "@/components/scene/Lot";
 import Roads from "@/components/scene/Roads";
@@ -49,6 +50,7 @@ function TownScene() {
 
       <Ground size={townData.groundSize} />
       <WestWorld />
+      <EastLake />
       <Roads />
       <SouthTrees />
       <PerimeterDecor />
