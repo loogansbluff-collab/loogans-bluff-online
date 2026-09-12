@@ -228,7 +228,7 @@ export default function TownBusinessBuilding({ building, onPointerDown, onPointe
   const windowX = -width * 0.22;
   const secondWindowX = width > 4.2 ? -width * 0.38 : -width * 0.2;
   const barred = profile.feature === "bail" || profile.feature === "police";
-  const faceNorth = SIDING_KINDS[building.id] ? false : rowFacesNorth(z);
+  const faceNorth = rowFacesNorth(z);
   const underConstruction = UNDER_CONSTRUCTION_IDS.has(building.id);
   const sidingKind = SIDING_KINDS[building.id];
 
