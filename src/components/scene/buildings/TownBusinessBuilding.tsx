@@ -72,34 +72,103 @@ function BusinessSiding({ width, height, depth, trim, kind }: { width: number; h
   const leftX = -width / 2 - 0.018;
   const rightX = width / 2 + 0.018;
 
-  if (kind === "general") {
-    const frontXs = Array.from({ length: 9 }, (_, i) => -width / 2 + 0.28 + i * ((width - 0.56) / 8));
-    const sideZs = Array.from({ length: 8 }, (_, i) => -depth / 2 + 0.28 + i * ((depth - 0.56) / 7));
+  if (kind === "police") {
+    const seam = "#3f4852";
+    const horizontalYs = [0.85, 1.85, 2.85].filter((y) => y < height - 0.25);
+    const frontXs = [-width * 0.27, width * 0.27];
     return (
       <group>
-        {frontXs.map((x) => <SidingStrip key={`f-${x}`} position={[x, height / 2, frontZ]} size={[0.045, height, 0.02]} color={trim} />)}
-        {sideZs.flatMap((z) => [
-          <SidingStrip key={`l-${z}`} position={[leftX, height / 2, z]} size={[0.02, height, 0.045]} color={trim} />,
-          <SidingStrip key={`r-${z}`} position={[rightX, height / 2, z]} size={[0.02, height, 0.045]} color={trim} />,
+        {horizontalYs.map((y) => <SidingStrip key={`ph-${y}`} position={[0, y, frontZ]} size={[width, 0.075, 0.02]} color={seam} />)}
+        {frontXs.map((x) => <SidingStrip key={`pv-${x}`} position={[x, height / 2, frontZ]} size={[0.075, height, 0.02]} color={seam} />)}
+        {horizontalYs.flatMap((y) => [
+          <SidingStrip key={`pl-${y}`} position={[leftX, y, 0]} size={[0.02, 0.075, depth]} color={seam} />,
+          <SidingStrip key={`pr-${y}`} position={[rightX, y, 0]} size={[0.02, 0.075, depth]} color={seam} />,
         ])}
       </group>
     );
   }
 
-  const spacing = kind === "bank" ? 0.78 : kind === "townhall" ? 0.62 : kind === "bail" ? 0.68 : 0.58;
-  const start = kind === "bank" ? 0.46 : 0.38;
-  const bandHeight = kind === "townhall" ? 0.07 : kind === "bank" ? 0.055 : 0.045;
-  const rows = Array.from({ length: Math.ceil(height / spacing) + 1 }, (_, i) => start + i * spacing).filter((y) => y < height - 0.22);
+  if (kind === "bail") {
+    const seam = "#2f3036";
+    const frontXs = Array.from({ length: 12 }, (_, i) => -width / 2 + 0.25 + i * ((width - 0.5) / 11));
+    const sideZs = Array.from({ length: 10 }, (_, i) => -depth / 2 + 0.25 + i * ((depth - 0.5) / 9));
+    return (
+      <group>
+        {frontXs.map((x) => <SidingStrip key={`bf-${x}`} position={[x, height / 2, frontZ]} size={[0.035, height, 0.02]} color={seam} />)}
+        {sideZs.flatMap((z) => [
+          <SidingStrip key={`bl-${z}`} position={[leftX, height / 2, z]} size={[0.02, height, 0.035]} color={seam} />,
+          <SidingStrip key={`br-${z}`} position={[rightX, height / 2, z]} size={[0.02, height, 0.035]} color={seam} />,
+        ])}
+      </group>
+    );
+  }
 
+  if (kind === "medical") {
+    const seam = "#9aa7ad";
+    const horizontalYs = [1.05, 2.15, 3.25].filter((y) => y < height - 0.25);
+    const frontXs = [-width * 0.22, width * 0.22];
+    const sideZs = [-depth * 0.22, depth * 0.22];
+    return (
+      <group>
+        {horizontalYs.map((y) => <SidingStrip key={`mh-${y}`} position={[0, y, frontZ]} size={[width, 0.055, 0.02]} color={seam} />)}
+        {frontXs.map((x) => <SidingStrip key={`mv-${x}`} position={[x, height / 2, frontZ]} size={[0.055, height, 0.02]} color={seam} />)}
+        {horizontalYs.flatMap((y) => [
+          <SidingStrip key={`mlh-${y}`} position={[leftX, y, 0]} size={[0.02, 0.055, depth]} color={seam} />,
+          <SidingStrip key={`mrh-${y}`} position={[rightX, y, 0]} size={[0.02, 0.055, depth]} color={seam} />,
+        ])}
+        {sideZs.flatMap((z) => [
+          <SidingStrip key={`mlv-${z}`} position={[leftX, height / 2, z]} size={[0.02, height, 0.055]} color={seam} />,
+          <SidingStrip key={`mrv-${z}`} position={[rightX, height / 2, z]} size={[0.02, height, 0.055]} color={seam} />,
+        ])}
+      </group>
+    );
+  }
+
+  if (kind === "townhall") {
+    const seam = "#5f4632";
+    const rows = [0.72, 1.42, 2.12, 2.82, 3.52, 4.22].filter((y) => y < height - 0.2);
+    return (
+      <group>
+        {rows.map((y, index) => (
+          <group key={`th-${y}`}>
+            <SidingStrip position={[0, y, frontZ]} size={[width, 0.08, 0.02]} color={seam} />
+            {[-width * 0.28, width * 0.28].map((x) => (
+              <SidingStrip key={`tv-${index}-${x}`} position={[x + (index % 2 ? width * 0.14 : 0), y - 0.35, frontZ]} size={[0.07, 0.62, 0.02]} color={seam} />
+            ))}
+            <SidingStrip position={[leftX, y, 0]} size={[0.02, 0.08, depth]} color={seam} />
+            <SidingStrip position={[rightX, y, 0]} size={[0.02, 0.08, depth]} color={seam} />
+          </group>
+        ))}
+      </group>
+    );
+  }
+
+  if (kind === "bank") {
+    const seam = "#554864";
+    const rows = [0.78, 1.62, 2.46].filter((y) => y < height - 0.25);
+    return (
+      <group>
+        {rows.map((y) => (
+          <group key={`bk-${y}`}>
+            <SidingStrip position={[0, y, frontZ]} size={[width, 0.065, 0.02]} color={seam} />
+            <SidingStrip position={[leftX, y, 0]} size={[0.02, 0.065, depth]} color={seam} />
+            <SidingStrip position={[rightX, y, 0]} size={[0.02, 0.065, depth]} color={seam} />
+          </group>
+        ))}
+      </group>
+    );
+  }
+
+  const seam = "#365468";
+  const frontXs = Array.from({ length: 8 }, (_, i) => -width / 2 + 0.3 + i * ((width - 0.6) / 7));
+  const sideZs = Array.from({ length: 7 }, (_, i) => -depth / 2 + 0.3 + i * ((depth - 0.6) / 6));
   return (
     <group>
-      {rows.map((y) => (
-        <group key={y}>
-          <SidingStrip position={[0, y, frontZ]} size={[width, bandHeight, 0.02]} color={trim} />
-          <SidingStrip position={[leftX, y, 0]} size={[0.02, bandHeight, depth]} color={trim} />
-          <SidingStrip position={[rightX, y, 0]} size={[0.02, bandHeight, depth]} color={trim} />
-        </group>
-      ))}
+      {frontXs.map((x) => <SidingStrip key={`gf-${x}`} position={[x, height / 2, frontZ]} size={[0.045, height, 0.02]} color={seam} />)}
+      {sideZs.flatMap((z) => [
+        <SidingStrip key={`gl-${z}`} position={[leftX, height / 2, z]} size={[0.02, height, 0.045]} color={seam} />,
+        <SidingStrip key={`gr-${z}`} position={[rightX, height / 2, z]} size={[0.02, height, 0.045]} color={seam} />,
+      ])}
     </group>
   );
 }
