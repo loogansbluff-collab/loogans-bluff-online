@@ -16,6 +16,8 @@ type Profile = {
   feature?: "police" | "bail" | "medical" | "townhall" | "bank" | "general" | "realty" | "auto" | "feed" | "diner" | "motel";
 };
 
+type SidingKind = "police" | "bail" | "medical" | "townhall" | "bank" | "general";
+
 const PROFILES: Record<string, Profile> = {
   "LB-COPSHOP-001": { wall: "#5d6875", trim: "#d5dde5", door: "#27323d", sign: "POLICE DEPARTMENT", feature: "police" },
   "LB-JAIL-001": { wall: "#4b4b52", trim: "#c9c9ce", door: "#242428", sign: "BAIL BONDS", signColor: "#facc15", feature: "bail" },
@@ -28,6 +30,15 @@ const PROFILES: Record<string, Profile> = {
   "LB-BARN-002": { wall: "#6f3b2f", trim: "#dbc9ad", door: "#4a3528", sign: "LOOGANS FEED & FARM SUPPLY", feature: "feed" },
   "LB-HOME-003": { wall: "#c47f25", trim: "#f8e7c3", door: "#7c4619", sign: "BLUFF DINER", awning: "#b91c1c", feature: "diner" },
   "LB-HOME-004": { wall: "#b65f62", trim: "#f6d6d7", door: "#6b2f33", sign: "LOOGANS MOTEL", signColor: "#fde68a", feature: "motel" },
+};
+
+const SIDING_KINDS: Partial<Record<string, SidingKind>> = {
+  "LB-COPSHOP-001": "police",
+  "LB-JAIL-001": "bail",
+  "LB-MEDICAL-001": "medical",
+  "LB-TOWNHALL-001": "townhall",
+  "LB-HOME-001": "bank",
+  "LB-HOME-002": "general",
 };
 
 const UNDER_CONSTRUCTION_IDS = new Set([
@@ -50,6 +61,47 @@ function rowFacesNorth(z: number) {
   }
   const rowIndex = Math.round((32 - z) / 16);
   return Math.abs(rowIndex) % 2 === 1;
+}
+
+function SidingStrip({ position, size, color }: { position: [number, number, number]; size: [number, number, number]; color: string }) {
+  return <mesh position={position}><boxGeometry args={size} /><meshStandardMaterial color={color} /></mesh>;
+}
+
+function BusinessSiding({ width, height, depth, trim, kind }: { width: number; height: number; depth: number; trim: string; kind: SidingKind }) {
+  const frontZ = depth / 2 + 0.018;
+  const leftX = -width / 2 - 0.018;
+  const rightX = width / 2 + 0.018;
+
+  if (kind === "general") {
+    const frontXs = Array.from({ length: 9 }, (_, i) => -width / 2 + 0.28 + i * ((width - 0.56) / 8));
+    const sideZs = Array.from({ length: 8 }, (_, i) => -depth / 2 + 0.28 + i * ((depth - 0.56) / 7));
+    return (
+      <group>
+        {frontXs.map((x) => <SidingStrip key={`f-${x}`} position={[x, height / 2, frontZ]} size={[0.045, height, 0.02]} color={trim} />)}
+        {sideZs.flatMap((z) => [
+          <SidingStrip key={`l-${z}`} position={[leftX, height / 2, z]} size={[0.02, height, 0.045]} color={trim} />,
+          <SidingStrip key={`r-${z}`} position={[rightX, height / 2, z]} size={[0.02, height, 0.045]} color={trim} />,
+        ])}
+      </group>
+    );
+  }
+
+  const spacing = kind === "bank" ? 0.78 : kind === "townhall" ? 0.62 : kind === "bail" ? 0.68 : 0.58;
+  const start = kind === "bank" ? 0.46 : 0.38;
+  const bandHeight = kind === "townhall" ? 0.07 : kind === "bank" ? 0.055 : 0.045;
+  const rows = Array.from({ length: Math.ceil(height / spacing) + 1 }, (_, i) => start + i * spacing).filter((y) => y < height - 0.22);
+
+  return (
+    <group>
+      {rows.map((y) => (
+        <group key={y}>
+          <SidingStrip position={[0, y, frontZ]} size={[width, bandHeight, 0.02]} color={trim} />
+          <SidingStrip position={[leftX, y, 0]} size={[0.02, bandHeight, depth]} color={trim} />
+          <SidingStrip position={[rightX, y, 0]} size={[0.02, bandHeight, depth]} color={trim} />
+        </group>
+      ))}
+    </group>
+  );
 }
 
 function Window({ x, y, z, width = 1.15, bars = false }: { x: number; y: number; z: number; width?: number; bars?: boolean }) {
@@ -178,6 +230,7 @@ export default function TownBusinessBuilding({ building, onPointerDown, onPointe
   const barred = profile.feature === "bail" || profile.feature === "police";
   const faceNorth = rowFacesNorth(z);
   const underConstruction = UNDER_CONSTRUCTION_IDS.has(building.id);
+  const sidingKind = SIDING_KINDS[building.id];
 
   if (profile.feature === "motel") {
     return <LoogansMotel building={building} onPointerDown={onPointerDown} onPointerUp={onPointerUp} />;
@@ -190,6 +243,7 @@ export default function TownBusinessBuilding({ building, onPointerDown, onPointe
       {profile.feature === "police" ? <><mesh position={[-0.42, height + 0.18, 0]}><boxGeometry args={[0.55, 0.18, 0.35]} /><meshStandardMaterial color="#2563eb" emissive="#1d4ed8" emissiveIntensity={0.6} /></mesh><mesh position={[0.42, height + 0.18, 0]}><boxGeometry args={[0.55, 0.18, 0.35]} /><meshStandardMaterial color="#dc2626" emissive="#b91c1c" emissiveIntensity={0.6} /></mesh></> : null}
 
       <group rotation={[0, faceNorth ? Math.PI : 0, 0]}>
+        {sidingKind ? <BusinessSiding width={width} height={height} depth={depth} trim={profile.trim} kind={sidingKind} /> : null}
         <mesh position={[doorX, 1.15, frontZ]}><boxGeometry args={[0.92, 2.3, 0.1]} /><meshStandardMaterial color={profile.door} /></mesh>
         <mesh position={[doorX + 0.28, 1.15, frontZ + 0.065]}><sphereGeometry args={[0.055, 10, 10]} /><meshStandardMaterial color="#d6b36a" /></mesh>
         <Window x={windowX} y={height * 0.48} z={frontZ} width={Math.min(1.35, width * 0.3)} bars={barred} />
