@@ -16,11 +16,25 @@ const SKIN_OFFSET = 0.03;
 const SKIN_DEPTH = 0.035;
 
 function SkinBox({ position, size, color }: SkinBoxProps) {
-  return (
+  const isFrontDetail = position[2] < 0 && size[2] <= 0.03;
+  const front = (
     <mesh position={position}>
       <boxGeometry args={size} />
       <meshStandardMaterial color={color} />
     </mesh>
+  );
+
+  if (!isFrontDetail) return front;
+
+  const backPosition: Vec3 = [position[0], position[1], -position[2]];
+  return (
+    <>
+      {front}
+      <mesh position={backPosition} raycast={() => null}>
+        <boxGeometry args={size} />
+        <meshStandardMaterial color={color} />
+      </mesh>
+    </>
   );
 }
 
@@ -41,7 +55,15 @@ function MatchingFrontDoor({ depth, color, trim }: { depth: number; color: strin
 }
 
 function SouthSkin({ width, height, depth, color }: { width: number; height: number; depth: number; color: string }) {
-  return <SkinBox position={[0, height / 2, -depth / 2 - SKIN_OFFSET]} size={[width, height, SKIN_DEPTH]} color={color} />;
+  return (
+    <>
+      <SkinBox position={[0, height / 2, -depth / 2 - SKIN_OFFSET]} size={[width, height, SKIN_DEPTH]} color={color} />
+      <mesh position={[0, height / 2, depth / 2 + SKIN_OFFSET]} raycast={() => null}>
+        <boxGeometry args={[width, height, SKIN_DEPTH]} />
+        <meshStandardMaterial color={color} />
+      </mesh>
+    </>
+  );
 }
 
 function SideSkins({ width, height, depth, color }: { width: number; height: number; depth: number; color: string }) {

@@ -129,7 +129,12 @@ function darken(color: string, amount = 0.62) {
 }
 
 function SidingStrip({ position, size, color, rotation }: { position: [number, number, number]; size: [number, number, number]; color: string; rotation?: [number, number, number] }) {
-  return <mesh position={position} rotation={rotation} raycast={() => null}><boxGeometry args={size} /><meshStandardMaterial color={color} /></mesh>;
+  const front = <mesh position={position} rotation={rotation} raycast={() => null}><boxGeometry args={size} /><meshStandardMaterial color={color} /></mesh>;
+  const isFrontStrip = position[2] > 0 && Math.abs(size[2] - 0.02) < 0.000001;
+  if (!isFrontStrip) return front;
+
+  const backPosition: [number, number, number] = [position[0], position[1], -position[2]];
+  return <>{front}<mesh position={backPosition} rotation={rotation} raycast={() => null}><boxGeometry args={size} /><meshStandardMaterial color={color} /></mesh></>;
 }
 
 function BusinessSiding({ width, height, depth, wall, kind }: { width: number; height: number; depth: number; wall: string; kind: SidingKind }) {
