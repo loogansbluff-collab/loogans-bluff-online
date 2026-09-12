@@ -17,7 +17,7 @@ type Profile = {
   feature?: "police" | "bail" | "medical" | "townhall" | "bank" | "general" | "realty" | "auto" | "feed" | "diner" | "motel";
 };
 
-type SidingKind = "police" | "bail" | "medical" | "townhall" | "bank" | "general" | "realty" | "auto" | "feed" | "diner" | "grocery" | "pharmacy";
+type SidingKind = "police" | "bail" | "medical" | "townhall" | "bank" | "general" | "realty" | "auto" | "feed" | "diner" | "grocery" | "pharmacy" | "firehall" | "post" | "dentist" | "vet" | "funeral" | "laundry";
 
 const PROFILES: Record<string, Profile> = {
   "LB-COPSHOP-001": { wall: "#5d6875", trim: "#d5dde5", door: "#27323d", sign: "POLICE DEPARTMENT", feature: "police" },
@@ -46,6 +46,12 @@ const SIDING_KINDS: Partial<Record<string, SidingKind>> = {
   "LB-HOME-003": "diner",
   "LB-GROCERY-001": "grocery",
   "LB-PHARMACY-001": "pharmacy",
+  "LB-FIREHALL-001": "firehall",
+  "LB-POST-001": "post",
+  "LB-DENTIST-001": "dentist",
+  "LB-VET-001": "vet",
+  "LB-FUNERAL-001": "funeral",
+  "LB-LAUNDRY-001": "laundry",
 };
 
 const UNDER_CONSTRUCTION_IDS = new Set([
@@ -74,8 +80,8 @@ function darken(color: string, amount = 0.62) {
   return new Color(color).multiplyScalar(amount).getStyle();
 }
 
-function SidingStrip({ position, size, color }: { position: [number, number, number]; size: [number, number, number]; color: string }) {
-  return <mesh position={position} raycast={() => null}><boxGeometry args={size} /><meshStandardMaterial color={color} /></mesh>;
+function SidingStrip({ position, size, color, rotation }: { position: [number, number, number]; size: [number, number, number]; color: string; rotation?: [number, number, number] }) {
+  return <mesh position={position} rotation={rotation} raycast={() => null}><boxGeometry args={size} /><meshStandardMaterial color={color} /></mesh>;
 }
 
 function BusinessSiding({ width, height, depth, wall, kind }: { width: number; height: number; depth: number; wall: string; kind: SidingKind }) {
@@ -154,11 +160,45 @@ function BusinessSiding({ width, height, depth, wall, kind }: { width: number; h
     return <group>{rows.map((y, row) => <group key={`gh-${y}`}><SidingStrip position={[0, y, frontZ]} size={[width, 0.045, 0.02]} color={seam} />{Array.from({ length: 4 }, (_, i) => -width / 2 + (i + 1) * (width / 5) + (row % 2 ? width / 10 : 0)).filter((x) => x < width / 2 - 0.12).map((x) => <SidingStrip key={`gv-${row}-${x}`} position={[x, y - 0.275, frontZ]} size={[0.04, 0.51, 0.02]} color={seam} />)}<SidingStrip position={[leftX, y, 0]} size={[0.02, 0.045, depth]} color={seam} /><SidingStrip position={[rightX, y, 0]} size={[0.02, 0.045, depth]} color={seam} /></group>)}</group>;
   }
 
-  const tile = 0.48;
-  const horizontalYs = Array.from({ length: Math.max(4, Math.floor(height / tile)) }, (_, i) => 0.42 + i * tile).filter((y) => y < height - 0.15);
-  const frontXs = Array.from({ length: 7 }, (_, i) => -width / 2 + 0.35 + i * ((width - 0.7) / 6));
-  const sideZs = Array.from({ length: 7 }, (_, i) => -depth / 2 + 0.35 + i * ((depth - 0.7) / 6));
-  return <group>{horizontalYs.map((y) => <SidingStrip key={`pxh-${y}`} position={[0, y, frontZ]} size={[width, 0.035, 0.02]} color={seam} />)}{frontXs.map((x) => <SidingStrip key={`pxv-${x}`} position={[x, height / 2, frontZ]} size={[0.035, height, 0.02]} color={seam} />)}{horizontalYs.flatMap((y) => [<SidingStrip key={`pxlh-${y}`} position={[leftX, y, 0]} size={[0.02, 0.035, depth]} color={seam} />, <SidingStrip key={`pxrh-${y}`} position={[rightX, y, 0]} size={[0.02, 0.035, depth]} color={seam} />])}{sideZs.flatMap((z) => [<SidingStrip key={`pxlv-${z}`} position={[leftX, height / 2, z]} size={[0.02, height, 0.035]} color={seam} />, <SidingStrip key={`pxrv-${z}`} position={[rightX, height / 2, z]} size={[0.02, height, 0.035]} color={seam} />])}</group>;
+  if (kind === "pharmacy") {
+    const tile = 0.48;
+    const horizontalYs = Array.from({ length: Math.max(4, Math.floor(height / tile)) }, (_, i) => 0.42 + i * tile).filter((y) => y < height - 0.15);
+    const frontXs = Array.from({ length: 7 }, (_, i) => -width / 2 + 0.35 + i * ((width - 0.7) / 6));
+    const sideZs = Array.from({ length: 7 }, (_, i) => -depth / 2 + 0.35 + i * ((depth - 0.7) / 6));
+    return <group>{horizontalYs.map((y) => <SidingStrip key={`pxh-${y}`} position={[0, y, frontZ]} size={[width, 0.035, 0.02]} color={seam} />)}{frontXs.map((x) => <SidingStrip key={`pxv-${x}`} position={[x, height / 2, frontZ]} size={[0.035, height, 0.02]} color={seam} />)}{horizontalYs.flatMap((y) => [<SidingStrip key={`pxlh-${y}`} position={[leftX, y, 0]} size={[0.02, 0.035, depth]} color={seam} />, <SidingStrip key={`pxrh-${y}`} position={[rightX, y, 0]} size={[0.02, 0.035, depth]} color={seam} />])}{sideZs.flatMap((z) => [<SidingStrip key={`pxlv-${z}`} position={[leftX, height / 2, z]} size={[0.02, height, 0.035]} color={seam} />, <SidingStrip key={`pxrv-${z}`} position={[rightX, height / 2, z]} size={[0.02, height, 0.035]} color={seam} />])}</group>;
+  }
+
+  if (kind === "firehall") {
+    const rows = Array.from({ length: Math.max(4, Math.floor(height / 0.72)) }, (_, i) => 0.5 + i * 0.72).filter((y) => y < height - 0.16);
+    return <group>{rows.map((y) => <group key={`fh-${y}`}><SidingStrip position={[0, y, frontZ]} size={[width, 0.07, 0.02]} color={seam} /><SidingStrip position={[leftX, y, 0]} size={[0.02, 0.07, depth]} color={seam} /><SidingStrip position={[rightX, y, 0]} size={[0.02, 0.07, depth]} color={seam} /></group>)}</group>;
+  }
+
+  if (kind === "post") {
+    const rows = Array.from({ length: Math.max(4, Math.floor(height / 0.72)) }, (_, i) => 0.58 + i * 0.72).filter((y) => y < height - 0.18);
+    return <group>{rows.map((y, row) => <group key={`po-${y}`}><SidingStrip position={[0, y, frontZ]} size={[width, 0.06, 0.02]} color={seam} />{[-0.34, 0.04, 0.38].map((ratio, i) => <SidingStrip key={`pov-${row}-${i}`} position={[width * ratio + (row % 2 ? width * 0.08 : 0), y - 0.34, frontZ]} size={[0.055, 0.62, 0.02]} color={seam} />)}<SidingStrip position={[leftX, y, 0]} size={[0.02, 0.06, depth]} color={seam} /><SidingStrip position={[rightX, y, 0]} size={[0.02, 0.06, depth]} color={seam} /></group>)}</group>;
+  }
+
+  if (kind === "dentist") {
+    const diagonalCount = 8;
+    const length = Math.max(width, height) * 1.35;
+    const offsets = Array.from({ length: diagonalCount }, (_, i) => -width * 0.58 + i * ((width * 1.16) / (diagonalCount - 1)));
+    const sideOffsets = Array.from({ length: 7 }, (_, i) => -depth * 0.55 + i * ((depth * 1.1) / 6));
+    return <group>{offsets.map((x, i) => <SidingStrip key={`df-${i}`} position={[x, height / 2, frontZ]} rotation={[0, 0, -0.48]} size={[0.045, length, 0.02]} color={seam} />)}{sideOffsets.flatMap((z, i) => [<SidingStrip key={`dl-${i}`} position={[leftX, height / 2, z]} rotation={[-0.48, 0, 0]} size={[0.02, length, 0.045]} color={seam} />, <SidingStrip key={`dr-${i}`} position={[rightX, height / 2, z]} rotation={[-0.48, 0, 0]} size={[0.02, length, 0.045]} color={seam} />])}</group>;
+  }
+
+  if (kind === "vet") {
+    const rows = Array.from({ length: Math.max(6, Math.floor(height / 0.38)) }, (_, i) => 0.3 + i * 0.38).filter((y) => y < height - 0.12);
+    return <group>{rows.map((y, i) => <group key={`vh-${i}`}><SidingStrip position={[0, y, frontZ]} size={[width, 0.03, 0.02]} color={seam} /><SidingStrip position={[leftX, y, 0]} size={[0.02, 0.03, depth]} color={seam} /><SidingStrip position={[rightX, y, 0]} size={[0.02, 0.03, depth]} color={seam} /></group>)}</group>;
+  }
+
+  if (kind === "funeral") {
+    const frontXs = Array.from({ length: 5 }, (_, i) => -width / 2 + 0.5 + i * ((width - 1.0) / 4));
+    const sideZs = Array.from({ length: 5 }, (_, i) => -depth / 2 + 0.5 + i * ((depth - 1.0) / 4));
+    return <group>{frontXs.map((x, i) => <SidingStrip key={`fu-f-${i}`} position={[x, height / 2, frontZ]} size={[0.065, height, 0.02]} color={seam} />)}{sideZs.flatMap((z, i) => [<SidingStrip key={`fu-l-${i}`} position={[leftX, height / 2, z]} size={[0.02, height, 0.065]} color={seam} />, <SidingStrip key={`fu-r-${i}`} position={[rightX, height / 2, z]} size={[0.02, height, 0.065]} color={seam} />])}</group>;
+  }
+
+  const rows = Array.from({ length: Math.max(4, Math.floor(height / 0.52)) }, (_, i) => 0.42 + i * 0.52).filter((y) => y < height - 0.15);
+  return <group>{rows.map((y, row) => <group key={`la-${row}`}><SidingStrip position={[0, y, frontZ]} size={[width, 0.035, 0.02]} color={seam} />{Array.from({ length: 4 }, (_, i) => -width / 2 + (i + 1) * (width / 5) + (row % 2 ? width / 10 : 0)).filter((x) => x < width / 2 - 0.12).map((x, i) => <SidingStrip key={`lav-${row}-${i}`} position={[x, y - 0.26, frontZ]} size={[0.035, 0.48, 0.02]} color={seam} />)}<SidingStrip position={[leftX, y, 0]} size={[0.02, 0.035, depth]} color={seam} /><SidingStrip position={[rightX, y, 0]} size={[0.02, 0.035, depth]} color={seam} /></group>)}</group>;
 }
 
 function Window({ x, y, z, width = 1.15, bars = false }: { x: number; y: number; z: number; width?: number; bars?: boolean }) {
