@@ -15,33 +15,36 @@ const LAKE_VERTEX_SHADER = `
   varying vec2 vLakePosition;
   varying vec3 vWorldPosition;
   varying vec3 vWaveNormal;
-  varying float vWaveHeight;
+  varying float vCrestSignal;
 
   void main() {
+    // Keep this undeformed local coordinate for the lake mask/shoreline.
     vLakePosition = position.xy;
+
     vec4 worldPosition = modelMatrix * vec4(position, 1.0);
     vec2 xz = worldPosition.xz;
 
-    vec2 dirA = normalize(vec2(1.0, 0.28));
-    vec2 dirB = normalize(vec2(-0.42, 1.0));
+    vec2 dirA = normalize(vec2(1.0, 0.34));
+    vec2 dirB = normalize(vec2(-0.46, 1.0));
     vec2 dirC = normalize(vec2(0.72, 0.69));
 
-    float freqA = 0.10;
-    float freqB = 0.16;
-    float freqC = 0.28;
+    float freqA = 0.024;
+    float freqB = 0.032;
+    float freqC = 0.046;
 
-    float phaseA = dot(xz, dirA) * freqA + uTime * 1.05;
-    float phaseB = dot(xz, dirB) * freqB - uTime * 0.88;
-    float phaseC = dot(xz, dirC) * freqC + uTime * 1.42;
+    float phaseA = dot(xz, dirA) * freqA + uTime * 0.52;
+    float phaseB = dot(xz, dirB) * freqB - uTime * 0.44;
+    float phaseC = dot(xz, dirC) * freqC + uTime * 0.61;
 
-    float ampA = 0.27;
-    float ampB = 0.18;
-    float ampC = 0.10;
+    float ampA = 0.070;
+    float ampB = 0.045;
+    float ampC = 0.025;
 
-    float waveA = sin(phaseA) * ampA;
-    float waveB = sin(phaseB) * ampB;
-    float waveC = sin(phaseC) * ampC;
-    float waveHeight = waveA + waveB + waveC;
+    float sineA = sin(phaseA);
+    float sineB = sin(phaseB);
+    float sineC = sin(phaseC);
+
+    float waveHeight = sineA * ampA + sineB * ampB + sineC * ampC;
 
     float dHdx =
       cos(phaseA) * ampA * freqA * dirA.x +
@@ -52,21 +55,22 @@ const LAKE_VERTEX_SHADER = `
       cos(phaseB) * ampB * freqB * dirB.y +
       cos(phaseC) * ampC * freqC * dirC.y;
 
+    // Vertical movement only. Never move X/Z, so the lake edge cannot tear or drift.
     worldPosition.y += waveHeight;
 
-    vWaveHeight = waveHeight;
     vWaveNormal = normalize(vec3(-dHdx, 1.0, -dHdz));
+    vCrestSignal = clamp((sineA * 0.52 + sineB * 0.31 + sineC * 0.17) * 0.5 + 0.5, 0.0, 1.0);
     vWorldPosition = worldPosition.xyz;
+
     gl_Position = projectionMatrix * viewMatrix * worldPosition;
   }
 `;
 
 const LAKE_FRAGMENT_SHADER = `
-  uniform float uTime;
   varying vec2 vLakePosition;
   varying vec3 vWorldPosition;
   varying vec3 vWaveNormal;
-  varying float vWaveHeight;
+  varying float vCrestSignal;
 
   float ellipseField(vec2 p, vec2 center, vec2 radius) {
     vec2 q = (p - center) / radius;
@@ -82,6 +86,7 @@ const LAKE_FRAGMENT_SHADER = `
   }
 
   void main() {
+    // Mask strictly from original, undeformed plane coordinates.
     if (lakeField(vLakePosition) > 1.0) discard;
 
     vec3 normal = normalize(vWaveNormal);
@@ -89,21 +94,19 @@ const LAKE_FRAGMENT_SHADER = `
     vec3 viewDir = normalize(cameraPosition - vWorldPosition);
     vec3 halfDir = normalize(lightDir + viewDir);
 
-    float diffuse = 0.58 + max(dot(normal, lightDir), 0.0) * 0.42;
-    float specular = pow(max(dot(normal, halfDir), 0.0), 54.0);
+    // A fixed blue floor: wave normals may brighten the lake but never darken it.
+    vec3 baseColor = vec3(0.085, 0.285, 0.355);
+    vec3 crestColor = vec3(0.38, 0.64, 0.69);
 
-    float crest = smoothstep(0.30, 0.43, vWaveHeight);
-    float thinCrest = crest * (1.0 - smoothstep(0.43, 0.53, vWaveHeight));
+    float specular = pow(max(dot(normal, halfDir), 0.0), 72.0) * 0.20;
 
-    vec3 deepWater = vec3(0.055, 0.18, 0.25);
-    vec3 lakeBlue = vec3(0.09, 0.31, 0.39);
-    vec3 crestColor = vec3(0.42, 0.68, 0.72);
+    // Only the very top of the combined wave signal becomes a crest line.
+    float crestPeak = smoothstep(0.82, 0.95, vCrestSignal);
+    float thinCrest = pow(crestPeak, 7.0) * 0.24;
 
-    float heightMix = clamp(vWaveHeight * 0.48 + 0.5, 0.0, 1.0);
-    vec3 baseColor = mix(deepWater, lakeBlue, 0.36 + heightMix * 0.34);
-    vec3 color = baseColor * diffuse;
-    color += crestColor * thinCrest * 0.30;
-    color += crestColor * specular * 0.34;
+    vec3 color = baseColor;
+    color += crestColor * thinCrest;
+    color += crestColor * specular;
 
     gl_FragColor = vec4(color, 1.0);
   }
