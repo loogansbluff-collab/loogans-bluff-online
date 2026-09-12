@@ -179,11 +179,19 @@ function BusinessSiding({ width, height, depth, wall, kind }: { width: number; h
   }
 
   if (kind === "dentist") {
-    const diagonalCount = 8;
-    const length = Math.max(width, height) * 1.35;
-    const offsets = Array.from({ length: diagonalCount }, (_, i) => -width * 0.58 + i * ((width * 1.16) / (diagonalCount - 1)));
-    const sideOffsets = Array.from({ length: 7 }, (_, i) => -depth * 0.55 + i * ((depth * 1.1) / 6));
-    return <group>{offsets.map((x, i) => <SidingStrip key={`df-${i}`} position={[x, height / 2, frontZ]} rotation={[0, 0, -0.48]} size={[0.045, length, 0.02]} color={seam} />)}{sideOffsets.flatMap((z, i) => [<SidingStrip key={`dl-${i}`} position={[leftX, height / 2, z]} rotation={[-0.48, 0, 0]} size={[0.02, length, 0.045]} color={seam} />, <SidingStrip key={`dr-${i}`} position={[rightX, height / 2, z]} rotation={[-0.48, 0, 0]} size={[0.02, length, 0.045]} color={seam} />])}</group>;
+    const rows = Array.from({ length: 5 }, (_, i) => 0.48 + i * 0.58).filter((y) => y < height - 0.18);
+    const perRow = 5;
+    return (
+      <group>
+        {rows.flatMap((y, row) =>
+          Array.from({ length: perRow }, (_, i) => {
+            const x = -width / 2 + 0.45 + i * ((width - 0.9) / (perRow - 1)) + (row % 2 ? 0.16 : 0);
+            if (x > width / 2 - 0.22) return null;
+            return <SidingStrip key={`df-${row}-${i}`} position={[x, y, frontZ]} rotation={[0, 0, -0.34]} size={[0.026, 0.62, 0.02]} color={seam} />;
+          }),
+        )}
+      </group>
+    );
   }
 
   if (kind === "vet") {
