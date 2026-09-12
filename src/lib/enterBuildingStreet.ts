@@ -54,6 +54,7 @@ export function enterStreetInFront(propertyId: string) {
   const entry: [number, number, number] = [x, townData.streetSpawn[1], spawnZ];
   state.setSelectedId(propertyId);
   state.setStreetEntry(entry);
+  state.setStreetEntryYaw(faceNorth ? Math.PI : 0);
   state.setMode("street");
   return true;
 }

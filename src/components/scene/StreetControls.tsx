@@ -54,6 +54,7 @@ export default function StreetControls() {
   const requestFocus = useGameStore((state) => state.requestFocus);
   const setPlayerPosition = useGameStore((state) => state.setPlayerPosition);
   const setStreetEntry = useGameStore((state) => state.setStreetEntry);
+  const setStreetEntryYaw = useGameStore((state) => state.setStreetEntryYaw);
   const pressedKeys = useRef(new Set<string>());
   const forward = useRef(new Vector3());
   const right = useRef(new Vector3());
@@ -65,6 +66,7 @@ export default function StreetControls() {
   useEffect(() => {
     const streetY = townData.streetSpawn[1];
     const oneShotEntry = useGameStore.getState().streetEntry;
+    const oneShotEntryYaw = useGameStore.getState().streetEntryYaw;
     const landedFromAerial = Math.abs(camera.position.y - streetY) < 0.05;
     const [spawnX, , spawnZ] = townData.streetSpawn;
     const entryX = oneShotEntry?.[0] ?? (landedFromAerial ? camera.position.x : spawnX);
@@ -72,9 +74,10 @@ export default function StreetControls() {
 
     camera.position.set(entryX, streetY, entryZ);
     camera.rotation.order = "YXZ";
-    camera.rotation.set(0, 0, 0);
+    camera.rotation.set(0, oneShotEntryYaw ?? 0, 0);
     setPlayerPosition([entryX, streetY, entryZ]);
     setStreetEntry(null);
+    setStreetEntryYaw(null);
 
     if (camera instanceof PerspectiveCamera) {
       camera.fov = 70;
@@ -89,6 +92,7 @@ export default function StreetControls() {
       requestFocus([camera.position.x, 0, camera.position.z]);
       if (document.pointerLockElement) document.exitPointerLock();
       setStreetEntry(null);
+      setStreetEntryYaw(null);
       setMode("aerial");
     };
 
@@ -171,7 +175,7 @@ export default function StreetControls() {
       touchLook.current = null;
       pressedKeys.current.clear();
     };
-  }, [camera, gl, requestFocus, setMode, setPlayerPosition, setStreetEntry]);
+  }, [camera, gl, requestFocus, setMode, setPlayerPosition, setStreetEntry, setStreetEntryYaw]);
 
   useFrame((_, delta) => {
     camera.getWorldDirection(forward.current);

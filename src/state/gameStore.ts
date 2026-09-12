@@ -15,6 +15,8 @@ type GameState = {
   setPlayerPosition: (position: PlayerPosition) => void;
   streetEntry: PlayerPosition | null;
   setStreetEntry: (position: PlayerPosition | null) => void;
+  streetEntryYaw: number | null;
+  setStreetEntryYaw: (yaw: number | null) => void;
   focusNonce: number;
   focusPosition: FocusPosition | null;
   requestFocus: (position: FocusPosition) => void;
@@ -44,6 +46,8 @@ export const useGameStore = create<GameState>((set) => ({
     }),
   streetEntry: null,
   setStreetEntry: (position) => set({ streetEntry: position }),
+  streetEntryYaw: null,
+  setStreetEntryYaw: (yaw) => set({ streetEntryYaw: yaw }),
   focusNonce: 0,
   focusPosition: null,
   requestFocus: (position) =>
