@@ -179,17 +179,18 @@ function BusinessSiding({ width, height, depth, wall, kind }: { width: number; h
   }
 
   if (kind === "dentist") {
-    const rows = Array.from({ length: 5 }, (_, i) => 0.48 + i * 0.58).filter((y) => y < height - 0.18);
-    const perRow = 5;
+    const rows = Array.from({ length: 5 }, (_, i) => 0.52 + i * 0.6).filter((y) => y < height - 0.2);
+    const frontXs = Array.from({ length: 6 }, (_, i) => -width / 2 + 0.42 + i * ((width - 0.84) / 5));
+    const sideZs = Array.from({ length: 7 }, (_, i) => -depth / 2 + 0.42 + i * ((depth - 0.84) / 6));
     return (
       <group>
-        {rows.flatMap((y, row) =>
-          Array.from({ length: perRow }, (_, i) => {
-            const x = -width / 2 + 0.45 + i * ((width - 0.9) / (perRow - 1)) + (row % 2 ? 0.16 : 0);
-            if (x > width / 2 - 0.22) return null;
-            return <SidingStrip key={`df-${row}-${i}`} position={[x, y, frontZ]} rotation={[0, 0, -0.34]} size={[0.026, 0.62, 0.02]} color={seam} />;
-          }),
-        )}
+        {rows.flatMap((y, row) => frontXs.map((x, i) => (
+          <SidingStrip key={`df-${row}-${i}`} position={[x, y, frontZ]} rotation={[0, 0, (row + i) % 2 ? 0.32 : -0.32]} size={[0.026, 0.46, 0.02]} color={seam} />
+        )))}
+        {rows.flatMap((y, row) => sideZs.flatMap((z, i) => [
+          <SidingStrip key={`dl-${row}-${i}`} position={[leftX, y, z]} rotation={[(row + i) % 2 ? 0.32 : -0.32, 0, 0]} size={[0.02, 0.46, 0.026]} color={seam} />,
+          <SidingStrip key={`dr-${row}-${i}`} position={[rightX, y, z]} rotation={[(row + i) % 2 ? -0.32 : 0.32, 0, 0]} size={[0.02, 0.46, 0.026]} color={seam} />,
+        ]))}
       </group>
     );
   }
