@@ -12,14 +12,14 @@ import {
 
 const LAKE_VERTEX_SHADER = `
   uniform float uTime;
-  varying vec2 vLakePosition;
+  varying vec2 vUvStatic;
   varying vec3 vWorldPosition;
   varying vec3 vWaveNormal;
   varying float vCrestSignal;
 
   void main() {
-    // Keep this undeformed local coordinate for the lake mask/shoreline.
-    vLakePosition = position.xy;
+    // UVs are immutable and completely independent from mesh rotation/displacement.
+    vUvStatic = uv;
 
     vec4 worldPosition = modelMatrix * vec4(position, 1.0);
     vec2 xz = worldPosition.xz;
@@ -55,7 +55,7 @@ const LAKE_VERTEX_SHADER = `
       cos(phaseB) * ampB * freqB * dirB.y +
       cos(phaseC) * ampC * freqC * dirC.y;
 
-    // Vertical movement only. Never move X/Z, so the lake edge cannot tear or drift.
+    // Vertical movement only. Never alter horizontal lake bounds or UVs.
     worldPosition.y += waveHeight;
 
     vWaveNormal = normalize(vec3(-dHdx, 1.0, -dHdz));
@@ -67,7 +67,7 @@ const LAKE_VERTEX_SHADER = `
 `;
 
 const LAKE_FRAGMENT_SHADER = `
-  varying vec2 vLakePosition;
+  varying vec2 vUvStatic;
   varying vec3 vWorldPosition;
   varying vec3 vWaveNormal;
   varying float vCrestSignal;
@@ -86,21 +86,22 @@ const LAKE_FRAGMENT_SHADER = `
   }
 
   void main() {
-    // Mask strictly from original, undeformed plane coordinates.
-    if (lakeField(vLakePosition) > 1.0) discard;
+    // Derive the lake mask ONLY from static UVs, converted back to lake-local units.
+    vec2 lakeLocal = vec2(
+      (vUvStatic.x - 0.5) * ${EAST_LAKE_WIDTH.toFixed(1)},
+      (vUvStatic.y - 0.5) * ${EAST_LAKE_DEPTH.toFixed(1)}
+    );
+    if (lakeField(lakeLocal) > 1.0) discard;
 
     vec3 normal = normalize(vWaveNormal);
     vec3 lightDir = normalize(vec3(-0.38, 0.88, 0.30));
     vec3 viewDir = normalize(cameraPosition - vWorldPosition);
     vec3 halfDir = normalize(lightDir + viewDir);
 
-    // A fixed blue floor: wave normals may brighten the lake but never darken it.
     vec3 baseColor = vec3(0.085, 0.285, 0.355);
     vec3 crestColor = vec3(0.38, 0.64, 0.69);
 
     float specular = pow(max(dot(normal, halfDir), 0.0), 72.0) * 0.20;
-
-    // Only the very top of the combined wave signal becomes a crest line.
     float crestPeak = smoothstep(0.82, 0.95, vCrestSignal);
     float thinCrest = pow(crestPeak, 7.0) * 0.24;
 
@@ -113,16 +114,16 @@ const LAKE_FRAGMENT_SHADER = `
 `;
 
 const SHORE_VERTEX_SHADER = `
-  varying vec2 vLakePosition;
+  varying vec2 vUvStatic;
 
   void main() {
-    vLakePosition = position.xy;
+    vUvStatic = uv;
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
   }
 `;
 
 const SHORE_FRAGMENT_SHADER = `
-  varying vec2 vLakePosition;
+  varying vec2 vUvStatic;
 
   float ellipseField(vec2 p, vec2 center, vec2 radius) {
     vec2 q = (p - center) / radius;
@@ -138,7 +139,11 @@ const SHORE_FRAGMENT_SHADER = `
   }
 
   void main() {
-    float field = lakeField(vLakePosition);
+    vec2 lakeLocal = vec2(
+      (vUvStatic.x - 0.5) * ${EAST_LAKE_WIDTH.toFixed(1)},
+      (vUvStatic.y - 0.5) * ${EAST_LAKE_DEPTH.toFixed(1)}
+    );
+    float field = lakeField(lakeLocal);
     if (field > 1.10 || field < 0.94) discard;
     gl_FragColor = vec4(0.38, 0.33, 0.23, 1.0);
   }
