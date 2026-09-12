@@ -64,7 +64,7 @@ function rowFacesNorth(z: number) {
 }
 
 function SidingStrip({ position, size, color }: { position: [number, number, number]; size: [number, number, number]; color: string }) {
-  return <mesh position={position}><boxGeometry args={size} /><meshStandardMaterial color={color} /></mesh>;
+  return <mesh position={position} raycast={() => null}><boxGeometry args={size} /><meshStandardMaterial color={color} /></mesh>;
 }
 
 function BusinessSiding({ width, height, depth, trim, kind }: { width: number; height: number; depth: number; trim: string; kind: SidingKind }) {
