@@ -17,7 +17,7 @@ type Profile = {
   feature?: "police" | "bail" | "medical" | "townhall" | "bank" | "general" | "realty" | "auto" | "feed" | "diner" | "motel";
 };
 
-type SidingKind = "police" | "bail" | "medical" | "townhall" | "bank" | "general" | "realty" | "auto" | "feed" | "diner" | "grocery" | "pharmacy" | "firehall" | "post" | "dentist" | "vet" | "funeral" | "laundry" | "bakery" | "coffee" | "pizza" | "burger" | "icecream" | "chinese";
+type SidingKind = "police" | "bail" | "medical" | "townhall" | "bank" | "general" | "realty" | "auto" | "feed" | "diner" | "grocery" | "pharmacy" | "firehall" | "post" | "dentist" | "vet" | "funeral" | "laundry" | "bakery" | "coffee" | "pizza" | "burger" | "icecream" | "chinese" | "butcher" | "clothing" | "shoe" | "furniture" | "appliance" | "electronics";
 
 const PROFILES: Record<string, Profile> = {
   "LB-COPSHOP-001": { wall: "#5d6875", trim: "#d5dde5", door: "#27323d", sign: "POLICE DEPARTMENT", feature: "police" },
@@ -58,6 +58,12 @@ const SIDING_KINDS: Partial<Record<string, SidingKind>> = {
   "LB-BURGER-001": "burger",
   "LB-ICECREAM-001": "icecream",
   "LB-CHINESE-001": "chinese",
+  "LB-BUTCHER-001": "butcher",
+  "LB-CLOTHING-001": "clothing",
+  "LB-SHOE-001": "shoe",
+  "LB-FURNITURE-001": "furniture",
+  "LB-APPLIANCE-001": "appliance",
+  "LB-ELECTRONICS-001": "electronics",
 };
 
 const UNDER_CONSTRUCTION_IDS = new Set([
@@ -188,17 +194,7 @@ function BusinessSiding({ width, height, depth, wall, kind }: { width: number; h
     const rows = Array.from({ length: 5 }, (_, i) => 0.52 + i * 0.6).filter((y) => y < height - 0.2);
     const frontXs = Array.from({ length: 6 }, (_, i) => -width / 2 + 0.42 + i * ((width - 0.84) / 5));
     const sideZs = Array.from({ length: 7 }, (_, i) => -depth / 2 + 0.42 + i * ((depth - 0.84) / 6));
-    return (
-      <group>
-        {rows.flatMap((y, row) => frontXs.map((x, i) => (
-          <SidingStrip key={`df-${row}-${i}`} position={[x, y, frontZ]} rotation={[0, 0, (row + i) % 2 ? 0.32 : -0.32]} size={[0.026, 0.46, 0.02]} color={seam} />
-        )))}
-        {rows.flatMap((y, row) => sideZs.flatMap((z, i) => [
-          <SidingStrip key={`dl-${row}-${i}`} position={[leftX, y, z]} rotation={[(row + i) % 2 ? 0.32 : -0.32, 0, 0]} size={[0.02, 0.46, 0.026]} color={seam} />,
-          <SidingStrip key={`dr-${row}-${i}`} position={[rightX, y, z]} rotation={[(row + i) % 2 ? -0.32 : 0.32, 0, 0]} size={[0.02, 0.46, 0.026]} color={seam} />,
-        ]))}
-      </group>
-    );
+    return <group>{rows.flatMap((y, row) => frontXs.map((x, i) => <SidingStrip key={`df-${row}-${i}`} position={[x, y, frontZ]} rotation={[0, 0, (row + i) % 2 ? 0.32 : -0.32]} size={[0.026, 0.46, 0.02]} color={seam} />))}{rows.flatMap((y, row) => sideZs.flatMap((z, i) => [<SidingStrip key={`dl-${row}-${i}`} position={[leftX, y, z]} rotation={[(row + i) % 2 ? 0.32 : -0.32, 0, 0]} size={[0.02, 0.46, 0.026]} color={seam} />, <SidingStrip key={`dr-${row}-${i}`} position={[rightX, y, z]} rotation={[(row + i) % 2 ? -0.32 : 0.32, 0, 0]} size={[0.02, 0.46, 0.026]} color={seam} />]))}</group>;
   }
 
   if (kind === "vet") {
@@ -214,7 +210,7 @@ function BusinessSiding({ width, height, depth, wall, kind }: { width: number; h
 
   if (kind === "bakery") {
     const rows = Array.from({ length: Math.max(4, Math.floor(height / 0.56)) }, (_, i) => 0.46 + i * 0.56).filter((y) => y < height - 0.16);
-    return <group>{rows.map((y, row) => <group key={`ba-${row}`}><SidingStrip position={[0, y, frontZ]} size={[width, 0.035, 0.02]} color={seam} />{Array.from({ length: 7 }, (_, i) => -width / 2 + 0.3 + i * ((width - 0.6) / 6) + (row % 2 ? 0.18 : 0)).filter((x) => x < width / 2 - 0.12).map((x, i) => <SidingStrip key={`baf-${row}-${i}`} position={[x, y - 0.20, frontZ]} size={[0.03, 0.30, 0.02]} color={seam} />)}<SidingStrip position={[leftX, y, 0]} size={[0.02, 0.035, depth]} color={seam} /><SidingStrip position={[rightX, y, 0]} size={[0.02, 0.035, depth]} color={seam} /></group>)}</group>;
+    return <group>{rows.map((y, row) => <group key={`ba-${row}`}><SidingStrip position={[0, y, frontZ]} size={[width, 0.035, 0.02]} color={seam} />{Array.from({ length: 7 }, (_, i) => -width / 2 + 0.3 + i * ((width - 0.6) / 6) + (row % 2 ? 0.18 : 0)).filter((x) => x < width / 2 - 0.12).map((x, i) => <SidingStrip key={`baf-${row}-${i}`} position={[x, y - 0.2, frontZ]} size={[0.03, 0.3, 0.02]} color={seam} />)}<SidingStrip position={[leftX, y, 0]} size={[0.02, 0.035, depth]} color={seam} /><SidingStrip position={[rightX, y, 0]} size={[0.02, 0.035, depth]} color={seam} /></group>)}</group>;
   }
 
   if (kind === "coffee") {
@@ -249,42 +245,60 @@ function BusinessSiding({ width, height, depth, wall, kind }: { width: number; h
     return <group>{rowYs.map((y) => <SidingStrip key={`chh-${y}`} position={[0, y, frontZ]} size={[width, 0.085, 0.02]} color={seam} />)}{colXs.map((x) => <SidingStrip key={`chv-${x}`} position={[x, height / 2, frontZ]} size={[0.085, height, 0.02]} color={seam} />)}{rowYs.flatMap((y) => [<SidingStrip key={`chlh-${y}`} position={[leftX, y, 0]} size={[0.02, 0.085, depth]} color={seam} />, <SidingStrip key={`chrh-${y}`} position={[rightX, y, 0]} size={[0.02, 0.085, depth]} color={seam} />])}{sideZs.flatMap((z) => [<SidingStrip key={`chlv-${z}`} position={[leftX, height / 2, z]} size={[0.02, height, 0.085]} color={seam} />, <SidingStrip key={`chrv-${z}`} position={[rightX, height / 2, z]} size={[0.02, height, 0.085]} color={seam} />])}</group>;
   }
 
+  if (kind === "butcher") {
+    const frontXs = Array.from({ length: 7 }, (_, i) => -width / 2 + 0.42 + i * ((width - 0.84) / 6));
+    const sideZs = Array.from({ length: 7 }, (_, i) => -depth / 2 + 0.42 + i * ((depth - 0.84) / 6));
+    return <group>{frontXs.map((x, i) => <SidingStrip key={`btf-${i}`} position={[x, height / 2, frontZ]} size={[i % 2 ? 0.07 : 0.11, height, 0.02]} color={seam} />)}{sideZs.flatMap((z, i) => [<SidingStrip key={`btl-${i}`} position={[leftX, height / 2, z]} size={[0.02, height, i % 2 ? 0.07 : 0.11]} color={seam} />, <SidingStrip key={`btr-${i}`} position={[rightX, height / 2, z]} size={[0.02, height, i % 2 ? 0.07 : 0.11]} color={seam} />])}</group>;
+  }
+
+  if (kind === "clothing") {
+    const rows = Array.from({ length: 6 }, (_, i) => 0.48 + i * 0.56).filter((y) => y < height - 0.16);
+    const xs = Array.from({ length: 6 }, (_, i) => -width / 2 + 0.38 + i * ((width - 0.76) / 5));
+    const zs = Array.from({ length: 6 }, (_, i) => -depth / 2 + 0.38 + i * ((depth - 0.76) / 5));
+    return <group>{rows.flatMap((y, row) => xs.map((x, i) => <SidingStrip key={`clf-${row}-${i}`} position={[x, y, frontZ]} rotation={[0, 0, (row + i) % 2 ? 0.72 : -0.72]} size={[0.032, 0.5, 0.02]} color={seam} />))}{rows.flatMap((y, row) => zs.flatMap((z, i) => [<SidingStrip key={`cll-${row}-${i}`} position={[leftX, y, z]} rotation={[(row + i) % 2 ? 0.72 : -0.72, 0, 0]} size={[0.02, 0.5, 0.032]} color={seam} />, <SidingStrip key={`clr-${row}-${i}`} position={[rightX, y, z]} rotation={[(row + i) % 2 ? -0.72 : 0.72, 0, 0]} size={[0.02, 0.5, 0.032]} color={seam} />]))}</group>;
+  }
+
+  if (kind === "shoe") {
+    const rows = Array.from({ length: 5 }, (_, i) => 0.58 + i * 0.66).filter((y) => y < height - 0.18);
+    return <group>{rows.map((y, row) => <group key={`sh-${row}`}><SidingStrip position={[0, y, frontZ]} size={[width, 0.048, 0.02]} color={seam} />{[-0.28, 0.28].map((ratio, i) => <SidingStrip key={`shf-${row}-${i}`} position={[width * ratio + (row % 2 ? width * 0.16 : 0), y - 0.3, frontZ]} size={[0.048, 0.56, 0.02]} color={seam} />)}<SidingStrip position={[leftX, y, 0]} size={[0.02, 0.048, depth]} color={seam} /><SidingStrip position={[rightX, y, 0]} size={[0.02, 0.048, depth]} color={seam} /></group>)}</group>;
+  }
+
+  if (kind === "furniture") {
+    const rowYs = [0.9, 2.0, 3.1].filter((y) => y < height - 0.2);
+    const colXs = [-width * 0.3, width * 0.3];
+    const sideZs = [-depth * 0.3, depth * 0.3];
+    return <group>{rowYs.map((y) => <SidingStrip key={`frh-${y}`} position={[0, y, frontZ]} size={[width, 0.075, 0.02]} color={seam} />)}{colXs.map((x) => <SidingStrip key={`frv-${x}`} position={[x, height / 2, frontZ]} size={[0.075, height, 0.02]} color={seam} />)}{rowYs.flatMap((y) => [<SidingStrip key={`frlh-${y}`} position={[leftX, y, 0]} size={[0.02, 0.075, depth]} color={seam} />, <SidingStrip key={`frrh-${y}`} position={[rightX, y, 0]} size={[0.02, 0.075, depth]} color={seam} />])}{sideZs.flatMap((z) => [<SidingStrip key={`frlv-${z}`} position={[leftX, height / 2, z]} size={[0.02, height, 0.075]} color={seam} />, <SidingStrip key={`frrv-${z}`} position={[rightX, height / 2, z]} size={[0.02, height, 0.075]} color={seam} />])}</group>;
+  }
+
+  if (kind === "appliance") {
+    const frontXs = [-width * 0.24, width * 0.24];
+    const sideZs = [-depth * 0.24, depth * 0.24];
+    return <group>{frontXs.map((x, i) => <SidingStrip key={`apf-${i}`} position={[x, height / 2, frontZ]} size={[0.08, height, 0.02]} color={seam} />)}{sideZs.flatMap((z, i) => [<SidingStrip key={`apl-${i}`} position={[leftX, height / 2, z]} size={[0.02, height, 0.08]} color={seam} />, <SidingStrip key={`apr-${i}`} position={[rightX, height / 2, z]} size={[0.02, height, 0.08]} color={seam} />])}</group>;
+  }
+
+  if (kind === "electronics") {
+    const rows = Array.from({ length: 7 }, (_, i) => 0.36 + i * 0.46).filter((y) => y < height - 0.14);
+    const frontXs = Array.from({ length: 8 }, (_, i) => -width / 2 + 0.3 + i * ((width - 0.6) / 7));
+    const sideZs = Array.from({ length: 8 }, (_, i) => -depth / 2 + 0.3 + i * ((depth - 0.6) / 7));
+    return <group>{rows.flatMap((y, row) => frontXs.map((x, i) => <SidingStrip key={`elf-${row}-${i}`} position={[x, y, frontZ]} size={[0.045, 0.045, 0.02]} color={seam} />))}{rows.flatMap((y, row) => sideZs.flatMap((z, i) => [<SidingStrip key={`ell-${row}-${i}`} position={[leftX, y, z]} size={[0.02, 0.045, 0.045]} color={seam} />, <SidingStrip key={`elr-${row}-${i}`} position={[rightX, y, z]} size={[0.02, 0.045, 0.045]} color={seam} />]))}</group>;
+  }
+
   const rows = Array.from({ length: Math.max(4, Math.floor(height / 0.52)) }, (_, i) => 0.42 + i * 0.52).filter((y) => y < height - 0.15);
   return <group>{rows.map((y, row) => <group key={`la-${row}`}><SidingStrip position={[0, y, frontZ]} size={[width, 0.035, 0.02]} color={seam} />{Array.from({ length: 4 }, (_, i) => -width / 2 + (i + 1) * (width / 5) + (row % 2 ? width / 10 : 0)).filter((x) => x < width / 2 - 0.12).map((x, i) => <SidingStrip key={`lav-${row}-${i}`} position={[x, y - 0.26, frontZ]} size={[0.035, 0.48, 0.02]} color={seam} />)}<SidingStrip position={[leftX, y, 0]} size={[0.02, 0.035, depth]} color={seam} /><SidingStrip position={[rightX, y, 0]} size={[0.02, 0.035, depth]} color={seam} /></group>)}</group>;
 }
 
 function Window({ x, y, z, width = 1.15, bars = false }: { x: number; y: number; z: number; width?: number; bars?: boolean }) {
-  return (
-    <group position={[x, y, z]}>
-      <mesh><boxGeometry args={[width, 1.15, 0.08]} /><meshStandardMaterial color="#8fb5c7" emissive="#6b91a3" emissiveIntensity={0.16} /></mesh>
-      <mesh position={[0, 0, 0.055]}><boxGeometry args={[0.055, 1.15, 0.035]} /><meshStandardMaterial color="#ddd6ca" /></mesh>
-      <mesh position={[0, 0, 0.055]}><boxGeometry args={[width, 0.055, 0.035]} /><meshStandardMaterial color="#ddd6ca" /></mesh>
-      {bars ? [-0.35, 0, 0.35].map((bx) => (
-        <mesh key={bx} position={[bx * width, 0, 0.09]}><boxGeometry args={[0.045, 1.15, 0.04]} /><meshStandardMaterial color="#27272a" /></mesh>
-      )) : null}
-    </group>
-  );
+  return <group position={[x, y, z]}><mesh><boxGeometry args={[width, 1.15, 0.08]} /><meshStandardMaterial color="#8fb5c7" emissive="#6b91a3" emissiveIntensity={0.16} /></mesh><mesh position={[0, 0, 0.055]}><boxGeometry args={[0.055, 1.15, 0.035]} /><meshStandardMaterial color="#ddd6ca" /></mesh><mesh position={[0, 0, 0.055]}><boxGeometry args={[width, 0.055, 0.035]} /><meshStandardMaterial color="#ddd6ca" /></mesh>{bars ? [-0.35, 0, 0.35].map((bx) => <mesh key={bx} position={[bx * width, 0, 0.09]}><boxGeometry args={[0.045, 1.15, 0.04]} /><meshStandardMaterial color="#27272a" /></mesh>) : null}</group>;
 }
 
 function SpecialFeature({ feature, width, height, frontZ }: { feature?: Profile["feature"]; width: number; height: number; frontZ: number }) {
-  if (feature === "medical") {
-    return <group position={[width * 0.33, height * 0.72, frontZ + 0.08]}><mesh><boxGeometry args={[0.24, 0.95, 0.08]} /><meshStandardMaterial color="#dc2626" /></mesh><mesh><boxGeometry args={[0.95, 0.24, 0.08]} /><meshStandardMaterial color="#dc2626" /></mesh></group>;
-  }
-  if (feature === "townhall" || feature === "bank") {
-    return <>{[-width * 0.34, width * 0.34].map((x) => <mesh key={x} position={[x, height * 0.43, frontZ + 0.18]}><cylinderGeometry args={[0.18, 0.22, height * 0.72, 12]} /><meshStandardMaterial color="#e7dfd2" /></mesh>)}</>;
-  }
+  if (feature === "medical") return <group position={[width * 0.33, height * 0.72, frontZ + 0.08]}><mesh><boxGeometry args={[0.24, 0.95, 0.08]} /><meshStandardMaterial color="#dc2626" /></mesh><mesh><boxGeometry args={[0.95, 0.24, 0.08]} /><meshStandardMaterial color="#dc2626" /></mesh></group>;
+  if (feature === "townhall" || feature === "bank") return <>{[-width * 0.34, width * 0.34].map((x) => <mesh key={x} position={[x, height * 0.43, frontZ + 0.18]}><cylinderGeometry args={[0.18, 0.22, height * 0.72, 12]} /><meshStandardMaterial color="#e7dfd2" /></mesh>)}</>;
   return null;
 }
 
 function MotelUnit({ x, frontZ, number, office = false }: { x: number; frontZ: number; number: number; office?: boolean }) {
-  return (
-    <group position={[x, 1.15, frontZ]}>
-      <mesh><boxGeometry args={[0.9, 2.15, 0.12]} /><meshStandardMaterial color="#6b2f33" /></mesh>
-      <mesh position={[0.28, 0, 0.085]}><sphereGeometry args={[0.05, 10, 10]} /><meshStandardMaterial color="#d6b36a" /></mesh>
-      <mesh position={[-0.67, 0.08, 0.015]}><boxGeometry args={[0.62, 1.08, 0.09]} /><meshStandardMaterial color="#8fb5c7" emissive="#6b91a3" emissiveIntensity={0.12} /></mesh>
-      <Text position={[0, 0.38, 0.09]} fontSize={office ? 0.18 : 0.22} maxWidth={1.7} lineHeight={1.02} textAlign="center" anchorX="center" anchorY="middle" color="#fde68a">{office ? `${number}\nOFFICE` : `${number}`}</Text>
-    </group>
-  );
+  return <group position={[x, 1.15, frontZ]}><mesh><boxGeometry args={[0.9, 2.15, 0.12]} /><meshStandardMaterial color="#6b2f33" /></mesh><mesh position={[0.28, 0, 0.085]}><sphereGeometry args={[0.05, 10, 10]} /><meshStandardMaterial color="#d6b36a" /></mesh><mesh position={[-0.67, 0.08, 0.015]}><boxGeometry args={[0.62, 1.08, 0.09]} /><meshStandardMaterial color="#8fb5c7" emissive="#6b91a3" emissiveIntensity={0.12} /></mesh><Text position={[0, 0.38, 0.09]} fontSize={office ? 0.18 : 0.22} maxWidth={1.7} lineHeight={1.02} textAlign="center" anchorX="center" anchorY="middle" color="#fde68a">{office ? `${number}\nOFFICE` : `${number}`}</Text></group>;
 }
 
 function LoogansMotel({ building, onPointerDown, onPointerUp }: { building: BuildingData; onPointerDown: Handler; onPointerUp: Handler }) {
@@ -296,21 +310,7 @@ function LoogansMotel({ building, onPointerDown, onPointerUp }: { building: Buil
   const frontZ = depth / 2 + 0.065;
   const unitXs = [-5, -3, -1, 1, 3, 5];
   const parkingLineXs = [7.2, 8.6, 10, 11.4, 12.8];
-
-  return (
-    <group position={[x, 0, z]} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
-      <group rotation={[0, faceNorth ? Math.PI : 0, 0]}>
-        <mesh position={[0, 0.08, 0]}><boxGeometry args={[width + 0.7, 0.16, depth + 1.3]} /><meshStandardMaterial color="#262626" /></mesh>
-        <mesh position={[0, height / 2, 0]}><boxGeometry args={[width, height, depth]} /><meshStandardMaterial color="#b65f62" /></mesh>
-        <mesh position={[0, height + 0.1, 0]}><boxGeometry args={[width + 0.32, 0.2, depth + 0.32]} /><meshStandardMaterial color="#111111" /></mesh>
-        <mesh position={[10, 0.045, 0.25]}><boxGeometry args={[6.2, 0.08, 5.8]} /><meshStandardMaterial color="#35383c" roughness={0.95} /></mesh>
-        {parkingLineXs.map((lineX) => <mesh key={lineX} position={[lineX, 0.095, 0.2]}><boxGeometry args={[0.06, 0.025, 4.7]} /><meshStandardMaterial color="#d9d6c8" /></mesh>)}
-        <mesh position={[-2.25, height - 0.44, frontZ + 0.04]}><boxGeometry args={[4.8, 0.58, 0.09]} /><meshStandardMaterial color="#252525" /></mesh>
-        <Text position={[-2.25, height - 0.44, frontZ + 0.1]} fontSize={0.32} maxWidth={4.3} textAlign="center" anchorX="center" anchorY="middle" color="#fde68a">LOOGANS MOTEL</Text>
-        {unitXs.map((unitX, index) => <MotelUnit key={index} x={unitX} frontZ={frontZ} number={index + 1} office={index === 5} />)}
-      </group>
-    </group>
-  );
+  return <group position={[x, 0, z]} onPointerDown={onPointerDown} onPointerUp={onPointerUp}><group rotation={[0, faceNorth ? Math.PI : 0, 0]}><mesh position={[0, 0.08, 0]}><boxGeometry args={[width + 0.7, 0.16, depth + 1.3]} /><meshStandardMaterial color="#262626" /></mesh><mesh position={[0, height / 2, 0]}><boxGeometry args={[width, height, depth]} /><meshStandardMaterial color="#b65f62" /></mesh><mesh position={[0, height + 0.1, 0]}><boxGeometry args={[width + 0.32, 0.2, depth + 0.32]} /><meshStandardMaterial color="#111111" /></mesh><mesh position={[10, 0.045, 0.25]}><boxGeometry args={[6.2, 0.08, 5.8]} /><meshStandardMaterial color="#35383c" roughness={0.95} /></mesh>{parkingLineXs.map((lineX) => <mesh key={lineX} position={[lineX, 0.095, 0.2]}><boxGeometry args={[0.06, 0.025, 4.7]} /><meshStandardMaterial color="#d9d6c8" /></mesh>)}<mesh position={[-2.25, height - 0.44, frontZ + 0.04]}><boxGeometry args={[4.8, 0.58, 0.09]} /><meshStandardMaterial color="#252525" /></mesh><Text position={[-2.25, height - 0.44, frontZ + 0.1]} fontSize={0.32} maxWidth={4.3} textAlign="center" anchorX="center" anchorY="middle" color="#fde68a">LOOGANS MOTEL</Text>{unitXs.map((unitX, index) => <MotelUnit key={index} x={unitX} frontZ={frontZ} number={index + 1} office={index === 5} />)}</group></group>;
 }
 
 export default function TownBusinessBuilding({ building, onPointerDown, onPointerUp }: { building: BuildingData; onPointerDown: Handler; onPointerUp: Handler; }) {
@@ -326,29 +326,7 @@ export default function TownBusinessBuilding({ building, onPointerDown, onPointe
   const underConstruction = UNDER_CONSTRUCTION_IDS.has(building.id);
   const sidingKind = SIDING_KINDS[building.id];
 
-  if (profile.feature === "motel") {
-    return <LoogansMotel building={building} onPointerDown={onPointerDown} onPointerUp={onPointerUp} />;
-  }
+  if (profile.feature === "motel") return <LoogansMotel building={building} onPointerDown={onPointerDown} onPointerUp={onPointerUp} />;
 
-  return (
-    <group position={[x, 0, z]} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
-      <mesh position={[0, height / 2, 0]}><boxGeometry args={[width, height, depth]} /><meshStandardMaterial color={profile.wall} /></mesh>
-      <mesh position={[0, height + 0.09, 0]}><boxGeometry args={[width + 0.28, 0.18, depth + 0.28]} /><meshStandardMaterial color="#111111" /></mesh>
-      {profile.feature === "police" ? <><mesh position={[-0.42, height + 0.18, 0]}><boxGeometry args={[0.55, 0.18, 0.35]} /><meshStandardMaterial color="#2563eb" emissive="#1d4ed8" emissiveIntensity={0.6} /></mesh><mesh position={[0.42, height + 0.18, 0]}><boxGeometry args={[0.55, 0.18, 0.35]} /><meshStandardMaterial color="#dc2626" emissive="#b91c1c" emissiveIntensity={0.6} /></mesh></> : null}
-      <group rotation={[0, faceNorth ? Math.PI : 0, 0]}>
-        {sidingKind ? <BusinessSiding width={width} height={height} depth={depth} wall={profile.wall} kind={sidingKind} /> : null}
-        <mesh position={[doorX, 1.15, frontZ]}><boxGeometry args={[0.92, 2.3, 0.1]} /><meshStandardMaterial color={profile.door} /></mesh>
-        <mesh position={[doorX + 0.28, 1.15, frontZ + 0.065]}><sphereGeometry args={[0.055, 10, 10]} /><meshStandardMaterial color="#d6b36a" /></mesh>
-        <Window x={windowX} y={height * 0.48} z={frontZ} width={Math.min(1.35, width * 0.3)} bars={barred} />
-        {width >= 5 ? <Window x={secondWindowX} y={height * 0.48} z={frontZ} width={1.05} bars={barred} /> : null}
-        <mesh position={[0, height * 0.82, frontZ + 0.04]}><boxGeometry args={[Math.min(width * 0.9, 5.5), 0.72, 0.09]} /><meshStandardMaterial color="#252525" /></mesh>
-        <Text position={[0, height * 0.82, frontZ + 0.1]} fontSize={Math.min(0.32, width / Math.max(profile.sign.length, 12) * 0.95)} maxWidth={Math.min(width * 0.82, 5.1)} textAlign="center" anchorX="center" anchorY="middle" color={profile.signColor ?? "#f8fafc"}>{profile.sign}</Text>
-        {underConstruction ? <group position={[0, height * 0.34, frontZ + 0.12]}><mesh><boxGeometry args={[2.25, 0.72, 0.05]} /><meshStandardMaterial color="#f5e7c8" /></mesh><Text position={[0, 0, 0.035]} fontSize={0.16} maxWidth={2.0} lineHeight={1.12} textAlign="center" anchorX="center" anchorY="middle" color="#1f2937">{"UNDER CONSTRUCTION\ncheck back soon"}</Text></group> : null}
-        {profile.awning ? <mesh position={[0, height * 0.63, frontZ + 0.38]} rotation={[0.18, 0, 0]}><boxGeometry args={[width * 0.9, 0.12, 0.8]} /><meshStandardMaterial color={profile.awning} /></mesh> : null}
-        {profile.feature === "realty" ? <group position={[-width * 0.24, height * 0.42, frontZ + 0.11]}>{[-0.35, 0, 0.35].map((dx, index) => <mesh key={dx} position={[dx, index % 2 ? -0.22 : 0.2, 0]}><boxGeometry args={[0.28, 0.34, 0.035]} /><meshStandardMaterial color="#f5f5dc" /></mesh>)}</group> : null}
-        {profile.feature === "diner" ? <mesh position={[-width * 0.28, 0.92, frontZ + 0.07]}><boxGeometry args={[width * 0.42, 1.35, 0.08]} /><meshStandardMaterial color="#a8d4de" emissive="#79aebb" emissiveIntensity={0.12} /></mesh> : null}
-        <SpecialFeature feature={profile.feature} width={width} height={height} frontZ={frontZ} />
-      </group>
-    </group>
-  );
+  return <group position={[x, 0, z]} onPointerDown={onPointerDown} onPointerUp={onPointerUp}><mesh position={[0, height / 2, 0]}><boxGeometry args={[width, height, depth]} /><meshStandardMaterial color={profile.wall} /></mesh><mesh position={[0, height + 0.09, 0]}><boxGeometry args={[width + 0.28, 0.18, depth + 0.28]} /><meshStandardMaterial color="#111111" /></mesh>{profile.feature === "police" ? <><mesh position={[-0.42, height + 0.18, 0]}><boxGeometry args={[0.55, 0.18, 0.35]} /><meshStandardMaterial color="#2563eb" emissive="#1d4ed8" emissiveIntensity={0.6} /></mesh><mesh position={[0.42, height + 0.18, 0]}><boxGeometry args={[0.55, 0.18, 0.35]} /><meshStandardMaterial color="#dc2626" emissive="#b91c1c" emissiveIntensity={0.6} /></mesh></> : null}<group rotation={[0, faceNorth ? Math.PI : 0, 0]}>{sidingKind ? <BusinessSiding width={width} height={height} depth={depth} wall={profile.wall} kind={sidingKind} /> : null}<mesh position={[doorX, 1.15, frontZ]}><boxGeometry args={[0.92, 2.3, 0.1]} /><meshStandardMaterial color={profile.door} /></mesh><mesh position={[doorX + 0.28, 1.15, frontZ + 0.065]}><sphereGeometry args={[0.055, 10, 10]} /><meshStandardMaterial color="#d6b36a" /></mesh><Window x={windowX} y={height * 0.48} z={frontZ} width={Math.min(1.35, width * 0.3)} bars={barred} />{width >= 5 ? <Window x={secondWindowX} y={height * 0.48} z={frontZ} width={1.05} bars={barred} /> : null}<mesh position={[0, height * 0.82, frontZ + 0.04]}><boxGeometry args={[Math.min(width * 0.9, 5.5), 0.72, 0.09]} /><meshStandardMaterial color="#252525" /></mesh><Text position={[0, height * 0.82, frontZ + 0.1]} fontSize={Math.min(0.32, width / Math.max(profile.sign.length, 12) * 0.95)} maxWidth={Math.min(width * 0.82, 5.1)} textAlign="center" anchorX="center" anchorY="middle" color={profile.signColor ?? "#f8fafc"}>{profile.sign}</Text>{underConstruction ? <group position={[0, height * 0.34, frontZ + 0.12]}><mesh><boxGeometry args={[2.25, 0.72, 0.05]} /><meshStandardMaterial color="#f5e7c8" /></mesh><Text position={[0, 0, 0.035]} fontSize={0.16} maxWidth={2.0} lineHeight={1.12} textAlign="center" anchorX="center" anchorY="middle" color="#1f2937">{"UNDER CONSTRUCTION\ncheck back soon"}</Text></group> : null}{profile.awning ? <mesh position={[0, height * 0.63, frontZ + 0.38]} rotation={[0.18, 0, 0]}><boxGeometry args={[width * 0.9, 0.12, 0.8]} /><meshStandardMaterial color={profile.awning} /></mesh> : null}{profile.feature === "realty" ? <group position={[-width * 0.24, height * 0.42, frontZ + 0.11]}>{[-0.35, 0, 0.35].map((dx, index) => <mesh key={dx} position={[dx, index % 2 ? -0.22 : 0.2, 0]}><boxGeometry args={[0.28, 0.34, 0.035]} /><meshStandardMaterial color="#f5f5dc" /></mesh>)}</group> : null}{profile.feature === "diner" ? <mesh position={[-width * 0.28, 0.92, frontZ + 0.07]}><boxGeometry args={[width * 0.42, 1.35, 0.08]} /><meshStandardMaterial color="#a8d4de" emissive="#79aebb" emissiveIntensity={0.12} /></mesh> : null}<SpecialFeature feature={profile.feature} width={width} height={height} frontZ={frontZ} /></group></group>;
 }
