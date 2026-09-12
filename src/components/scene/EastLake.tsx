@@ -14,16 +14,48 @@ const LAKE_VERTEX_SHADER = `
   uniform float uTime;
   varying vec2 vLakePosition;
   varying vec3 vWorldPosition;
+  varying vec3 vWaveNormal;
+  varying float vWaveHeight;
 
   void main() {
     vLakePosition = position.xy;
     vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+    vec2 xz = worldPosition.xz;
 
-    float waveA = sin(worldPosition.x * 0.20 + worldPosition.z * 0.16 + uTime * 0.72);
-    float waveB = sin(worldPosition.x * -0.14 + worldPosition.z * 0.27 - uTime * 0.58);
-    float waveC = sin((worldPosition.x + worldPosition.z) * 0.11 + uTime * 0.39);
-    worldPosition.y += (waveA * 0.035 + waveB * 0.024 + waveC * 0.018);
+    vec2 dirA = normalize(vec2(1.0, 0.28));
+    vec2 dirB = normalize(vec2(-0.42, 1.0));
+    vec2 dirC = normalize(vec2(0.72, 0.69));
 
+    float freqA = 0.10;
+    float freqB = 0.16;
+    float freqC = 0.28;
+
+    float phaseA = dot(xz, dirA) * freqA + uTime * 1.05;
+    float phaseB = dot(xz, dirB) * freqB - uTime * 0.88;
+    float phaseC = dot(xz, dirC) * freqC + uTime * 1.42;
+
+    float ampA = 0.27;
+    float ampB = 0.18;
+    float ampC = 0.10;
+
+    float waveA = sin(phaseA) * ampA;
+    float waveB = sin(phaseB) * ampB;
+    float waveC = sin(phaseC) * ampC;
+    float waveHeight = waveA + waveB + waveC;
+
+    float dHdx =
+      cos(phaseA) * ampA * freqA * dirA.x +
+      cos(phaseB) * ampB * freqB * dirB.x +
+      cos(phaseC) * ampC * freqC * dirC.x;
+    float dHdz =
+      cos(phaseA) * ampA * freqA * dirA.y +
+      cos(phaseB) * ampB * freqB * dirB.y +
+      cos(phaseC) * ampC * freqC * dirC.y;
+
+    worldPosition.y += waveHeight;
+
+    vWaveHeight = waveHeight;
+    vWaveNormal = normalize(vec3(-dHdx, 1.0, -dHdz));
     vWorldPosition = worldPosition.xyz;
     gl_Position = projectionMatrix * viewMatrix * worldPosition;
   }
@@ -33,6 +65,8 @@ const LAKE_FRAGMENT_SHADER = `
   uniform float uTime;
   varying vec2 vLakePosition;
   varying vec3 vWorldPosition;
+  varying vec3 vWaveNormal;
+  varying float vWaveHeight;
 
   float ellipseField(vec2 p, vec2 center, vec2 radius) {
     vec2 q = (p - center) / radius;
@@ -50,17 +84,26 @@ const LAKE_FRAGMENT_SHADER = `
   void main() {
     if (lakeField(vLakePosition) > 1.0) discard;
 
-    float rippleA = sin(vWorldPosition.x * 0.31 + vWorldPosition.z * 0.19 + uTime * 0.82);
-    float rippleB = sin(vWorldPosition.x * -0.23 + vWorldPosition.z * 0.36 - uTime * 0.67);
-    float rippleC = sin(vWorldPosition.x * 0.12 - vWorldPosition.z * 0.29 + uTime * 0.47);
-    float ripple = smoothstep(1.15, 2.35, rippleA + rippleB + rippleC * 0.55);
+    vec3 normal = normalize(vWaveNormal);
+    vec3 lightDir = normalize(vec3(-0.38, 0.88, 0.30));
+    vec3 viewDir = normalize(cameraPosition - vWorldPosition);
+    vec3 halfDir = normalize(lightDir + viewDir);
 
-    float broadVariation = 0.5 + 0.5 * sin((vWorldPosition.x + vWorldPosition.z) * 0.035 + uTime * 0.10);
-    vec3 deepWater = vec3(0.065, 0.20, 0.27);
-    vec3 lakeBlue = vec3(0.10, 0.33, 0.40);
-    vec3 highlight = vec3(0.31, 0.57, 0.61);
-    vec3 baseColor = mix(deepWater, lakeBlue, 0.48 + broadVariation * 0.14);
-    vec3 color = mix(baseColor, highlight, ripple * 0.24);
+    float diffuse = 0.58 + max(dot(normal, lightDir), 0.0) * 0.42;
+    float specular = pow(max(dot(normal, halfDir), 0.0), 54.0);
+
+    float crest = smoothstep(0.30, 0.43, vWaveHeight);
+    float thinCrest = crest * (1.0 - smoothstep(0.43, 0.53, vWaveHeight));
+
+    vec3 deepWater = vec3(0.055, 0.18, 0.25);
+    vec3 lakeBlue = vec3(0.09, 0.31, 0.39);
+    vec3 crestColor = vec3(0.42, 0.68, 0.72);
+
+    float heightMix = clamp(vWaveHeight * 0.48 + 0.5, 0.0, 1.0);
+    vec3 baseColor = mix(deepWater, lakeBlue, 0.36 + heightMix * 0.34);
+    vec3 color = baseColor * diffuse;
+    color += crestColor * thinCrest * 0.30;
+    color += crestColor * specular * 0.34;
 
     gl_FragColor = vec4(color, 1.0);
   }
@@ -115,7 +158,7 @@ export default function EastLake() {
       </mesh>
 
       <mesh position={[0, 0.032, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[EAST_LAKE_WIDTH, EAST_LAKE_DEPTH, 48, 72]} />
+        <planeGeometry args={[EAST_LAKE_WIDTH, EAST_LAKE_DEPTH, 96, 96]} />
         <shaderMaterial
           ref={waterMaterialRef}
           vertexShader={LAKE_VERTEX_SHADER}
