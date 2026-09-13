@@ -11,6 +11,8 @@ const EYE_HEIGHT = 1.7;
 const ROOM_HALF_WIDTH = 5;
 const ROOM_HALF_DEPTH = 6;
 const PLAYER_RADIUS = 0.4;
+const ROOM_HEIGHT = 4;
+const CEILING_Y = 4.05;
 const MOVE_KEYS = new Set(["KeyW", "KeyA", "KeyS", "KeyD"]);
 
 function NewInteriorControls() {
@@ -103,33 +105,33 @@ export default function NewShopInterior() {
         <meshStandardMaterial color="#6b6258" roughness={0.9} />
       </mesh>
 
-      <mesh position={[0, 4, -5.95]}>
-        <boxGeometry args={[10, 8, 0.1]} />
+      <mesh position={[0, ROOM_HEIGHT / 2, -5.95]}>
+        <boxGeometry args={[10, ROOM_HEIGHT, 0.1]} />
         <meshStandardMaterial color="#a8a29e" roughness={0.95} />
       </mesh>
-      <mesh position={[-4.95, 4, 0]}>
-        <boxGeometry args={[0.1, 8, 12]} />
+      <mesh position={[-4.95, ROOM_HEIGHT / 2, 0]}>
+        <boxGeometry args={[0.1, ROOM_HEIGHT, 12]} />
         <meshStandardMaterial color="#9f968d" roughness={0.95} />
       </mesh>
-      <mesh position={[4.95, 4, 0]}>
-        <boxGeometry args={[0.1, 8, 12]} />
+      <mesh position={[4.95, ROOM_HEIGHT / 2, 0]}>
+        <boxGeometry args={[0.1, ROOM_HEIGHT, 12]} />
         <meshStandardMaterial color="#9f968d" roughness={0.95} />
       </mesh>
 
-      <mesh position={[-3.1, 4, 5.95]}>
-        <boxGeometry args={[3.8, 8, 0.1]} />
+      <mesh position={[-3.1, ROOM_HEIGHT / 2, 5.95]}>
+        <boxGeometry args={[3.8, ROOM_HEIGHT, 0.1]} />
         <meshStandardMaterial color="#a8a29e" roughness={0.95} />
       </mesh>
-      <mesh position={[3.1, 4, 5.95]}>
-        <boxGeometry args={[3.8, 8, 0.1]} />
+      <mesh position={[3.1, ROOM_HEIGHT / 2, 5.95]}>
+        <boxGeometry args={[3.8, ROOM_HEIGHT, 0.1]} />
         <meshStandardMaterial color="#a8a29e" roughness={0.95} />
       </mesh>
-      <mesh position={[0, 6.4, 5.95]}>
-        <boxGeometry args={[2.4, 3.2, 0.1]} />
+      <mesh position={[0, 3.35, 5.95]}>
+        <boxGeometry args={[2.4, 1.3, 0.1]} />
         <meshStandardMaterial color="#a8a29e" roughness={0.95} />
       </mesh>
 
-      <mesh position={[0, 7.95, 0]}>
+      <mesh position={[0, CEILING_Y, 0]}>
         <boxGeometry args={[10, 0.1, 12]} />
         <meshStandardMaterial color="#c9c5bf" roughness={1} />
       </mesh>

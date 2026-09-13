@@ -6,7 +6,7 @@ type Props = {
   distance: number;
 };
 
-const CEILING_Y = 7.9;
+const CEILING_Y = 4.05;
 
 export default function IndustrialCage({ position, emissiveColor, lightColor, intensity, distance }: Props) {
   const cordLength = Math.max(0.2, CEILING_Y - position[1]);
