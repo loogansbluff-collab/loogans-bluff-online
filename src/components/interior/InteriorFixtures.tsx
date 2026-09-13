@@ -4,6 +4,7 @@ import CeilingDisc from "@/components/interior/fixtures/CeilingDisc";
 import Chandelier from "@/components/interior/fixtures/Chandelier";
 import FluorescentPanel from "@/components/interior/fixtures/FluorescentPanel";
 import IndustrialCage from "@/components/interior/fixtures/IndustrialCage";
+import LanternLight from "@/components/interior/fixtures/LanternLight";
 import PendantLight from "@/components/interior/fixtures/PendantLight";
 import WallSconce from "@/components/interior/fixtures/WallSconce";
 import { INTERIOR_FIXTURE_LAYOUTS } from "@/data/interiorFixtures";
@@ -41,6 +42,10 @@ export default function InteriorFixtures() {
 
         if (fixture.kind === "wallSconce") {
           return <WallSconce key={key} {...fixture} />;
+        }
+
+        if (fixture.kind === "lantern") {
+          return <LanternLight key={key} {...fixture} />;
         }
 
         return <Chandelier key={key} {...fixture} />;

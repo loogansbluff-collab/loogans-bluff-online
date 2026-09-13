@@ -59,13 +59,26 @@ export type ChandelierFixture = {
   distance: number;
 };
 
+export type LanternFixture = {
+  kind: "lantern";
+  position: Vec3;
+  radius: number;
+  height: number;
+  bodyColor: string;
+  trimColor: string;
+  lightColor: string;
+  intensity: number;
+  distance: number;
+};
+
 export type InteriorFixture =
   | FluorescentFixture
   | CeilingDiscFixture
   | IndustrialCageFixture
   | PendantFixture
   | WallSconceFixture
-  | ChandelierFixture;
+  | ChandelierFixture
+  | LanternFixture;
 
 export const INTERIOR_FIXTURE_LAYOUTS: Record<string, InteriorFixture[]> = {
   "LB-MEDICAL-001": [
@@ -127,5 +140,31 @@ export const INTERIOR_FIXTURE_LAYOUTS: Record<string, InteriorFixture[]> = {
     { kind: "disc", position: [1.5, 3.68, -1.55], radius: 0.72, emissiveColor: "#fff2a8", lightColor: "#fff3bc", intensity: 0.7, distance: 8 },
     { kind: "disc", position: [-1.5, 3.68, 1.55], radius: 0.72, emissiveColor: "#fff2a8", lightColor: "#fff3bc", intensity: 0.7, distance: 8 },
     { kind: "disc", position: [1.5, 3.68, 1.55], radius: 0.72, emissiveColor: "#fff2a8", lightColor: "#fff3bc", intensity: 0.7, distance: 8 },
+  ],
+  "LB-ICECREAM-001": [
+    { kind: "fluorescent", position: [-1.3, 3.72, 0], size: [0.82, 0.24, 8.2], emissiveColor: "#ffb6d9", lightColor: "#ffd0e7", intensity: 0.92, distance: 11 },
+    { kind: "fluorescent", position: [1.3, 3.72, 0], size: [0.82, 0.24, 8.2], emissiveColor: "#aeefff", lightColor: "#c9f6ff", intensity: 0.92, distance: 11 },
+  ],
+  "LB-CHINESE-001": [
+    { kind: "lantern", position: [-1.45, 2.58, 0], radius: 0.56, height: 0.92, bodyColor: "#b91c1c", trimColor: "#d4a017", lightColor: "#ffd27a", intensity: 0.72, distance: 8 },
+    { kind: "lantern", position: [1.45, 2.58, 0], radius: 0.56, height: 0.92, bodyColor: "#b91c1c", trimColor: "#d4a017", lightColor: "#ffd27a", intensity: 0.72, distance: 8 },
+  ],
+  "LB-BUTCHER-001": [
+    { kind: "fluorescent", position: [-1.35, 3.72, 0], size: [0.82, 0.24, 8.2], emissiveColor: "#eef8ff", lightColor: "#f4fbff", intensity: 0.95, distance: 11 },
+    { kind: "fluorescent", position: [1.35, 3.72, 0], size: [0.82, 0.24, 8.2], emissiveColor: "#eef8ff", lightColor: "#f4fbff", intensity: 0.95, distance: 11 },
+  ],
+  "LB-CLOTHING-001": [
+    { kind: "disc", position: [0, 3.68, -2.2], radius: 0.62, emissiveColor: "#fff5df", lightColor: "#fff7e8", intensity: 0.62, distance: 8 },
+    { kind: "disc", position: [0, 3.68, 0], radius: 0.62, emissiveColor: "#fff5df", lightColor: "#fff7e8", intensity: 0.62, distance: 8 },
+    { kind: "disc", position: [0, 3.68, 2.2], radius: 0.62, emissiveColor: "#fff5df", lightColor: "#fff7e8", intensity: 0.62, distance: 8 },
+  ],
+  "LB-SHOE-001": [
+    { kind: "fluorescent", position: [0, 3.72, -2.0], size: [2.8, 0.22, 0.78], emissiveColor: "#fff7eb", lightColor: "#fff8ef", intensity: 0.66, distance: 8 },
+    { kind: "disc", position: [0, 3.68, 0], radius: 0.62, emissiveColor: "#fff3db", lightColor: "#fff7ea", intensity: 0.58, distance: 8 },
+    { kind: "fluorescent", position: [0, 3.72, 2.0], size: [2.8, 0.22, 0.78], emissiveColor: "#fff7eb", lightColor: "#fff8ef", intensity: 0.66, distance: 8 },
+  ],
+  "LB-FURNITURE-001": [
+    { kind: "pendant", position: [-1.65, 2.64, 0], shadeRadius: 0.95, shadeHeight: 0.66, emissiveColor: "#f5cf9a", lightColor: "#f6d8aa", intensity: 0.55, distance: 7 },
+    { kind: "pendant", position: [1.65, 2.64, 0], shadeRadius: 0.95, shadeHeight: 0.66, emissiveColor: "#f5cf9a", lightColor: "#f6d8aa", intensity: 0.55, distance: 7 },
   ],
 };
