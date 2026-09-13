@@ -2,6 +2,7 @@
 
 import { Canvas } from "@react-three/fiber";
 import GasDress from "@/components/interior/GasDress";
+import InteriorFixtures from "@/components/interior/InteriorFixtures";
 import InteriorLights from "@/components/interior/InteriorLights";
 import InteriorTouchLook from "@/components/interior/InteriorTouchLook";
 import NewShopInterior from "@/components/interior/NewShopInterior";
@@ -36,6 +37,7 @@ export default function InteriorCanvas() {
           <NewShopInterior />
           <InteriorTouchLook />
           <InteriorLights />
+          <InteriorFixtures />
         </>
       )}
     </Canvas>
