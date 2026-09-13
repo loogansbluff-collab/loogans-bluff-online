@@ -8,19 +8,19 @@ type Props = {
 };
 
 export default function FluorescentPanel({ position, size, emissiveColor, lightColor, intensity, distance }: Props) {
-  const housingHeight = Math.max(size[1], 0.18) + 0.12;
+  const housingHeight = Math.max(size[1], 0.18) + 0.14;
 
   return (
     <group position={position}>
       <mesh>
-        <boxGeometry args={[size[0] + 0.16, housingHeight, size[2] + 0.16]} />
-        <meshStandardMaterial color="#343a40" roughness={0.75} />
+        <boxGeometry args={[size[0] + 0.2, housingHeight, size[2] + 0.2]} />
+        <meshBasicMaterial color="#3d4349" />
       </mesh>
-      <mesh position={[0, -(housingHeight / 2 + 0.045), 0]}>
-        <boxGeometry args={[size[0], 0.09, size[2]]} />
-        <meshStandardMaterial color="#f7f8fa" emissive={emissiveColor} emissiveIntensity={2.8} roughness={0.32} />
+      <mesh position={[0, -(housingHeight / 2 + 0.05), 0]}>
+        <boxGeometry args={[size[0], 0.1, size[2]]} />
+        <meshBasicMaterial color={emissiveColor} />
       </mesh>
-      <pointLight position={[0, -(housingHeight / 2 + 0.28), 0]} color={lightColor} intensity={intensity} distance={distance} castShadow={false} />
+      <pointLight position={[0, -(housingHeight / 2 + 0.32), 0]} color={lightColor} intensity={intensity} distance={distance} castShadow={false} />
     </group>
   );
 }

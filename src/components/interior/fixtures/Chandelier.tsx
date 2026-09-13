@@ -9,37 +9,38 @@ type Props = {
 const CEILING_Y = 4.05;
 
 export default function Chandelier({ position, emissiveColor, lightColor, intensity, distance }: Props) {
-  const stemLength = Math.max(0.2, CEILING_Y - position[1] - 0.28);
+  const stemLength = Math.max(0.3, CEILING_Y - position[1] - 0.34);
+  const arm = 0.9;
   const bulbs: Array<[number, number, number]> = [
-    [-0.62, -0.12, 0],
-    [0.62, -0.12, 0],
-    [0, -0.12, -0.62],
-    [0, -0.12, 0.62],
+    [-arm, -0.18, 0],
+    [arm, -0.18, 0],
+    [0, -0.18, -arm],
+    [0, -0.18, arm],
   ];
 
   return (
     <group position={position}>
-      <mesh position={[0, 0.28 + stemLength / 2, 0]}>
-        <cylinderGeometry args={[0.035, 0.035, stemLength, 10]} />
-        <meshStandardMaterial color="#4a3927" metalness={0.35} roughness={0.55} />
+      <mesh position={[0, 0.34 + stemLength / 2, 0]}>
+        <cylinderGeometry args={[0.05, 0.05, stemLength, 12]} />
+        <meshBasicMaterial color="#5a432c" />
       </mesh>
       <mesh>
-        <cylinderGeometry args={[0.09, 0.09, 0.5, 12]} />
-        <meshStandardMaterial color="#6b4d2e" metalness={0.4} roughness={0.48} />
+        <cylinderGeometry args={[0.13, 0.13, 0.62, 14]} />
+        <meshBasicMaterial color="#755633" />
       </mesh>
       {bulbs.map(([x, y, z], index) => (
         <group key={index} position={[x, y, z]}>
-          <mesh position={[-x / 2, 0.05, -z / 2]} rotation={[0, 0, z === 0 ? (x > 0 ? -0.18 : 0.18) : 0]}>
-            <boxGeometry args={[Math.abs(x) > 0 ? 0.7 : 0.08, 0.08, Math.abs(z) > 0 ? 0.7 : 0.08]} />
-            <meshStandardMaterial color="#5a422a" metalness={0.35} roughness={0.55} />
+          <mesh position={[-x / 2, 0.07, -z / 2]}>
+            <boxGeometry args={[Math.abs(x) > 0 ? 0.96 : 0.1, 0.1, Math.abs(z) > 0 ? 0.96 : 0.1]} />
+            <meshBasicMaterial color="#6b4d2e" />
           </mesh>
           <mesh>
-            <sphereGeometry args={[0.14, 16, 12]} />
-            <meshStandardMaterial color="#fff4d6" emissive={emissiveColor} emissiveIntensity={2.7} roughness={0.25} />
+            <sphereGeometry args={[0.2, 18, 14]} />
+            <meshBasicMaterial color={emissiveColor} />
           </mesh>
         </group>
       ))}
-      <pointLight position={[0, -0.32, 0]} color={lightColor} intensity={intensity} distance={distance} castShadow={false} />
+      <pointLight position={[0, -0.42, 0]} color={lightColor} intensity={intensity} distance={distance} castShadow={false} />
     </group>
   );
 }

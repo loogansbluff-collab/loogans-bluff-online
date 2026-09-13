@@ -8,17 +8,19 @@ type Props = {
 };
 
 export default function CeilingDisc({ position, radius, emissiveColor, lightColor, intensity, distance }: Props) {
+  const visibleRadius = Math.max(radius, 0.55);
+
   return (
     <group position={position}>
       <mesh>
-        <cylinderGeometry args={[radius + 0.1, radius + 0.1, 0.18, 28]} />
-        <meshStandardMaterial color="#3f454b" roughness={0.78} />
+        <cylinderGeometry args={[visibleRadius + 0.13, visibleRadius + 0.13, 0.22, 30]} />
+        <meshBasicMaterial color="#474d54" />
       </mesh>
-      <mesh position={[0, -0.12, 0]}>
-        <cylinderGeometry args={[radius, radius, 0.07, 28]} />
-        <meshStandardMaterial color="#f8f8f6" emissive={emissiveColor} emissiveIntensity={2.6} roughness={0.36} />
+      <mesh position={[0, -0.145, 0]}>
+        <cylinderGeometry args={[visibleRadius, visibleRadius, 0.08, 30]} />
+        <meshBasicMaterial color={emissiveColor} />
       </mesh>
-      <pointLight position={[0, -0.32, 0]} color={lightColor} intensity={intensity} distance={distance} castShadow={false} />
+      <pointLight position={[0, -0.38, 0]} color={lightColor} intensity={intensity} distance={distance} castShadow={false} />
     </group>
   );
 }
