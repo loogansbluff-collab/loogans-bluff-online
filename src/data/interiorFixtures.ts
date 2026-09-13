@@ -193,4 +193,30 @@ export const INTERIOR_FIXTURE_LAYOUTS: Record<string, InteriorFixture[]> = {
     { kind: "fluorescent", position: [-1.3, 3.72, 0], size: [0.84, 0.24, 8.4], emissiveColor: "#bfefff", lightColor: "#d8f7ff", intensity: 0.96, distance: 11 },
     { kind: "fluorescent", position: [1.3, 3.72, 0], size: [0.84, 0.24, 8.4], emissiveColor: "#bfefff", lightColor: "#d8f7ff", intensity: 0.96, distance: 11 },
   ],
+  "LB-USEDCAR-001": [
+    { kind: "fluorescent", position: [-1.3, 3.72, 0], size: [0.82, 0.24, 8.0], emissiveColor: "#fff4dc", lightColor: "#fff7e8", intensity: 0.88, distance: 10 },
+    { kind: "fluorescent", position: [1.3, 3.72, 0], size: [0.82, 0.24, 8.0], emissiveColor: "#fff4dc", lightColor: "#fff7e8", intensity: 0.88, distance: 10 },
+  ],
+  "LB-TAXI-001": [
+    { kind: "disc", position: [0, 3.66, 0], radius: 0.62, emissiveColor: "#e8cf9a", lightColor: "#ead6ad", intensity: 0.46, distance: 7 },
+    { kind: "wallSconce", position: [-2.35, 2.18, -5.68], rotationY: 0, emissiveColor: "#d7b878", lightColor: "#ddc492", intensity: 0.28, distance: 6 },
+    { kind: "wallSconce", position: [2.35, 2.18, -5.68], rotationY: 0, emissiveColor: "#d7b878", lightColor: "#ddc492", intensity: 0.28, distance: 6 },
+  ],
+  "LB-BUSDEPOT-001": [
+    { kind: "fluorescent", position: [-1.35, 3.72, 0], size: [0.84, 0.24, 8.4], emissiveColor: "#dfe4e8", lightColor: "#e6eaed", intensity: 0.74, distance: 10 },
+    { kind: "fluorescent", position: [1.35, 3.72, 0], size: [0.84, 0.24, 8.4], emissiveColor: "#dfe4e8", lightColor: "#e6eaed", intensity: 0.74, distance: 10 },
+  ],
+  "LB-HOTEL-001": [
+    { kind: "fluorescent", position: [-1.3, 3.72, 0], size: [0.84, 0.24, 8.2], emissiveColor: "#fff2d8", lightColor: "#fff6e8", intensity: 0.84, distance: 10 },
+    { kind: "fluorescent", position: [1.3, 3.72, 0], size: [0.84, 0.24, 8.2], emissiveColor: "#fff2d8", lightColor: "#fff6e8", intensity: 0.84, distance: 10 },
+  ],
+  "LB-INSURANCE-001": [
+    { kind: "fluorescent", position: [0, 3.72, -1.65], size: [2.6, 0.22, 0.82], emissiveColor: "#f1efe8", lightColor: "#f5f3ec", intensity: 0.56, distance: 8 },
+    { kind: "fluorescent", position: [0, 3.72, 1.65], size: [2.6, 0.22, 0.82], emissiveColor: "#f1efe8", lightColor: "#f5f3ec", intensity: 0.56, distance: 8 },
+  ],
+  "LB-ACCOUNTANT-001": [
+    { kind: "fluorescent", position: [0, 3.72, -2.0], size: [2.8, 0.22, 0.8], emissiveColor: "#e7f3ff", lightColor: "#edf6ff", intensity: 0.68, distance: 8 },
+    { kind: "disc", position: [0, 3.66, 0], radius: 0.56, emissiveColor: "#e6f1ff", lightColor: "#eef7ff", intensity: 0.52, distance: 7 },
+    { kind: "fluorescent", position: [0, 3.72, 2.0], size: [2.8, 0.22, 0.8], emissiveColor: "#e7f3ff", lightColor: "#edf6ff", intensity: 0.68, distance: 8 },
+  ],
 };
