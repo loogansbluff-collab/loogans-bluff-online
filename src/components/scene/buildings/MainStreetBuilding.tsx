@@ -505,6 +505,11 @@ export default function MainStreetBuilding({ building, onPointerDown, onPointerU
       <FacadeBox position={[0, 1.1, backZ]} size={[1.1, 2.2, 0.12]} color={rearDoorColor} />
       <WarmWindow position={[-width * 0.28, 2.05, backZ]} size={[1.35, 1.15, 0.12]} color={LIGHT_MEDIUM} intensity={0.7} />
       <WarmWindow position={[width * 0.28, 2.05, backZ]} size={[1.35, 1.15, 0.12]} color={LIGHT_DIM} intensity={0.3} />
+      <mesh position={[0, height - 0.68, backZ + 0.12]} raycast={() => null}>
+        <boxGeometry args={[Math.max(2.6, width * 0.7), 0.62, 0.08]} />
+        <meshStandardMaterial color={signColor} />
+      </mesh>
+      <Text position={[0, height - 0.68, backZ + 0.17]} fontSize={0.28} maxWidth={Math.max(2.2, width * 0.62)} anchorX="center" anchorY="middle" color={signTextColor} raycast={() => null}>{signText}</Text>
 
       {building.id === "LB-BARBER-001" && (
         <>
