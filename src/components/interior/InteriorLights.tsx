@@ -8,10 +8,12 @@ import {
   LIGHTING_FAMILIES,
 } from "@/data/interiorLighting";
 
-const MIN_AMBIENT_INTENSITY = 0.28;
-const MIN_HEMISPHERE_INTENSITY = 0.18;
-const MIN_AMBIENT_LUMINANCE = 0.34;
-const MIN_HEMISPHERE_LUMINANCE = 0.3;
+const MIN_AMBIENT_INTENSITY = 0.55;
+const MIN_HEMISPHERE_INTENSITY = 0.35;
+const MIN_AMBIENT_LUMINANCE = 0.52;
+const MIN_HEMISPHERE_LUMINANCE = 0.46;
+const MIN_POINT_DISTANCE = 16;
+const POINT_INTENSITY_MULTIPLIER = 1.6;
 
 function readableLightColor(value: string, minimumLuminance: number) {
   const color = new Color(value);
@@ -58,8 +60,8 @@ export default function InteriorLights() {
           key={`${interiorId}-point-${index}`}
           position={light.position}
           color={light.color}
-          intensity={light.intensity}
-          distance={light.distance}
+          intensity={light.intensity * POINT_INTENSITY_MULTIPLIER}
+          distance={Math.max(light.distance, MIN_POINT_DISTANCE)}
           castShadow={false}
         />
       ))}
