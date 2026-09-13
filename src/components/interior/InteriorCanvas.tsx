@@ -23,7 +23,7 @@ export default function InteriorCanvas() {
       camera={{ position: INTERIOR_CAMERA, fov: 70, near: 0.1, far: 100 }}
       style={{ width: "100%", height: "100%" }}
     >
-      <color attach="background" args={["#111827"]} />
+      <color attach="background" args={[isProtected ? "#111827" : "#202938"]} />
       {isProtected ? (
         <>
           <ShopInterior />

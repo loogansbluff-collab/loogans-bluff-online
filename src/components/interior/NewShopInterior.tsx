@@ -22,9 +22,7 @@ function NewInteriorControls() {
 
   useEffect(() => {
     camera.position.set(0, EYE_HEIGHT, 3.5);
-    const faceRoomFrame = window.requestAnimationFrame(() => {
-      camera.lookAt(0, EYE_HEIGHT, -ROOM_HALF_DEPTH);
-    });
+    camera.lookAt(0, EYE_HEIGHT, -ROOM_HALF_DEPTH);
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (MOVE_KEYS.has(event.code)) {
@@ -54,7 +52,6 @@ function NewInteriorControls() {
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("keyup", onKeyUp);
     return () => {
-      window.cancelAnimationFrame(faceRoomFrame);
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("keyup", onKeyUp);
       pressedKeys.current.clear();
