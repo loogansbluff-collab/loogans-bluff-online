@@ -27,6 +27,7 @@ export type IndustrialCageFixture = {
   lightColor: string;
   intensity: number;
   distance: number;
+  basicHousing?: boolean;
 };
 
 export type PendantFixture = {
@@ -166,5 +167,30 @@ export const INTERIOR_FIXTURE_LAYOUTS: Record<string, InteriorFixture[]> = {
   "LB-FURNITURE-001": [
     { kind: "pendant", position: [-1.65, 2.64, 0], shadeRadius: 0.95, shadeHeight: 0.66, emissiveColor: "#f5cf9a", lightColor: "#f6d8aa", intensity: 0.55, distance: 7 },
     { kind: "pendant", position: [1.65, 2.64, 0], shadeRadius: 0.95, shadeHeight: 0.66, emissiveColor: "#f5cf9a", lightColor: "#f6d8aa", intensity: 0.55, distance: 7 },
+  ],
+  "LB-APPLIANCE-001": [
+    { kind: "fluorescent", position: [-1.35, 3.72, 0], size: [0.86, 0.24, 8.4], emissiveColor: "#f1f8ff", lightColor: "#f7fbff", intensity: 1.0, distance: 11 },
+    { kind: "fluorescent", position: [1.35, 3.72, 0], size: [0.86, 0.24, 8.4], emissiveColor: "#f1f8ff", lightColor: "#f7fbff", intensity: 1.0, distance: 11 },
+  ],
+  "LB-ELECTRONICS-001": [
+    { kind: "fluorescent", position: [0, 3.72, -2.15], size: [3.0, 0.22, 0.8], emissiveColor: "#c9f6ff", lightColor: "#d9f9ff", intensity: 0.68, distance: 8 },
+    { kind: "disc", position: [0, 3.68, 0], radius: 0.62, emissiveColor: "#d7f7ff", lightColor: "#e7fbff", intensity: 0.58, distance: 8 },
+    { kind: "fluorescent", position: [0, 3.72, 2.15], size: [3.0, 0.22, 0.8], emissiveColor: "#c9f6ff", lightColor: "#d9f9ff", intensity: 0.68, distance: 8 },
+  ],
+  "LB-OUTDOOR-001": [
+    { kind: "pendant", position: [-1.65, 2.62, 0], shadeRadius: 0.92, shadeHeight: 0.68, emissiveColor: "#d7a45d", lightColor: "#e6bd7c", intensity: 0.58, distance: 8 },
+    { kind: "pendant", position: [1.65, 2.62, 0], shadeRadius: 0.92, shadeHeight: 0.68, emissiveColor: "#d7a45d", lightColor: "#e6bd7c", intensity: 0.58, distance: 8 },
+  ],
+  "LB-AUTOPARTS-001": [
+    { kind: "industrialCage", position: [0, 3.02, -1.8], emissiveColor: "#eef6ff", lightColor: "#f3f8ff", intensity: 1.0, distance: 11, basicHousing: true },
+    { kind: "industrialCage", position: [0, 3.02, 1.8], emissiveColor: "#eef6ff", lightColor: "#f3f8ff", intensity: 1.0, distance: 11, basicHousing: true },
+  ],
+  "LB-TIRE-001": [
+    { kind: "industrialCage", position: [0, 2.98, -1.8], emissiveColor: "#cfd4d8", lightColor: "#d8dde2", intensity: 0.64, distance: 9, basicHousing: true },
+    { kind: "industrialCage", position: [0, 2.98, 1.8], emissiveColor: "#cfd4d8", lightColor: "#d8dde2", intensity: 0.64, distance: 9, basicHousing: true },
+  ],
+  "LB-CARWASH-001": [
+    { kind: "fluorescent", position: [-1.3, 3.72, 0], size: [0.84, 0.24, 8.4], emissiveColor: "#bfefff", lightColor: "#d8f7ff", intensity: 0.96, distance: 11 },
+    { kind: "fluorescent", position: [1.3, 3.72, 0], size: [0.84, 0.24, 8.4], emissiveColor: "#bfefff", lightColor: "#d8f7ff", intensity: 0.96, distance: 11 },
   ],
 };
