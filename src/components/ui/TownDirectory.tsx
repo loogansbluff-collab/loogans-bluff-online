@@ -44,11 +44,17 @@ export default function TownDirectory() {
   const normalizedFilter = filter.trim().toLowerCase();
   const buildings = useMemo(
     () =>
-      townData.buildings.filter((item) => {
-        const directoryName = getDirectoryBuildingName(item.id, item.name).toLowerCase();
-        const directoryId = getDirectoryBuildingId(item.id).toLowerCase();
-        return !normalizedFilter || directoryName.includes(normalizedFilter) || directoryId.includes(normalizedFilter);
-      }),
+      townData.buildings
+        .filter((item) => {
+          const directoryName = getDirectoryBuildingName(item.id, item.name).toLowerCase();
+          const directoryId = getDirectoryBuildingId(item.id).toLowerCase();
+          return !normalizedFilter || directoryName.includes(normalizedFilter) || directoryId.includes(normalizedFilter);
+        })
+        .sort((a, b) =>
+          getDirectoryBuildingName(a.id, a.name).localeCompare(getDirectoryBuildingName(b.id, b.name), undefined, {
+            sensitivity: "base",
+          }),
+        ),
     [normalizedFilter],
   );
   const lots = useMemo(
