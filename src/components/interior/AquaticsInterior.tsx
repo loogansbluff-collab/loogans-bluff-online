@@ -1,6 +1,6 @@
 "use client";
 
-import { PointerLockControls, RoundedBox, Text, useTexture } from "@react-three/drei";
+import { PointerLockControls, Text, useTexture } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import { CatmullRomCurve3, DoubleSide, PlaneGeometry, Vector3 } from "three";
@@ -220,114 +220,17 @@ function PeeTrail() {
   );
 }
 
-function BeachChair({ x, color }: { x: number; color: string }) {
-  return (
-    <group position={[x, 0, -9.72]}>
-      <mesh position={[0, 1.75, -0.18]} rotation={[-0.16, 0, 0]}>
-        <boxGeometry args={[2.45, 2.7, 0.12]} />
-        <meshStandardMaterial color={color} roughness={0.72} />
-      </mesh>
-      <mesh position={[0, 0.63, 0.52]}>
-        <boxGeometry args={[2.45, 0.12, 1.45]} />
-        <meshStandardMaterial color={color} roughness={0.72} />
-      </mesh>
-      {[-0.95, 0.95].map((legX) => (
-        <group key={`chair-leg-${x}-${legX}`}>
-          <mesh position={[legX, 0.34, 0.26]} rotation={[0.12, 0, 0]}>
-            <boxGeometry args={[0.11, 0.75, 0.11]} />
-            <meshStandardMaterial color="#606b70" metalness={0.45} roughness={0.4} />
-          </mesh>
-          <mesh position={[legX, 0.34, -0.3]} rotation={[-0.12, 0, 0]}>
-            <boxGeometry args={[0.11, 0.75, 0.11]} />
-            <meshStandardMaterial color="#606b70" metalness={0.45} roughness={0.4} />
-          </mesh>
-        </group>
-      ))}
-    </group>
-  );
-}
-
-function PoolsideCharacter({ src, x, height = 4.05 }: { src: string; x: number; height?: number }) {
-  const texture = useTexture(src);
-  const image = texture.image as HTMLImageElement | undefined;
-  const aspect = image?.width && image?.height ? image.width / image.height : 0.78;
-
-  return (
-    <mesh position={[x, height / 2 + 0.02, -9.42]}>
-      <planeGeometry args={[height * aspect, height]} />
-      <meshBasicMaterial map={texture} transparent alphaTest={0.06} toneMapped={false} side={DoubleSide} />
-    </mesh>
-  );
-}
-
-function SpeechBubble({ x, text, width = 3.4 }: { x: number; text: string; width?: number }) {
-  return (
-    <group position={[x, 5.25, -9.28]}>
-      <RoundedBox args={[width + 0.1, 1.42, 0.08]} radius={0.22} smoothness={5} position={[0, 0, -0.015]}>
-        <meshBasicMaterial color="#111111" />
-      </RoundedBox>
-      <RoundedBox args={[width, 1.32, 0.08]} radius={0.2} smoothness={5} position={[0, 0, 0.035]}>
-        <meshBasicMaterial color="#ffffff" />
-      </RoundedBox>
-      <mesh position={[0, -0.82, 0.04]} rotation={[0, 0, Math.PI]}>
-        <coneGeometry args={[0.22, 0.48, 3]} />
-        <meshBasicMaterial color="#ffffff" />
-      </mesh>
-      <Text
-        position={[0, 0, 0.09]}
-        fontSize={0.23}
-        color="#111111"
-        anchorX="center"
-        anchorY="middle"
-        maxWidth={width - 0.35}
-        textAlign="center"
-        lineHeight={1.05}
-      >
-        {text}
-      </Text>
-    </group>
-  );
-}
-
-function RubberDucky() {
-  return (
-    <group position={[4.3, 1.45, -9.05]} scale={0.72}>
-      <mesh scale={[1.25, 0.9, 0.85]}>
-        <sphereGeometry args={[0.42, 20, 14]} />
-        <meshStandardMaterial color="#ffd92f" roughness={0.62} />
-      </mesh>
-      <mesh position={[0.25, 0.46, 0]}>
-        <sphereGeometry args={[0.31, 20, 14]} />
-        <meshStandardMaterial color="#ffe447" roughness={0.62} />
-      </mesh>
-      <mesh position={[0.55, 0.43, 0]} rotation={[0, 0, -Math.PI / 2]} scale={[1.15, 0.62, 0.82]}>
-        <coneGeometry args={[0.16, 0.34, 4]} />
-        <meshStandardMaterial color="#f58a22" roughness={0.65} />
-      </mesh>
-      <mesh position={[0.39, 0.57, 0.23]}>
-        <sphereGeometry args={[0.045, 10, 8]} />
-        <meshBasicMaterial color="#111111" />
-      </mesh>
-    </group>
-  );
-}
-
 function PoolsideIdiots() {
+  const texture = useTexture("/poolsidetrans.png");
+  const image = texture.image as HTMLImageElement | undefined;
+  const aspect = image?.width && image?.height ? image.width / image.height : 1.82;
+  const height = 5.6;
+
   return (
-    <group>
-      <BeachChair x={-3.65} color="#c62828" />
-      <BeachChair x={0} color="#1d5fa7" />
-      <BeachChair x={3.65} color="#2e8b45" />
-
-      <PoolsideCharacter src="/interior/larry-chair.png" x={-3.65} height={4.0} />
-      <PoolsideCharacter src="/interior/barry-chair.png" x={0} height={4.05} />
-      <PoolsideCharacter src="/interior/garry-toosexy.png" x={3.65} height={4.0} />
-      <RubberDucky />
-
-      <SpeechBubble x={-3.65} text={"That water looks funny colored,\nits supposed to be blue!"} />
-      <SpeechBubble x={0} text={"Technically BOSS,\nthat's because someone\nwent peepee on it!"} />
-      <SpeechBubble x={3.65} width={3.15} text={"Is that why my\nducky is yellow?!"} />
-    </group>
+    <mesh position={[0, height / 2 + 0.02, -9.42]}>
+      <planeGeometry args={[height * aspect, height]} />
+      <meshBasicMaterial map={texture} transparent alphaTest={0.04} toneMapped={false} side={DoubleSide} />
+    </mesh>
   );
 }
 
