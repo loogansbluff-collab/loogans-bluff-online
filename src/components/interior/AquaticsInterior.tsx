@@ -179,15 +179,11 @@ function WaterSurface() {
   return (
     <mesh position={[0, 0.055, -1]} rotation={[-Math.PI / 2, 0, 0]}>
       <planeGeometry ref={geometryRef} args={[12.6, 15.6, 32, 40]} />
-      <meshPhysicalMaterial
+      <meshBasicMaterial
         color="#55d7e8"
         transparent
         opacity={0.76}
-        roughness={0.35}
-        metalness={0}
-        clearcoat={0}
-        clearcoatRoughness={1}
-        specularIntensity={0}
+        toneMapped={false}
         side={DoubleSide}
       />
     </mesh>
