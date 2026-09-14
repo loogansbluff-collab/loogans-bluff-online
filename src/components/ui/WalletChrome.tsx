@@ -94,7 +94,7 @@ export default function WalletChrome() {
   }, [logoutServerSession, sessionAddress, walletAddress]);
 
   const signedIn = useMemo(
-    () => Boolean(sessionAddress && (!walletAddress || sessionAddress === walletAddress)),
+    () => Boolean(walletAddress && sessionAddress === walletAddress),
     [sessionAddress, walletAddress],
   );
 
@@ -111,6 +111,7 @@ export default function WalletChrome() {
     try {
       const result = await provider.connect();
       setWalletAddress(result.publicKey.toString());
+      await refreshSession();
     } catch (error) {
       connectionRequestedRef.current = false;
       setWalletError(error instanceof Error ? error.message : "Wallet connection failed");
@@ -182,7 +183,7 @@ export default function WalletChrome() {
     }
   };
 
-  const addressToShow = sessionAddress ?? walletAddress;
+  const addressToShow = walletAddress;
 
   return (
     <div className="fixed right-3 top-3 z-[70] flex max-w-[calc(100vw-1.5rem)] flex-col items-end gap-1 sm:right-4 sm:top-4">
@@ -192,7 +193,7 @@ export default function WalletChrome() {
             {signedIn ? "SIGNED IN" : "PHANTOM"}
           </span>
           <span className="font-mono">{shortWallet(addressToShow)}</span>
-          {walletAddress && !signedIn ? (
+          {!signedIn ? (
             <button
               type="button"
               onClick={signIn}
@@ -208,7 +209,7 @@ export default function WalletChrome() {
             disabled={walletBusy}
             className="rounded bg-slate-700 px-2 py-1 font-semibold hover:bg-slate-600 disabled:cursor-wait disabled:opacity-60"
           >
-            {walletBusy ? "..." : walletAddress ? "DISCONNECT" : "LOG OUT"}
+            {walletBusy ? "..." : "DISCONNECT"}
           </button>
         </div>
       ) : (
