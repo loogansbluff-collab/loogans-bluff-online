@@ -105,7 +105,7 @@ export default function AquaticsCentreBuilding({
               outlineWidth={0.025}
               outlineColor="#0b3d91"
             >
-              BLUFF AQUATICS CENTRE - SWIM & PLAY AT OWN RISK
+              BLUFF AQUATICS CENTER - SWIM & PLAY AT OWN RISK
             </Text>
           </group>
         </group>
