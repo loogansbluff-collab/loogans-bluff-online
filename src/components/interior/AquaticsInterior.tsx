@@ -177,7 +177,7 @@ function WaterSurface() {
   });
 
   return (
-    <mesh position={[0, 0.055, -1]} rotation={[-Math.PI / 2, 0, 0]}>
+    <mesh position={[0, 0.055, -1]} rotation={[-Math.PI / 2, 0, 0]} renderOrder={1}>
       <planeGeometry ref={geometryRef} args={[12.6, 15.6, 32, 40]} />
       <meshPhysicalMaterial
         color="#55d7e8"
@@ -189,6 +189,7 @@ function WaterSurface() {
         clearcoatRoughness={0.05}
         specularColor="#e5d238"
         specularIntensity={1}
+        depthWrite={false}
         side={DoubleSide}
       />
     </mesh>
@@ -283,7 +284,7 @@ function AquaticsLights() {
           size={[3.8, 0.24, 1.0]}
           emissiveColor="#e9f8ff"
           lightColor="#f4fbff"
-          intensity={0}
+          intensity={0.95}
           distance={14}
         />
       ))}
