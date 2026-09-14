@@ -11,6 +11,7 @@ import {
   type ChallengeTokenPayload,
   type SessionTokenPayload,
 } from "@/lib/auth";
+import { getOrCreatePlayer } from "@/lib/db";
 
 export const runtime = "nodejs";
 
@@ -61,6 +62,7 @@ export async function POST(request: NextRequest) {
       return response;
     }
 
+    const player = await getOrCreatePlayer(publicKey);
     const now = Date.now();
     const session = signToken<SessionTokenPayload>({
       address: publicKey,
@@ -68,13 +70,13 @@ export async function POST(request: NextRequest) {
       exp: now + SESSION_TTL_SECONDS * 1000,
     });
 
-    const response = NextResponse.json({ address: publicKey });
+    const response = NextResponse.json({ address: publicKey, player });
     clearChallenge(response);
     response.cookies.set(SESSION_COOKIE, session, authCookieOptions(SESSION_TTL_SECONDS));
     return response;
   } catch (error) {
     console.error("Failed to verify wallet login", error);
-    const response = NextResponse.json({ error: "Authentication is not configured" }, { status: 500 });
+    const response = NextResponse.json({ error: "Authentication or player storage is not configured" }, { status: 500 });
     clearChallenge(response);
     return response;
   }
