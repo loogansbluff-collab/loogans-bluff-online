@@ -9,6 +9,19 @@ export type NearestPropertyResult = {
   distance: number;
 };
 
+function getPropertyDistance(playerX: number, playerZ: number, property: PropertyData) {
+  const [x, , z] = property.position;
+
+  if (property.id !== "LB-COMMUNITY-001") {
+    return Math.hypot(playerX - x, playerZ - z);
+  }
+
+  const [width, , depth] = property.size;
+  const dx = Math.max(Math.abs(playerX - x) - width / 2, 0);
+  const dz = Math.max(Math.abs(playerZ - z) - depth / 2, 0);
+  return Math.hypot(dx, dz);
+}
+
 export function findNearestProperty(
   position: [number, number, number],
   properties: PropertyData[],
@@ -19,8 +32,7 @@ export function findNearestProperty(
   let nearestDistance = range;
 
   for (const property of properties) {
-    const [x, , z] = property.position;
-    const distance = Math.hypot(playerX - x, playerZ - z);
+    const distance = getPropertyDistance(playerX, playerZ, property);
 
     if (distance <= nearestDistance) {
       nearest = {
