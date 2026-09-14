@@ -283,7 +283,7 @@ function AquaticsLights() {
           size={[3.8, 0.24, 1.0]}
           emissiveColor="#e9f8ff"
           lightColor="#f4fbff"
-          intensity={0.95}
+          intensity={0}
           distance={14}
         />
       ))}
