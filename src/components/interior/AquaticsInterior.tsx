@@ -187,36 +187,11 @@ function WaterSurface() {
         metalness={0.02}
         clearcoat={1}
         clearcoatRoughness={0.05}
+        specularColor="#e5d238"
+        specularIntensity={1}
         side={DoubleSide}
       />
     </mesh>
-  );
-}
-
-function PeeTrail() {
-  const streaks = [
-    { position: [3.75, 0.14, -8.1] as [number, number, number], scale: [0.24, 0.9, 1] as [number, number, number], rotation: -0.08, opacity: 0.32 },
-    { position: [3.5, 0.14, -7.15] as [number, number, number], scale: [0.3, 1.1, 1] as [number, number, number], rotation: -0.15, opacity: 0.28 },
-    { position: [3.05, 0.14, -5.95] as [number, number, number], scale: [0.38, 1.35, 1] as [number, number, number], rotation: -0.2, opacity: 0.24 },
-    { position: [2.5, 0.14, -4.45] as [number, number, number], scale: [0.5, 1.55, 1] as [number, number, number], rotation: -0.12, opacity: 0.2 },
-    { position: [2.15, 0.14, -2.85] as [number, number, number], scale: [0.65, 1.75, 1] as [number, number, number], rotation: 0.03, opacity: 0.16 },
-  ];
-
-  return (
-    <>
-      {streaks.map((streak, index) => (
-        <mesh
-          key={`pee-trail-${index}`}
-          position={streak.position}
-          rotation={[-Math.PI / 2, 0, streak.rotation]}
-          scale={streak.scale}
-          renderOrder={2}
-        >
-          <circleGeometry args={[1, 32]} />
-          <meshBasicMaterial color="#e5d238" transparent opacity={streak.opacity} depthWrite={false} side={DoubleSide} />
-        </mesh>
-      ))}
-    </>
   );
 }
 
@@ -283,7 +258,6 @@ export default function AquaticsInterior() {
         <meshStandardMaterial color="#166b7a" emissive="#0d4350" emissiveIntensity={0.45} roughness={0.55} />
       </mesh>
       <WaterSurface />
-      <PeeTrail />
 
       <mesh position={[0, 0.08, 7.25]}><boxGeometry args={[13.8, 0.16, 0.5]} /><meshBasicMaterial color="#d9dde0" /></mesh>
       <mesh position={[0, 0.08, -9.25]}><boxGeometry args={[13.8, 0.16, 0.5]} /><meshBasicMaterial color="#d9dde0" /></mesh>
