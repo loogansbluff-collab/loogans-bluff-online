@@ -3,7 +3,7 @@
 import { PointerLockControls, Text, useTexture } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
-import { CatmullRomCurve3, DoubleSide, Mesh, PlaneGeometry, Shape, Vector3 } from "three";
+import { DoubleSide, Mesh, PlaneGeometry, Vector3 } from "three";
 import FluorescentPanel from "@/components/interior/fixtures/FluorescentPanel";
 import WallSconce from "@/components/interior/fixtures/WallSconce";
 import { exitInterior } from "@/lib/enterInterior";
@@ -113,99 +113,6 @@ function AquaticsControls() {
   });
 
   return <PointerLockControls />;
-}
-
-function PoolSlide() {
-  const slideCurve = useMemo(
-    () =>
-      new CatmullRomCurve3([
-        new Vector3(8.35, 5.2, -10.6),
-        new Vector3(8.15, 4.7, -8.7),
-        new Vector3(7.7, 3.8, -6.8),
-        new Vector3(7.0, 2.7, -4.9),
-        new Vector3(6.2, 1.7, -3.0),
-        new Vector3(5.55, 0.9, -1.35),
-      ]),
-    [],
-  );
-
-  const slideProfile = useMemo(() => {
-    const shape = new Shape();
-    shape.moveTo(-0.9, 0.55);
-    shape.lineTo(-0.9, -0.18);
-    shape.lineTo(0.9, -0.18);
-    shape.lineTo(0.9, 0.55);
-    shape.lineTo(0.66, 0.55);
-    shape.lineTo(0.66, 0.05);
-    shape.lineTo(-0.66, 0.05);
-    shape.lineTo(-0.66, 0.55);
-    shape.closePath();
-    return shape;
-  }, []);
-
-  const ladderRungs = [1.0, 1.6, 2.2, 2.8, 3.4, 4.0, 4.6];
-
-  return (
-    <group>
-      <mesh>
-        <extrudeGeometry
-          args={[
-            slideProfile,
-            {
-              steps: 48,
-              bevelEnabled: false,
-              extrudePath: slideCurve,
-            },
-          ]}
-        />
-        <meshBasicMaterial color="#1683a3" side={DoubleSide} />
-      </mesh>
-
-      <mesh position={[8.45, 5.08, -11.2]}>
-        <boxGeometry args={[2.5, 0.24, 2.0]} />
-        <meshBasicMaterial color="#374151" />
-      </mesh>
-
-      <mesh position={[7.22, 5.45, -11.2]}>
-        <boxGeometry args={[0.12, 0.75, 1.95]} />
-        <meshBasicMaterial color="#c7d2da" />
-      </mesh>
-      <mesh position={[9.68, 5.45, -11.2]}>
-        <boxGeometry args={[0.12, 0.75, 1.95]} />
-        <meshBasicMaterial color="#c7d2da" />
-      </mesh>
-      <mesh position={[8.45, 5.45, -12.16]}>
-        <boxGeometry args={[2.35, 0.75, 0.12]} />
-        <meshBasicMaterial color="#c7d2da" />
-      </mesh>
-
-      {[
-        [8.2, 2.55, -8.8, 4.8],
-        [7.1, 1.65, -5.1, 3.1],
-        [5.95, 0.82, -2.25, 1.45],
-      ].map(([x, y, z, height], index) => (
-        <mesh key={`slide-support-${index}`} position={[x, y, z]}>
-          <cylinderGeometry args={[0.15, 0.15, height, 10]} />
-          <meshBasicMaterial color="#7b8794" />
-        </mesh>
-      ))}
-
-      <mesh position={[9.55, 2.75, -12.0]}>
-        <cylinderGeometry args={[0.08, 0.08, 4.5, 8]} />
-        <meshBasicMaterial color="#c7d2da" />
-      </mesh>
-      <mesh position={[10.35, 2.75, -12.0]}>
-        <cylinderGeometry args={[0.08, 0.08, 4.5, 8]} />
-        <meshBasicMaterial color="#c7d2da" />
-      </mesh>
-      {ladderRungs.map((height) => (
-        <mesh key={`slide-rung-${height}`} position={[9.95, height, -12.0]} rotation={[0, 0, Math.PI / 2]}>
-          <cylinderGeometry args={[0.055, 0.055, 0.8, 8]} />
-          <meshBasicMaterial color="#c7d2da" />
-        </mesh>
-      ))}
-    </group>
-  );
 }
 
 function WaterSurface() {
@@ -375,7 +282,6 @@ export default function AquaticsInterior() {
       <mesh position={[-6.75, 0.08, -1]}><boxGeometry args={[0.5, 0.16, 16.0]} /><meshBasicMaterial color="#d9dde0" /></mesh>
       <mesh position={[6.75, 0.08, -1]}><boxGeometry args={[0.5, 0.16, 16.0]} /><meshBasicMaterial color="#d9dde0" /></mesh>
 
-      <PoolSlide />
       <PoolsideIdiots />
 
       <mesh position={[0, ROOM_HEIGHT / 2, -17.95]}><boxGeometry args={[24, ROOM_HEIGHT, 0.1]} /><meshStandardMaterial color="#d5dde2" roughness={0.9} /></mesh>
