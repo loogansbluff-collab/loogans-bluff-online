@@ -233,7 +233,7 @@ function DivingBoard() {
   const height = 5.2;
 
   return (
-    <mesh position={[8.2, height / 2 + 0.02, -1.0]} renderOrder={3}>
+    <mesh position={[8.2, height / 2 - 0.4, -1.0]} renderOrder={3}>
       <planeGeometry args={[height * aspect, height]} />
       <meshBasicMaterial map={texture} transparent alphaTest={0.04} depthWrite={false} toneMapped={false} side={DoubleSide} />
     </mesh>
