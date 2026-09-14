@@ -68,9 +68,11 @@ export default function WalletChrome() {
 
   useEffect(() => {
     // Never reuse a browser-stored Loogans Bluff auth session after a reload.
-    // Every page load starts as a visitor and requires a fresh Phantom proof.
+    // This cleanup must happen once on initial mount only.
     void logoutServerSession();
+  }, [logoutServerSession]);
 
+  useEffect(() => {
     const provider = getPhantomProvider();
     if (!provider) return;
 
