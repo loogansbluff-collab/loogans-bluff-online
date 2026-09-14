@@ -1,6 +1,7 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
+import AquaticsInterior from "@/components/interior/AquaticsInterior";
 import GasDress from "@/components/interior/GasDress";
 import InteriorFixtures from "@/components/interior/InteriorFixtures";
 import InteriorLights from "@/components/interior/InteriorLights";
@@ -16,6 +17,7 @@ const INTERIOR_CAMERA: [number, number, number] = [0, 1.7, 3.5];
 export default function InteriorCanvas() {
   const interiorId = useGameStore((state) => state.interiorId);
   const isProtected = isProtectedInteriorId(interiorId);
+  const isAquatics = interiorId === "LB-COMMUNITY-001";
   const isTavern = interiorId === "LB-TAVERN-001";
   const isGas = interiorId === "LB-GAS-001";
 
@@ -31,6 +33,11 @@ export default function InteriorCanvas() {
           <InteriorTouchLook />
           {isTavern ? <TavernDress /> : null}
           {isGas ? <GasDress /> : null}
+        </>
+      ) : isAquatics ? (
+        <>
+          <AquaticsInterior />
+          <InteriorTouchLook />
         </>
       ) : (
         <>
