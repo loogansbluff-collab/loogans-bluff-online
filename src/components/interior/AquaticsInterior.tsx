@@ -3,7 +3,7 @@
 import { PointerLockControls, Text, useTexture } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
-import { CatmullRomCurve3, DoubleSide, PlaneGeometry, Vector3 } from "three";
+import { CatmullRomCurve3, DoubleSide, Mesh, PlaneGeometry, Vector3 } from "three";
 import FluorescentPanel from "@/components/interior/fixtures/FluorescentPanel";
 import WallSconce from "@/components/interior/fixtures/WallSconce";
 import { exitInterior } from "@/lib/enterInterior";
@@ -195,6 +195,59 @@ function WaterSurface() {
   );
 }
 
+function YellowWaterPatches() {
+  const patchRefs = useRef<(Mesh | null)[]>([]);
+  const patches = useMemo(
+    () => [
+      { baseX: -3.6, baseZ: -6.85, scaleX: 0.9, scaleZ: 1.6, baseRot: 0.18, phase: 0.1, speed: 0.62, xAmp: 0.16, zAmp: 0.18, baseOpacity: 0.14 },
+      { baseX: -1.55, baseZ: -5.3, scaleX: 1.1, scaleZ: 1.9, baseRot: -0.14, phase: 1.3, speed: 0.54, xAmp: 0.2, zAmp: 0.15, baseOpacity: 0.16 },
+      { baseX: 1.15, baseZ: -7.0, scaleX: 1.0, scaleZ: 1.8, baseRot: 0.09, phase: 2.2, speed: 0.58, xAmp: 0.14, zAmp: 0.18, baseOpacity: 0.15 },
+      { baseX: 3.45, baseZ: -4.95, scaleX: 1.2, scaleZ: 2.05, baseRot: -0.08, phase: 0.8, speed: 0.49, xAmp: 0.18, zAmp: 0.2, baseOpacity: 0.14 },
+      { baseX: -2.4, baseZ: -2.8, scaleX: 1.25, scaleZ: 2.1, baseRot: 0.04, phase: 2.9, speed: 0.52, xAmp: 0.16, zAmp: 0.18, baseOpacity: 0.13 },
+      { baseX: 2.0, baseZ: -1.45, scaleX: 1.35, scaleZ: 2.25, baseRot: -0.11, phase: 1.9, speed: 0.56, xAmp: 0.18, zAmp: 0.16, baseOpacity: 0.12 },
+    ],
+    [],
+  );
+
+  useFrame(({ clock }) => {
+    const time = clock.elapsedTime;
+
+    patches.forEach((patch, index) => {
+      const mesh = patchRefs.current[index];
+      if (!mesh) return;
+
+      mesh.position.x = patch.baseX + Math.sin(time * patch.speed + patch.phase) * patch.xAmp;
+      mesh.position.z = patch.baseZ + Math.cos(time * patch.speed * 0.82 + patch.phase) * patch.zAmp;
+      mesh.rotation.z = patch.baseRot + Math.sin(time * patch.speed * 0.7 + patch.phase) * 0.12;
+
+      const material = mesh.material as { opacity?: number };
+      if (typeof material.opacity === "number") {
+        material.opacity = patch.baseOpacity + (Math.sin(time * patch.speed * 1.35 + patch.phase) + 1) * 0.035;
+      }
+    });
+  });
+
+  return (
+    <>
+      {patches.map((patch, index) => (
+        <mesh
+          key={`yellow-water-patch-${index}`}
+          ref={(node) => {
+            patchRefs.current[index] = node;
+          }}
+          position={[patch.baseX, 0.11, patch.baseZ]}
+          rotation={[-Math.PI / 2, 0, patch.baseRot]}
+          scale={[patch.scaleX, patch.scaleZ, 1]}
+          renderOrder={2}
+        >
+          <circleGeometry args={[1, 32]} />
+          <meshBasicMaterial color="#e5d238" transparent opacity={patch.baseOpacity} depthWrite={false} toneMapped={false} side={DoubleSide} />
+        </mesh>
+      ))}
+    </>
+  );
+}
+
 function PoolsideIdiots() {
   const texture = useTexture("/poolsidetrans.png");
   const image = texture.image as HTMLImageElement | undefined;
@@ -258,6 +311,7 @@ export default function AquaticsInterior() {
         <meshStandardMaterial color="#166b7a" emissive="#0d4350" emissiveIntensity={0.45} roughness={0.55} />
       </mesh>
       <WaterSurface />
+      <YellowWaterPatches />
 
       <mesh position={[0, 0.08, 7.25]}><boxGeometry args={[13.8, 0.16, 0.5]} /><meshBasicMaterial color="#d9dde0" /></mesh>
       <mesh position={[0, 0.08, -9.25]}><boxGeometry args={[13.8, 0.16, 0.5]} /><meshBasicMaterial color="#d9dde0" /></mesh>
