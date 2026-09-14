@@ -82,24 +82,29 @@ const BASE58_INDEX = new Map(Array.from(BASE58_ALPHABET, (char, index) => [char,
 function decodeBase58(value: string) {
   if (!value) throw new Error("Invalid public key");
 
-  let numeric = 0n;
+  const bytes: number[] = [];
   for (const char of value) {
     const digit = BASE58_INDEX.get(char);
     if (digit === undefined) throw new Error("Invalid public key");
-    numeric = numeric * 58n + BigInt(digit);
-  }
 
-  const decoded: number[] = [];
-  while (numeric > 0n) {
-    decoded.push(Number(numeric & 0xffn));
-    numeric >>= 8n;
+    let carry = digit;
+    for (let index = 0; index < bytes.length; index += 1) {
+      carry += bytes[index] * 58;
+      bytes[index] = carry & 0xff;
+      carry = Math.floor(carry / 256);
+    }
+
+    while (carry > 0) {
+      bytes.push(carry & 0xff);
+      carry = Math.floor(carry / 256);
+    }
   }
-  decoded.reverse();
 
   let leadingZeros = 0;
   while (leadingZeros < value.length && value[leadingZeros] === "1") leadingZeros += 1;
 
-  return Buffer.concat([Buffer.alloc(leadingZeros), Buffer.from(decoded)]);
+  bytes.reverse();
+  return Buffer.concat([Buffer.alloc(leadingZeros), Buffer.from(bytes)]);
 }
 
 export function verifyWalletSignature(publicKey: string, signatureBase64: string, message: string) {
