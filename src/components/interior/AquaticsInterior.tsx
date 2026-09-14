@@ -183,12 +183,11 @@ function WaterSurface() {
         color="#55d7e8"
         transparent
         opacity={0.76}
-        roughness={0.1}
-        metalness={0.02}
-        clearcoat={1}
-        clearcoatRoughness={0.05}
-        specularColor="#e5d238"
-        specularIntensity={1}
+        roughness={0.35}
+        metalness={0}
+        clearcoat={0}
+        clearcoatRoughness={1}
+        specularIntensity={0}
         side={DoubleSide}
       />
     </mesh>
