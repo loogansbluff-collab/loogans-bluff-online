@@ -226,6 +226,20 @@ function PoolsideIdiots() {
   );
 }
 
+function DivingBoard() {
+  const texture = useTexture("/dive.png");
+  const image = texture.image as HTMLImageElement | undefined;
+  const aspect = image?.width && image?.height ? image.width / image.height : 1.35;
+  const height = 5.2;
+
+  return (
+    <mesh position={[8.2, height / 2 + 0.02, -1.0]} renderOrder={3}>
+      <planeGeometry args={[height * aspect, height]} />
+      <meshBasicMaterial map={texture} transparent alphaTest={0.04} depthWrite={false} toneMapped={false} side={DoubleSide} />
+    </mesh>
+  );
+}
+
 function AquaticsLights() {
   const ceilingFixtures = [
     [-7.2, 7.72, -10.5],
@@ -282,6 +296,7 @@ export default function AquaticsInterior() {
       <mesh position={[-6.75, 0.08, -1]}><boxGeometry args={[0.5, 0.16, 16.0]} /><meshBasicMaterial color="#d9dde0" /></mesh>
       <mesh position={[6.75, 0.08, -1]}><boxGeometry args={[0.5, 0.16, 16.0]} /><meshBasicMaterial color="#d9dde0" /></mesh>
 
+      <DivingBoard />
       <PoolsideIdiots />
 
       <mesh position={[0, ROOM_HEIGHT / 2, -17.95]}><boxGeometry args={[24, ROOM_HEIGHT, 0.1]} /><meshStandardMaterial color="#d5dde2" roughness={0.9} /></mesh>
