@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   bytesToBase64,
   getPhantomProvider,
@@ -21,6 +21,7 @@ export default function WalletChrome() {
   const [sessionAddress, setSessionAddress] = useState<string | null>(null);
   const [walletBusy, setWalletBusy] = useState(false);
   const [walletError, setWalletError] = useState<string | null>(null);
+  const connectionRequestedRef = useRef(false);
 
   const refreshSession = useCallback(async () => {
     try {
@@ -57,25 +58,24 @@ export default function WalletChrome() {
     const provider = getPhantomProvider();
     if (!provider) return;
 
-    const syncWallet = () => {
-      setWalletAddress(provider.publicKey?.toString() ?? null);
-    };
     const onConnect = (publicKey?: PhantomPublicKey | null) => {
+      if (!connectionRequestedRef.current) return;
       setWalletAddress(publicKey?.toString() ?? provider.publicKey?.toString() ?? null);
       setWalletError(null);
     };
     const onDisconnect = () => {
+      connectionRequestedRef.current = false;
       setWalletAddress(null);
       setWalletError(null);
     };
     const onAccountChanged = (publicKey?: PhantomPublicKey | null) => {
+      if (!connectionRequestedRef.current) return;
       const nextAddress = publicKey?.toString() ?? null;
       setWalletAddress(nextAddress);
       setWalletError(null);
       if (sessionAddress && nextAddress !== sessionAddress) void logoutServerSession();
     };
 
-    syncWallet();
     provider.on?.("connect", onConnect);
     provider.on?.("disconnect", onDisconnect);
     provider.on?.("accountChanged", onAccountChanged);
@@ -105,12 +105,14 @@ export default function WalletChrome() {
       return;
     }
 
+    connectionRequestedRef.current = true;
     setWalletBusy(true);
     setWalletError(null);
     try {
       const result = await provider.connect();
       setWalletAddress(result.publicKey.toString());
     } catch (error) {
+      connectionRequestedRef.current = false;
       setWalletError(error instanceof Error ? error.message : "Wallet connection failed");
     } finally {
       setWalletBusy(false);
@@ -169,6 +171,7 @@ export default function WalletChrome() {
     setWalletBusy(true);
     setWalletError(null);
     try {
+      connectionRequestedRef.current = false;
       await logoutServerSession();
       await provider?.disconnect();
       setWalletAddress(null);
