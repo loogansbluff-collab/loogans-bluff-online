@@ -3,7 +3,7 @@
 import { PointerLockControls, Text, useTexture } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
-import { DoubleSide, Mesh, PlaneGeometry, Vector3 } from "three";
+import { CatmullRomCurve3, DoubleSide, Mesh, PlaneGeometry, Shape, Vector3 } from "three";
 import FluorescentPanel from "@/components/interior/fixtures/FluorescentPanel";
 import WallSconce from "@/components/interior/fixtures/WallSconce";
 import { exitInterior } from "@/lib/enterInterior";
@@ -116,85 +116,90 @@ function AquaticsControls() {
 }
 
 function PoolSlide() {
-  const slideSections = [
-    { position: [7.95, 4.55, -8.65] as [number, number, number], rotation: [-0.32, 0.08, 0] as [number, number, number], length: 4.1 },
-    { position: [7.25, 3.0, -5.25] as [number, number, number], rotation: [-0.43, 0.12, 0] as [number, number, number], length: 3.8 },
-    { position: [6.35, 1.45, -2.15] as [number, number, number], rotation: [-0.31, 0.18, 0] as [number, number, number], length: 3.0 },
-  ];
+  const slideCurve = useMemo(
+    () =>
+      new CatmullRomCurve3([
+        new Vector3(8.35, 5.2, -10.6),
+        new Vector3(8.15, 4.7, -8.7),
+        new Vector3(7.7, 3.8, -6.8),
+        new Vector3(7.0, 2.7, -4.9),
+        new Vector3(6.2, 1.7, -3.0),
+        new Vector3(5.55, 0.9, -1.35),
+      ]),
+    [],
+  );
 
-  const ladderRungs = [0.95, 1.55, 2.15, 2.75, 3.35, 3.95, 4.55];
+  const slideProfile = useMemo(() => {
+    const shape = new Shape();
+    shape.moveTo(-0.9, 0.55);
+    shape.lineTo(-0.9, -0.18);
+    shape.lineTo(0.9, -0.18);
+    shape.lineTo(0.9, 0.55);
+    shape.lineTo(0.66, 0.55);
+    shape.lineTo(0.66, 0.05);
+    shape.lineTo(-0.66, 0.05);
+    shape.lineTo(-0.66, 0.55);
+    shape.closePath();
+    return shape;
+  }, []);
+
+  const ladderRungs = [1.0, 1.6, 2.2, 2.8, 3.4, 4.0, 4.6];
 
   return (
     <group>
-      <mesh position={[8.45, 5.15, -10.75]}>
-        <boxGeometry args={[2.5, 0.24, 2.2]} />
+      <mesh>
+        <extrudeGeometry
+          args={[
+            slideProfile,
+            {
+              steps: 48,
+              bevelEnabled: false,
+              extrudePath: slideCurve,
+            },
+          ]}
+        />
+        <meshBasicMaterial color="#1683a3" side={DoubleSide} />
+      </mesh>
+
+      <mesh position={[8.45, 5.08, -11.2]}>
+        <boxGeometry args={[2.5, 0.24, 2.0]} />
         <meshBasicMaterial color="#374151" />
       </mesh>
 
-      <mesh position={[8.45, 5.48, -10.75]}>
-        <boxGeometry args={[2.4, 0.16, 0.12]} />
+      <mesh position={[7.22, 5.45, -11.2]}>
+        <boxGeometry args={[0.12, 0.75, 1.95]} />
         <meshBasicMaterial color="#c7d2da" />
       </mesh>
-      <mesh position={[7.28, 5.48, -10.75]}>
-        <boxGeometry args={[0.12, 0.72, 2.1]} />
+      <mesh position={[9.68, 5.45, -11.2]}>
+        <boxGeometry args={[0.12, 0.75, 1.95]} />
         <meshBasicMaterial color="#c7d2da" />
       </mesh>
-      <mesh position={[9.62, 5.48, -10.75]}>
-        <boxGeometry args={[0.12, 0.72, 2.1]} />
+      <mesh position={[8.45, 5.45, -12.16]}>
+        <boxGeometry args={[2.35, 0.75, 0.12]} />
         <meshBasicMaterial color="#c7d2da" />
-      </mesh>
-
-      {slideSections.map((section, index) => (
-        <group key={`slide-section-${index}`} position={section.position} rotation={section.rotation}>
-          <mesh>
-            <boxGeometry args={[1.6, 0.16, section.length]} />
-            <meshBasicMaterial color="#1683a3" />
-          </mesh>
-          <mesh position={[-0.77, 0.28, 0]}>
-            <boxGeometry args={[0.14, 0.62, section.length]} />
-            <meshBasicMaterial color="#0f6f8d" />
-          </mesh>
-          <mesh position={[0.77, 0.28, 0]}>
-            <boxGeometry args={[0.14, 0.62, section.length]} />
-            <meshBasicMaterial color="#0f6f8d" />
-          </mesh>
-        </group>
-      ))}
-
-      <mesh position={[5.95, 0.64, -0.72]} rotation={[-0.12, 0.18, 0]}>
-        <boxGeometry args={[1.6, 0.14, 1.65]} />
-        <meshBasicMaterial color="#1683a3" />
-      </mesh>
-      <mesh position={[5.19, 0.86, -0.72]} rotation={[-0.12, 0.18, 0]}>
-        <boxGeometry args={[0.14, 0.48, 1.65]} />
-        <meshBasicMaterial color="#0f6f8d" />
-      </mesh>
-      <mesh position={[6.71, 0.86, -0.72]} rotation={[-0.12, 0.18, 0]}>
-        <boxGeometry args={[0.14, 0.48, 1.65]} />
-        <meshBasicMaterial color="#0f6f8d" />
       </mesh>
 
       {[
-        [8.45, 2.55, -10.75, 5.0],
-        [7.45, 2.0, -6.2, 3.9],
-        [6.55, 1.1, -2.9, 2.1],
+        [8.2, 2.55, -8.8, 4.8],
+        [7.1, 1.65, -5.1, 3.1],
+        [5.95, 0.82, -2.25, 1.45],
       ].map(([x, y, z, height], index) => (
         <mesh key={`slide-support-${index}`} position={[x, y, z]}>
-          <cylinderGeometry args={[0.16, 0.16, height, 10]} />
+          <cylinderGeometry args={[0.15, 0.15, height, 10]} />
           <meshBasicMaterial color="#7b8794" />
         </mesh>
       ))}
 
-      <mesh position={[9.55, 2.75, -11.78]}>
+      <mesh position={[9.55, 2.75, -12.0]}>
         <cylinderGeometry args={[0.08, 0.08, 4.5, 8]} />
         <meshBasicMaterial color="#c7d2da" />
       </mesh>
-      <mesh position={[10.35, 2.75, -11.78]}>
+      <mesh position={[10.35, 2.75, -12.0]}>
         <cylinderGeometry args={[0.08, 0.08, 4.5, 8]} />
         <meshBasicMaterial color="#c7d2da" />
       </mesh>
       {ladderRungs.map((height) => (
-        <mesh key={`slide-rung-${height}`} position={[9.95, height, -11.78]} rotation={[0, 0, Math.PI / 2]}>
+        <mesh key={`slide-rung-${height}`} position={[9.95, height, -12.0]} rotation={[0, 0, Math.PI / 2]}>
           <cylinderGeometry args={[0.055, 0.055, 0.8, 8]} />
           <meshBasicMaterial color="#c7d2da" />
         </mesh>
