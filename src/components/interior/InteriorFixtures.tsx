@@ -11,6 +11,7 @@ import { INTERIOR_FIXTURE_LAYOUTS } from "@/data/interiorFixtures";
 import { BATCH6_FIXTURE_LAYOUTS } from "@/data/interiorFixturesBatch6";
 import { BATCH7_FIXTURE_LAYOUTS } from "@/data/interiorFixturesBatch7";
 import { BATCH8_FIXTURE_LAYOUTS } from "@/data/interiorFixturesBatch8";
+import { BATCH9_FIXTURE_LAYOUTS } from "@/data/interiorFixturesBatch9";
 import { isProtectedInteriorId } from "@/data/interiorLighting";
 import { useGameStore } from "@/state/gameStore";
 
@@ -19,7 +20,7 @@ export default function InteriorFixtures() {
 
   if (!interiorId || isProtectedInteriorId(interiorId)) return null;
 
-  const fixtures = INTERIOR_FIXTURE_LAYOUTS[interiorId] ?? BATCH6_FIXTURE_LAYOUTS[interiorId] ?? BATCH7_FIXTURE_LAYOUTS[interiorId] ?? BATCH8_FIXTURE_LAYOUTS[interiorId];
+  const fixtures = INTERIOR_FIXTURE_LAYOUTS[interiorId] ?? BATCH6_FIXTURE_LAYOUTS[interiorId] ?? BATCH7_FIXTURE_LAYOUTS[interiorId] ?? BATCH8_FIXTURE_LAYOUTS[interiorId] ?? BATCH9_FIXTURE_LAYOUTS[interiorId];
   if (!fixtures) return null;
 
   return (
