@@ -23,24 +23,6 @@ export default function WalletChrome() {
   const [walletError, setWalletError] = useState<string | null>(null);
   const connectionRequestedRef = useRef(false);
 
-  const refreshSession = useCallback(async () => {
-    try {
-      const response = await fetch("/api/auth/session", {
-        method: "GET",
-        cache: "no-store",
-        credentials: "same-origin",
-      });
-      if (!response.ok) {
-        setSessionAddress(null);
-        return;
-      }
-      const data = (await response.json()) as SessionResponse;
-      setSessionAddress(data.address);
-    } catch {
-      setSessionAddress(null);
-    }
-  }, []);
-
   const logoutServerSession = useCallback(async () => {
     try {
       await fetch("/api/auth/logout", {
@@ -52,28 +34,64 @@ export default function WalletChrome() {
     }
   }, []);
 
+  const signInWithProvider = useCallback(async (publicKey: string) => {
+    const provider = getPhantomProvider();
+    if (!provider?.signMessage) throw new Error("This Phantom wallet cannot sign login messages");
+
+    const challengeResponse = await fetch("/api/auth/challenge", {
+      method: "POST",
+      credentials: "same-origin",
+    });
+    if (!challengeResponse.ok) throw new Error("Could not create login challenge");
+    const challenge = (await challengeResponse.json()) as ChallengeResponse;
+
+    const signed = await provider.signMessage(new TextEncoder().encode(challenge.message), "utf8");
+    const verifyResponse = await fetch("/api/auth/verify", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        publicKey,
+        signature: bytesToBase64(signed.signature),
+        message: challenge.message,
+      }),
+    });
+    if (!verifyResponse.ok) {
+      const payload = (await verifyResponse.json().catch(() => null)) as { error?: string } | null;
+      throw new Error(payload?.error ?? "Wallet sign-in failed");
+    }
+
+    const session = (await verifyResponse.json()) as SessionResponse;
+    setSessionAddress(session.address);
+    return session.address;
+  }, []);
+
   useEffect(() => {
-    void refreshSession();
+    // Never reuse a browser-stored Loogans Bluff auth session after a reload.
+    // Every page load starts as a visitor and requires a fresh Phantom proof.
+    void logoutServerSession();
 
     const provider = getPhantomProvider();
     if (!provider) return;
 
-    const onConnect = (publicKey?: PhantomPublicKey | null) => {
-      if (!connectionRequestedRef.current) return;
-      setWalletAddress(publicKey?.toString() ?? provider.publicKey?.toString() ?? null);
-      setWalletError(null);
+    const onConnect = () => {
+      // A provider connect event alone is not enough to expose or authenticate a wallet.
+      // connectWallet() sets walletAddress only after the fresh signed proof succeeds.
     };
     const onDisconnect = () => {
       connectionRequestedRef.current = false;
       setWalletAddress(null);
+      setSessionAddress(null);
       setWalletError(null);
     };
     const onAccountChanged = (publicKey?: PhantomPublicKey | null) => {
       if (!connectionRequestedRef.current) return;
       const nextAddress = publicKey?.toString() ?? null;
-      setWalletAddress(nextAddress);
-      setWalletError(null);
-      if (sessionAddress && nextAddress !== sessionAddress) void logoutServerSession();
+      if (!nextAddress || nextAddress !== walletAddress) {
+        connectionRequestedRef.current = false;
+        setWalletAddress(null);
+        void logoutServerSession();
+      }
     };
 
     provider.on?.("connect", onConnect);
@@ -85,13 +103,7 @@ export default function WalletChrome() {
       provider.off?.("disconnect", onDisconnect);
       provider.off?.("accountChanged", onAccountChanged);
     };
-  }, [logoutServerSession, refreshSession, sessionAddress]);
-
-  useEffect(() => {
-    if (walletAddress && sessionAddress && walletAddress !== sessionAddress) {
-      void logoutServerSession();
-    }
-  }, [logoutServerSession, sessionAddress, walletAddress]);
+  }, [logoutServerSession, walletAddress]);
 
   const signedIn = useMemo(
     () => Boolean(walletAddress && sessionAddress === walletAddress),
@@ -109,68 +121,37 @@ export default function WalletChrome() {
     setWalletBusy(true);
     setWalletError(null);
     setWalletAddress(null);
+    setSessionAddress(null);
+
     try {
+      await logoutServerSession();
+
       try {
         await provider.disconnect();
       } catch {
-        // Ignore stale-provider disconnect errors; the fresh handshake below is authoritative.
+        // Ignore stale-provider disconnect errors.
       }
 
       const connectFresh = provider.connect as (options?: { onlyIfTrusted?: boolean }) => Promise<{ publicKey: PhantomPublicKey }>;
       const result = await connectFresh({ onlyIfTrusted: false });
-      setWalletAddress(result.publicKey.toString());
-      await refreshSession();
+      const freshAddress = result.publicKey.toString();
+
+      // Phantom may remember trusted sites and return a public key without showing UI.
+      // Require a fresh signed server challenge before we display or accept that wallet.
+      const verifiedAddress = await signInWithProvider(freshAddress);
+      if (verifiedAddress !== freshAddress) throw new Error("Wallet verification mismatch");
+
+      setWalletAddress(freshAddress);
     } catch (error) {
       connectionRequestedRef.current = false;
       setWalletAddress(null);
-      setWalletError(error instanceof Error ? error.message : "Wallet connection failed");
-    } finally {
-      setWalletBusy(false);
-    }
-  };
-
-  const signIn = async () => {
-    const provider = getPhantomProvider();
-    const publicKey = provider?.publicKey?.toString() ?? walletAddress;
-    if (!provider || !publicKey) {
-      setWalletError("Connect Phantom before signing in");
-      return;
-    }
-    if (!provider.signMessage) {
-      setWalletError("This Phantom wallet cannot sign login messages");
-      return;
-    }
-
-    setWalletBusy(true);
-    setWalletError(null);
-    try {
-      const challengeResponse = await fetch("/api/auth/challenge", {
-        method: "POST",
-        credentials: "same-origin",
-      });
-      if (!challengeResponse.ok) throw new Error("Could not create login challenge");
-      const challenge = (await challengeResponse.json()) as ChallengeResponse;
-
-      const signed = await provider.signMessage(new TextEncoder().encode(challenge.message), "utf8");
-      const verifyResponse = await fetch("/api/auth/verify", {
-        method: "POST",
-        credentials: "same-origin",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          publicKey,
-          signature: bytesToBase64(signed.signature),
-          message: challenge.message,
-        }),
-      });
-      if (!verifyResponse.ok) {
-        const payload = (await verifyResponse.json().catch(() => null)) as { error?: string } | null;
-        throw new Error(payload?.error ?? "Wallet sign-in failed");
+      setSessionAddress(null);
+      try {
+        await provider.disconnect();
+      } catch {
+        // Keep the UI disconnected even if Phantom refuses the cleanup call.
       }
-
-      const session = (await verifyResponse.json()) as SessionResponse;
-      setSessionAddress(session.address);
-    } catch (error) {
-      setWalletError(error instanceof Error ? error.message : "Wallet sign-in failed");
+      setWalletError(error instanceof Error ? error.message : "Wallet connection failed");
     } finally {
       setWalletBusy(false);
     }
@@ -192,26 +173,12 @@ export default function WalletChrome() {
     }
   };
 
-  const addressToShow = walletAddress;
-
   return (
     <div className="fixed right-3 top-3 z-[70] flex max-w-[calc(100vw-1.5rem)] flex-col items-end gap-1 sm:right-4 sm:top-4">
-      {addressToShow ? (
+      {walletAddress && signedIn ? (
         <div className="flex items-center gap-2 rounded-lg border border-emerald-400/30 bg-slate-950/90 px-2 py-2 text-xs text-white shadow-lg backdrop-blur sm:px-3">
-          <span className={signedIn ? "hidden text-emerald-300 sm:inline" : "hidden text-violet-300 sm:inline"}>
-            {signedIn ? "SIGNED IN" : "PHANTOM"}
-          </span>
-          <span className="font-mono">{shortWallet(addressToShow)}</span>
-          {!signedIn ? (
-            <button
-              type="button"
-              onClick={signIn}
-              disabled={walletBusy}
-              className="rounded bg-emerald-700 px-2 py-1 font-semibold hover:bg-emerald-600 disabled:cursor-wait disabled:opacity-60"
-            >
-              {walletBusy ? "..." : "SIGN IN"}
-            </button>
-          ) : null}
+          <span className="hidden text-emerald-300 sm:inline">SIGNED IN</span>
+          <span className="font-mono">{shortWallet(walletAddress)}</span>
           <button
             type="button"
             onClick={disconnectWallet}
