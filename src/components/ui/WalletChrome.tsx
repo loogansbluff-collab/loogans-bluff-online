@@ -108,12 +108,21 @@ export default function WalletChrome() {
     connectionRequestedRef.current = true;
     setWalletBusy(true);
     setWalletError(null);
+    setWalletAddress(null);
     try {
-      const result = await provider.connect();
+      try {
+        await provider.disconnect();
+      } catch {
+        // Ignore stale-provider disconnect errors; the fresh handshake below is authoritative.
+      }
+
+      const connectFresh = provider.connect as (options?: { onlyIfTrusted?: boolean }) => Promise<{ publicKey: PhantomPublicKey }>;
+      const result = await connectFresh({ onlyIfTrusted: false });
       setWalletAddress(result.publicKey.toString());
       await refreshSession();
     } catch (error) {
       connectionRequestedRef.current = false;
+      setWalletAddress(null);
       setWalletError(error instanceof Error ? error.message : "Wallet connection failed");
     } finally {
       setWalletBusy(false);
