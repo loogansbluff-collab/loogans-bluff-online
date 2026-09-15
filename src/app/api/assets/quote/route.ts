@@ -3,12 +3,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { isExpired, SESSION_COOKIE, verifyToken, type SessionTokenPayload } from "@/lib/auth";
 import { createAssetTradeQuote, getPlayerByWallet } from "@/lib/db";
 import { quoteLoogansForUsdCents } from "@/lib/loogansMarketQuote";
+import { getLatestSolanaBlockhash, getMintTokenProgram } from "@/lib/solanaTradeVerify";
 
 export const runtime = "nodejs";
 
 const BARBER_ASSET_ID = "LB-BARBER-001";
 const BARBER_USD_CENTS = 100;
 const QUOTE_TTL_MS = 60_000;
+const LOCKED_TREASURY_WALLET = "4QaA5ESqNzmCyA5wEanGxSVKxodqb7XHjwkVq5zY66ZC";
 
 export async function POST(request: NextRequest) {
   try {
@@ -28,7 +30,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Player not found" }, { status: 404 });
     }
 
+    const treasuryWallet = process.env.TREASURY_WALLET?.trim();
+    if (treasuryWallet !== LOCKED_TREASURY_WALLET) {
+      return NextResponse.json(
+        { error: "TRADE_UNAVAILABLE", message: "Treasury configuration is unavailable." },
+        { status: 503 },
+      );
+    }
+
     const marketQuote = await quoteLoogansForUsdCents(BARBER_USD_CENTS);
+    const [tokenProgram, blockhashInfo] = await Promise.all([
+      getMintTokenProgram(marketQuote.mint),
+      getLatestSolanaBlockhash(),
+    ]);
     const expiresAt = new Date(Date.now() + QUOTE_TTL_MS);
     const quote = await createAssetTradeQuote({
       id: randomUUID(),
@@ -57,6 +71,10 @@ export async function POST(request: NextRequest) {
       createdAt: quote.createdAt,
       expiresAt: quote.expiresAt,
       expiresInSeconds: 60,
+      treasuryWallet,
+      tokenProgram,
+      recentBlockhash: blockhashInfo.blockhash,
+      lastValidBlockHeight: blockhashInfo.lastValidBlockHeight,
     });
   } catch (error) {
     console.error("Failed to create Barbershop trade quote", error);

@@ -19,6 +19,7 @@ export type AssetTradeQuoteRecord = {
   priceUsdPerToken: string;
   priceSource: string;
   status: string;
+  usedSignature: string | null;
   createdAt: string;
   expiresAt: string;
 };
@@ -64,13 +65,34 @@ async function ensureAssetTradeQuotesTable() {
       price_usd_per_token TEXT NOT NULL,
       price_source TEXT NOT NULL,
       status TEXT NOT NULL DEFAULT 'open',
+      used_signature TEXT,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       expires_at TIMESTAMPTZ NOT NULL
     )
   `;
+  await sql`ALTER TABLE asset_trade_quotes ADD COLUMN IF NOT EXISTS used_signature TEXT`;
   await sql`
     CREATE INDEX IF NOT EXISTS asset_trade_quotes_player_asset_created_idx
     ON asset_trade_quotes (player_id, asset_id, created_at DESC)
+  `;
+}
+
+async function ensureAssetTradeLedgerTable() {
+  const sql = getSql();
+  await sql`
+    CREATE TABLE IF NOT EXISTS asset_trade_ledger (
+      id BIGSERIAL PRIMARY KEY,
+      player_id BIGINT NOT NULL REFERENCES players(id) ON DELETE CASCADE,
+      wallet_address TEXT NOT NULL,
+      asset_id TEXT NOT NULL,
+      quote_id TEXT NOT NULL UNIQUE REFERENCES asset_trade_quotes(id),
+      amount_raw NUMERIC(40, 0) NOT NULL,
+      mint TEXT NOT NULL,
+      tx_signature TEXT NOT NULL UNIQUE,
+      direction TEXT NOT NULL,
+      status TEXT NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
   `;
 }
 
@@ -129,6 +151,18 @@ export async function getPlayerAssetIds(playerId: string): Promise<string[]> {
     ORDER BY acquired_at ASC, id ASC
   `;
   return rows.map((row) => String(row.assetId));
+}
+
+export async function playerOwnsAsset(playerId: string, assetId: string): Promise<boolean> {
+  await ensurePlayerAssetsTable();
+  const sql = getSql();
+  const rows = await sql`
+    SELECT 1 AS owned
+    FROM player_assets
+    WHERE player_id = ${playerId} AND asset_id = ${assetId}
+    LIMIT 1
+  `;
+  return rows.length > 0;
 }
 
 export async function collectPlayerAsset(playerId: string, assetId: string): Promise<string[]> {
@@ -196,6 +230,7 @@ export async function createAssetTradeQuote(input: {
       price_usd_per_token AS "priceUsdPerToken",
       price_source AS "priceSource",
       status,
+      used_signature AS "usedSignature",
       created_at::text AS "createdAt",
       expires_at::text AS "expiresAt"
   `;
@@ -203,4 +238,110 @@ export async function createAssetTradeQuote(input: {
   const quote = rows[0] as AssetTradeQuoteRecord | undefined;
   if (!quote) throw new Error("Failed to create asset trade quote");
   return quote;
+}
+
+export async function getAssetTradeQuoteById(id: string): Promise<AssetTradeQuoteRecord | null> {
+  await ensureAssetTradeQuotesTable();
+  const sql = getSql();
+  const rows = await sql`
+    SELECT
+      id,
+      player_id::text AS "playerId",
+      wallet_address AS "walletAddress",
+      asset_id AS "assetId",
+      usd_cents AS "usdCents",
+      mint,
+      mint_decimals AS "mintDecimals",
+      loogans_amount_raw::text AS "loogansAmountRaw",
+      price_usd_per_token AS "priceUsdPerToken",
+      price_source AS "priceSource",
+      status,
+      used_signature AS "usedSignature",
+      created_at::text AS "createdAt",
+      expires_at::text AS "expiresAt"
+    FROM asset_trade_quotes
+    WHERE id = ${id}
+    LIMIT 1
+  `;
+  return (rows[0] as AssetTradeQuoteRecord | undefined) ?? null;
+}
+
+export async function isTradeSignatureUsed(signature: string): Promise<boolean> {
+  await ensureAssetTradeQuotesTable();
+  await ensureAssetTradeLedgerTable();
+  const sql = getSql();
+  const rows = await sql`
+    SELECT 1 AS used
+    FROM asset_trade_ledger
+    WHERE tx_signature = ${signature}
+    LIMIT 1
+  `;
+  return rows.length > 0;
+}
+
+export async function finalizeLoogansTrade(input: {
+  quoteId: string;
+  playerId: string;
+  walletAddress: string;
+  assetId: string;
+  signature: string;
+}): Promise<string[]> {
+  await ensurePlayerAssetsTable();
+  await ensureAssetTradeQuotesTable();
+  await ensureAssetTradeLedgerTable();
+  const sql = getSql();
+
+  const rows = await sql`
+    WITH consumed_quote AS (
+      UPDATE asset_trade_quotes
+      SET status = 'used', used_signature = ${input.signature}
+      WHERE id = ${input.quoteId}
+        AND player_id = ${input.playerId}
+        AND wallet_address = ${input.walletAddress}
+        AND asset_id = ${input.assetId}
+        AND status = 'open'
+        AND expires_at > NOW()
+      RETURNING id, player_id, wallet_address, asset_id, loogans_amount_raw, mint
+    ), ledger_write AS (
+      INSERT INTO asset_trade_ledger (
+        player_id,
+        wallet_address,
+        asset_id,
+        quote_id,
+        amount_raw,
+        mint,
+        tx_signature,
+        direction,
+        status
+      )
+      SELECT
+        player_id,
+        wallet_address,
+        asset_id,
+        id,
+        loogans_amount_raw,
+        mint,
+        ${input.signature},
+        'trade_in',
+        'confirmed'
+      FROM consumed_quote
+      RETURNING id
+    ), asset_write AS (
+      INSERT INTO player_assets (player_id, asset_id, source)
+      SELECT player_id, asset_id, 'loogans_trade'
+      FROM consumed_quote
+      RETURNING asset_id
+    )
+    SELECT
+      (SELECT COUNT(*)::int FROM consumed_quote) AS consumed,
+      (SELECT COUNT(*)::int FROM ledger_write) AS ledger,
+      (SELECT COUNT(*)::int FROM asset_write) AS asset
+  `;
+
+  const result = rows[0] as { consumed?: number; ledger?: number; asset?: number } | undefined;
+  if (!result || result.consumed !== 1 || result.ledger !== 1 || result.asset !== 1) {
+    throw new Error("Trade could not be finalized atomically");
+  }
+
+  return getPlayerAssetIds(input.playerId);
 }
