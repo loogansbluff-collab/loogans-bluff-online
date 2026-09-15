@@ -1,3 +1,5 @@
+import type { Transaction } from "@solana/web3.js";
+
 export type PhantomPublicKey = {
   toString: () => string;
 };
@@ -13,6 +15,7 @@ export type PhantomProvider = {
   connect: () => Promise<{ publicKey: PhantomPublicKey }>;
   disconnect: () => Promise<void>;
   signMessage?: (message: Uint8Array, display?: "utf8" | "hex") => Promise<PhantomSignedMessage>;
+  signAndSendTransaction?: (transaction: Transaction) => Promise<{ signature: string }>;
   on?: (event: "connect" | "disconnect" | "accountChanged", handler: (value?: PhantomPublicKey | null) => void) => void;
   off?: (event: "connect" | "disconnect" | "accountChanged", handler: (value?: PhantomPublicKey | null) => void) => void;
 };
