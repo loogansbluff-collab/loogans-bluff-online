@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isExpired, SESSION_COOKIE, verifyToken, type SessionTokenPayload } from "@/lib/auth";
-import { getPlayerByWallet } from "@/lib/db";
+import { getPlayerAssetIds, getPlayerByWallet } from "@/lib/db";
 
 export const runtime = "nodejs";
 
@@ -18,12 +18,15 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Player not found" }, { status: 404 });
     }
 
+    const collectedAssetIds = await getPlayerAssetIds(player.id);
+
     return NextResponse.json({
       id: player.id,
       walletAddress: player.walletAddress,
       createdAt: player.createdAt,
-      propertyAssetsCollected: 0,
+      propertyAssetsCollected: collectedAssetIds.length,
       propertyAssetsTotal: 68,
+      collectedAssetIds,
     });
   } catch (error) {
     console.error("Failed to load player dashboard", error);

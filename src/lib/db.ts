@@ -19,6 +19,20 @@ function getSql() {
   return neon(getDatabaseUrl());
 }
 
+async function ensurePlayerAssetsTable() {
+  const sql = getSql();
+  await sql`
+    CREATE TABLE IF NOT EXISTS player_assets (
+      id BIGSERIAL PRIMARY KEY,
+      player_id BIGINT NOT NULL REFERENCES players(id) ON DELETE CASCADE,
+      asset_id TEXT NOT NULL,
+      acquired_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      source TEXT NOT NULL DEFAULT 'demo',
+      UNIQUE (player_id, asset_id)
+    )
+  `;
+}
+
 export async function getOrCreatePlayer(walletAddress: string): Promise<PlayerRecord> {
   const sql = getSql();
 
@@ -62,4 +76,27 @@ export async function getPlayerByWallet(walletAddress: string): Promise<PlayerRe
   `;
 
   return (rows[0] as PlayerRecord | undefined) ?? null;
+}
+
+export async function getPlayerAssetIds(playerId: string): Promise<string[]> {
+  await ensurePlayerAssetsTable();
+  const sql = getSql();
+  const rows = await sql`
+    SELECT asset_id AS "assetId"
+    FROM player_assets
+    WHERE player_id = ${playerId}
+    ORDER BY acquired_at ASC, id ASC
+  `;
+  return rows.map((row) => String(row.assetId));
+}
+
+export async function collectPlayerAsset(playerId: string, assetId: string): Promise<string[]> {
+  await ensurePlayerAssetsTable();
+  const sql = getSql();
+  await sql`
+    INSERT INTO player_assets (player_id, asset_id, source)
+    VALUES (${playerId}, ${assetId}, 'demo')
+    ON CONFLICT (player_id, asset_id) DO NOTHING
+  `;
+  return getPlayerAssetIds(playerId);
 }
