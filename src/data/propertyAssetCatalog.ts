@@ -9,7 +9,7 @@ const CITY_HELD_IDS = new Set([
   "LB-COMMUNITY-001",
 ]);
 
-export const PRICE_BANDS = [0.25, 0.35, 0.50, 0.75, 1.00, 1.25, 1.50, 1.80, 2.10, 2.40, 2.80, 3.20, 3.50] as const;
+export const PRICE_BANDS = [0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50, 0.55, 0.60, 0.65, 0.70] as const;
 
 export type PropertyAssetCatalogItem = {
   id: string;
@@ -86,13 +86,13 @@ for (let index = 1; index < sortedByVolume.length; index += 1) {
 const smallestMold = propertyAssetCatalog.filter(
   (asset) => asset.width === 3.5 && asset.height === 3.2 && asset.depth === 4,
 );
-if (smallestMold.length !== 5 || smallestMold.some((asset) => asset.governmentPriceSol !== 0.25)) {
-  throw new Error("Smallest 3.5x3.2x4 Property Assets must all be 0.25 SOL");
+if (smallestMold.length !== 5 || smallestMold.some((asset) => asset.governmentPriceSol !== 0.10)) {
+  throw new Error("Smallest 3.5x3.2x4 Property Assets must all be 0.10 SOL");
 }
 
 const largestMold = propertyAssetCatalog.filter(
   (asset) => asset.width === 5.8 && asset.height === 4.6 && asset.depth === 6.4,
 );
-if (largestMold.length !== 3 || largestMold.some((asset) => asset.governmentPriceSol !== 3.50)) {
-  throw new Error("Largest 5.8x4.6x6.4 Property Assets must all be 3.50 SOL");
+if (largestMold.length !== 3 || largestMold.some((asset) => asset.governmentPriceSol !== 0.70)) {
+  throw new Error("Largest 5.8x4.6x6.4 Property Assets must all be 0.70 SOL");
 }
