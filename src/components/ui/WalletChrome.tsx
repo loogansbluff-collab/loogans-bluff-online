@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import PlayerDashboard, { type DashboardPlayer } from "@/components/ui/PlayerDashboard";
 import {
   bytesToBase64,
   getPhantomProvider,
@@ -21,6 +22,8 @@ export default function WalletChrome() {
   const [sessionAddress, setSessionAddress] = useState<string | null>(null);
   const [walletBusy, setWalletBusy] = useState(false);
   const [walletError, setWalletError] = useState<string | null>(null);
+  const [dashboardOpen, setDashboardOpen] = useState(false);
+  const [dashboardPlayer, setDashboardPlayer] = useState<DashboardPlayer | null>(null);
   const connectionRequestedRef = useRef(false);
 
   const logoutServerSession = useCallback(async () => {
@@ -31,6 +34,8 @@ export default function WalletChrome() {
       });
     } finally {
       setSessionAddress(null);
+      setDashboardOpen(false);
+      setDashboardPlayer(null);
     }
   }, []);
 
@@ -85,6 +90,8 @@ export default function WalletChrome() {
       setWalletAddress(null);
       setSessionAddress(null);
       setWalletError(null);
+      setDashboardOpen(false);
+      setDashboardPlayer(null);
     };
     const onAccountChanged = (publicKey?: PhantomPublicKey | null) => {
       if (!connectionRequestedRef.current) return;
@@ -159,6 +166,30 @@ export default function WalletChrome() {
     }
   };
 
+  const openDashboard = async () => {
+    if (!signedIn) return;
+    setWalletBusy(true);
+    setWalletError(null);
+    try {
+      const response = await fetch("/api/me", {
+        method: "GET",
+        cache: "no-store",
+        credentials: "same-origin",
+      });
+      if (!response.ok) {
+        const payload = (await response.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(payload?.error ?? "Could not load player dashboard");
+      }
+      const player = (await response.json()) as DashboardPlayer;
+      setDashboardPlayer(player);
+      setDashboardOpen(true);
+    } catch (error) {
+      setWalletError(error instanceof Error ? error.message : "Could not load player dashboard");
+    } finally {
+      setWalletBusy(false);
+    }
+  };
+
   const disconnectWallet = async () => {
     const provider = getPhantomProvider();
     setWalletBusy(true);
@@ -176,35 +207,49 @@ export default function WalletChrome() {
   };
 
   return (
-    <div className="fixed right-3 top-3 z-[70] flex max-w-[calc(100vw-1.5rem)] flex-col items-end gap-1 sm:right-4 sm:top-4">
-      {walletAddress && signedIn ? (
-        <div className="flex items-center gap-2 rounded-lg border border-emerald-400/30 bg-slate-950/90 px-2 py-2 text-xs text-white shadow-lg backdrop-blur sm:px-3">
-          <span className="hidden text-emerald-300 sm:inline">SIGNED IN</span>
-          <span className="font-mono">{shortWallet(walletAddress)}</span>
+    <>
+      <div className="fixed right-3 top-3 z-[70] flex max-w-[calc(100vw-1.5rem)] flex-col items-end gap-1 sm:right-4 sm:top-4">
+        {walletAddress && signedIn ? (
+          <div className="flex items-center gap-2 rounded-lg border border-emerald-400/30 bg-slate-950/90 px-2 py-2 text-xs text-white shadow-lg backdrop-blur sm:px-3">
+            <span className="hidden text-emerald-300 sm:inline">SIGNED IN</span>
+            <span className="font-mono">{shortWallet(walletAddress)}</span>
+            <button
+              type="button"
+              onClick={openDashboard}
+              disabled={walletBusy}
+              className="rounded bg-emerald-700 px-2 py-1 font-semibold hover:bg-emerald-600 disabled:cursor-wait disabled:opacity-60"
+            >
+              {walletBusy ? "..." : "DASHBOARD"}
+            </button>
+            <button
+              type="button"
+              onClick={disconnectWallet}
+              disabled={walletBusy}
+              className="rounded bg-slate-700 px-2 py-1 font-semibold hover:bg-slate-600 disabled:cursor-wait disabled:opacity-60"
+            >
+              {walletBusy ? "..." : "DISCONNECT"}
+            </button>
+          </div>
+        ) : (
           <button
             type="button"
-            onClick={disconnectWallet}
+            onClick={connectWallet}
             disabled={walletBusy}
-            className="rounded bg-slate-700 px-2 py-1 font-semibold hover:bg-slate-600 disabled:cursor-wait disabled:opacity-60"
+            className="rounded-lg border border-violet-400/40 bg-slate-950/90 px-3 py-2 text-xs font-bold text-white shadow-lg backdrop-blur hover:bg-slate-800 disabled:cursor-wait disabled:opacity-60 sm:text-sm"
           >
-            {walletBusy ? "..." : "DISCONNECT"}
+            {walletBusy ? "CONNECTING..." : "CONNECT PHANTOM"}
           </button>
-        </div>
-      ) : (
-        <button
-          type="button"
-          onClick={connectWallet}
-          disabled={walletBusy}
-          className="rounded-lg border border-violet-400/40 bg-slate-950/90 px-3 py-2 text-xs font-bold text-white shadow-lg backdrop-blur hover:bg-slate-800 disabled:cursor-wait disabled:opacity-60 sm:text-sm"
-        >
-          {walletBusy ? "CONNECTING..." : "CONNECT PHANTOM"}
-        </button>
-      )}
-      {walletError ? (
-        <p className="max-w-72 rounded bg-red-950/90 px-2 py-1 text-right text-[11px] text-red-200 shadow">
-          {walletError}
-        </p>
+        )}
+        {walletError ? (
+          <p className="max-w-72 rounded bg-red-950/90 px-2 py-1 text-right text-[11px] text-red-200 shadow">
+            {walletError}
+          </p>
+        ) : null}
+      </div>
+
+      {dashboardOpen && dashboardPlayer ? (
+        <PlayerDashboard player={dashboardPlayer} onClose={() => setDashboardOpen(false)} />
       ) : null}
-    </div>
+    </>
   );
 }

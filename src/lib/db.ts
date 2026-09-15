@@ -47,3 +47,19 @@ export async function getOrCreatePlayer(walletAddress: string): Promise<PlayerRe
   if (!player) throw new Error("Failed to create or load player");
   return player;
 }
+
+export async function getPlayerByWallet(walletAddress: string): Promise<PlayerRecord | null> {
+  const sql = getSql();
+  const rows = await sql`
+    SELECT
+      id::text AS id,
+      wallet_address AS "walletAddress",
+      created_at::text AS "createdAt",
+      last_login_at::text AS "lastLoginAt"
+    FROM players
+    WHERE wallet_address = ${walletAddress}
+    LIMIT 1
+  `;
+
+  return (rows[0] as PlayerRecord | undefined) ?? null;
+}
