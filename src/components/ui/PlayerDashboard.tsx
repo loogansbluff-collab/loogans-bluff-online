@@ -52,6 +52,14 @@ type TradeResponse = {
   propertyAssetsCollected?: number;
 };
 
+type TradeBackResponse = {
+  error?: string;
+  assetId?: string;
+  collectedAssetIds?: string[];
+  payoutSignature?: string;
+  amountRaw?: string;
+};
+
 const BARBER_ASSET_ID = "LB-BARBER-001";
 
 function walletErrorMessage(error: unknown) {
@@ -70,6 +78,8 @@ export default function PlayerDashboard({ player, onClose }: PlayerDashboardProp
   const [barberSecondsLeft, setBarberSecondsLeft] = useState(0);
   const [barberTrading, setBarberTrading] = useState(false);
   const [barberTradeError, setBarberTradeError] = useState<string | null>(null);
+  const [barberTradeBackLoading, setBarberTradeBackLoading] = useState(false);
+  const [barberTradeBackError, setBarberTradeBackError] = useState<string | null>(null);
   const collectedCount = collectedAssetIds.size;
 
   const collectedIdsArray = useMemo(() => Array.from(collectedAssetIds), [collectedAssetIds]);
@@ -112,10 +122,11 @@ export default function PlayerDashboard({ player, onClose }: PlayerDashboardProp
   };
 
   const getBarberQuote = async () => {
-    if (barberQuoteLoading || barberTrading || collectedAssetIds.has(BARBER_ASSET_ID)) return;
+    if (barberQuoteLoading || barberTrading || barberTradeBackLoading || collectedAssetIds.has(BARBER_ASSET_ID)) return;
     setBarberQuoteLoading(true);
     setBarberQuoteError(null);
     setBarberTradeError(null);
+    setBarberTradeBackError(null);
     setBarberQuote(null);
     try {
       const response = await fetch("/api/assets/quote", {
@@ -139,6 +150,7 @@ export default function PlayerDashboard({ player, onClose }: PlayerDashboardProp
   const tradeBarbershop = async () => {
     if (
       barberTrading ||
+      barberTradeBackLoading ||
       !barberQuote ||
       barberSecondsLeft <= 0 ||
       collectedAssetIds.has(BARBER_ASSET_ID)
@@ -148,6 +160,7 @@ export default function PlayerDashboard({ player, onClose }: PlayerDashboardProp
 
     setBarberTrading(true);
     setBarberTradeError(null);
+    setBarberTradeBackError(null);
 
     try {
       const provider = getPhantomProvider();
@@ -224,6 +237,33 @@ export default function PlayerDashboard({ player, onClose }: PlayerDashboardProp
     }
   };
 
+  const tradeBackBarbershop = async () => {
+    if (barberTradeBackLoading || !collectedAssetIds.has(BARBER_ASSET_ID)) return;
+    setBarberTradeBackLoading(true);
+    setBarberTradeBackError(null);
+    setBarberTradeError(null);
+    try {
+      const response = await fetch("/api/assets/trade-back", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ assetId: BARBER_ASSET_ID }),
+      });
+      const payload = (await response.json().catch(() => null)) as TradeBackResponse | null;
+      if (!response.ok || !payload?.collectedAssetIds) {
+        throw new Error(payload?.error ?? "TRADE BACK failed");
+      }
+      setCollectedAssetIds(new Set(payload.collectedAssetIds));
+      setBarberQuote(null);
+      setBarberQuoteError(null);
+      setBarberTradeBackError(null);
+    } catch (error) {
+      setBarberTradeBackError(error instanceof Error ? error.message : "TRADE BACK failed");
+    } finally {
+      setBarberTradeBackLoading(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/55 p-4 backdrop-blur-sm">
       <section className="flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-emerald-400/30 bg-slate-950/95 text-white shadow-2xl">
@@ -274,6 +314,9 @@ export default function PlayerDashboard({ player, onClose }: PlayerDashboardProp
                     {isBarber && !collected && barberTradeError ? (
                       <p className="mt-1 text-xs font-semibold text-red-300">{barberTradeError}</p>
                     ) : null}
+                    {isBarber && collected && barberTradeBackError ? (
+                      <p className="mt-1 text-xs font-semibold text-red-300">{barberTradeBackError}</p>
+                    ) : null}
                   </div>
                   <div className="hidden text-right text-xs text-slate-400 sm:block">
                     <p>{asset.width} × {asset.height} × {asset.depth}</p>
@@ -285,13 +328,27 @@ export default function PlayerDashboard({ player, onClose }: PlayerDashboardProp
                     )}
                   </div>
                   {collected ? (
-                    <span className="text-xs font-semibold uppercase tracking-wider text-emerald-300">{isBarber ? "OWNED" : "Collected"}</span>
+                    isBarber ? (
+                      <div className="flex flex-col items-end gap-1">
+                        <span className="text-xs font-semibold uppercase tracking-wider text-emerald-300">OWNED</span>
+                        <button
+                          type="button"
+                          onClick={() => void tradeBackBarbershop()}
+                          disabled={barberTradeBackLoading}
+                          className="rounded bg-amber-700 px-2 py-1 text-xs font-semibold hover:bg-amber-600 disabled:cursor-wait disabled:opacity-60"
+                        >
+                          {barberTradeBackLoading ? "TRADING BACK..." : "TRADE BACK"}
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="text-xs font-semibold uppercase tracking-wider text-emerald-300">Collected</span>
+                    )
                   ) : isBarber ? (
                     <div className="flex flex-col items-end gap-1">
                       <button
                         type="button"
                         onClick={() => void getBarberQuote()}
-                        disabled={barberQuoteLoading || barberTrading}
+                        disabled={barberQuoteLoading || barberTrading || barberTradeBackLoading}
                         className="rounded bg-amber-600 px-2 py-1 text-xs font-semibold hover:bg-amber-500 disabled:cursor-wait disabled:opacity-60"
                       >
                         {barberQuoteLoading ? "QUOTING..." : barberQuoteLive ? "REFRESH QUOTE" : "GET QUOTE"}
@@ -299,7 +356,7 @@ export default function PlayerDashboard({ player, onClose }: PlayerDashboardProp
                       <button
                         type="button"
                         onClick={() => void tradeBarbershop()}
-                        disabled={!barberQuoteLive || barberTrading}
+                        disabled={!barberQuoteLive || barberTrading || barberTradeBackLoading}
                         className="rounded bg-emerald-700 px-2 py-1 text-xs font-semibold hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         {barberTrading ? "TRADING..." : "TRADE"}

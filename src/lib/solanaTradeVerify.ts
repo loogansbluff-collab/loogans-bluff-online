@@ -100,6 +100,30 @@ async function getParsedTransaction(signature: string): Promise<ParsedTransactio
   throw new Error("Confirmed transaction not found");
 }
 
+function assertNoUnexpectedMintDeltas(input: {
+  pre: RpcTokenBalance[] | undefined;
+  post: RpcTokenBalance[] | undefined;
+  mint: string;
+  decimals: number;
+  allowedOwners: string[];
+}) {
+  const owners = new Set<string>();
+  for (const balance of [...(input.pre ?? []), ...(input.post ?? [])]) {
+    if (balance.mint !== input.mint) continue;
+    if (!balance.owner) throw new Error("Ambiguous LOOGANS token owner data");
+    owners.add(balance.owner);
+  }
+
+  const allowed = new Set(input.allowedOwners);
+  for (const owner of owners) {
+    const pre = sumOwnerMintBalance(input.pre, owner, input.mint, input.decimals);
+    const post = sumOwnerMintBalance(input.post, owner, input.mint, input.decimals);
+    if (post - pre !== BigInt(0) && !allowed.has(owner)) {
+      throw new Error("Unexpected LOOGANS movement in payout transaction");
+    }
+  }
+}
+
 export async function verifyLoogansTradeTransfer(input: {
   signature: string;
   playerWallet: string;
@@ -150,4 +174,64 @@ export async function verifyLoogansTradeTransfer(input: {
   if (postTreasury - preTreasury !== expected) {
     throw new Error("Treasury LOOGANS credit does not match stored quote");
   }
+}
+
+export async function verifyLoogansTradeBackTransfer(input: {
+  signature: string;
+  playerWallet: string;
+  treasuryWallet: string;
+  mint: string;
+  decimals: number;
+  amountRaw: string;
+}) {
+  if (!/^\d+$/.test(input.amountRaw) || BigInt(input.amountRaw) <= BigInt(0)) {
+    throw new Error("Invalid TRADE BACK amount");
+  }
+
+  const tx = await getParsedTransaction(input.signature);
+  if (!tx.meta || tx.meta.err) throw new Error("Treasury payout transaction failed");
+  if (!walletSignedTransaction(tx, input.treasuryWallet)) {
+    throw new Error("Treasury wallet did not sign payout transaction");
+  }
+
+  const preTreasury = sumOwnerMintBalance(
+    tx.meta.preTokenBalances,
+    input.treasuryWallet,
+    input.mint,
+    input.decimals,
+  );
+  const postTreasury = sumOwnerMintBalance(
+    tx.meta.postTokenBalances,
+    input.treasuryWallet,
+    input.mint,
+    input.decimals,
+  );
+  const prePlayer = sumOwnerMintBalance(
+    tx.meta.preTokenBalances,
+    input.playerWallet,
+    input.mint,
+    input.decimals,
+  );
+  const postPlayer = sumOwnerMintBalance(
+    tx.meta.postTokenBalances,
+    input.playerWallet,
+    input.mint,
+    input.decimals,
+  );
+  const expected = BigInt(input.amountRaw);
+
+  if (preTreasury - postTreasury !== expected) {
+    throw new Error("Treasury LOOGANS debit does not match TRADE BACK amount");
+  }
+  if (postPlayer - prePlayer !== expected) {
+    throw new Error("Player LOOGANS credit does not match TRADE BACK amount");
+  }
+
+  assertNoUnexpectedMintDeltas({
+    pre: tx.meta.preTokenBalances,
+    post: tx.meta.postTokenBalances,
+    mint: input.mint,
+    decimals: input.decimals,
+    allowedOwners: [input.treasuryWallet, input.playerWallet],
+  });
 }

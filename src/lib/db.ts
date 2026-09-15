@@ -24,6 +24,19 @@ export type AssetTradeQuoteRecord = {
   expiresAt: string;
 };
 
+export type TradeBackPendingRecord = {
+  id: string;
+  playerId: string;
+  walletAddress: string;
+  assetId: string;
+  tradeInLedgerId: string;
+  quoteId: string;
+  amountRaw: string;
+  mint: string;
+  payoutSignature: string | null;
+  createdAt: string;
+};
+
 function getDatabaseUrl() {
   const databaseUrl = process.env.DATABASE_URL ?? process.env.POSTGRES_URL;
   if (!databaseUrl) {
@@ -85,13 +98,41 @@ async function ensureAssetTradeLedgerTable() {
       player_id BIGINT NOT NULL REFERENCES players(id) ON DELETE CASCADE,
       wallet_address TEXT NOT NULL,
       asset_id TEXT NOT NULL,
-      quote_id TEXT NOT NULL UNIQUE REFERENCES asset_trade_quotes(id),
+      quote_id TEXT NOT NULL REFERENCES asset_trade_quotes(id),
       amount_raw NUMERIC(40, 0) NOT NULL,
       mint TEXT NOT NULL,
       tx_signature TEXT NOT NULL UNIQUE,
       direction TEXT NOT NULL,
       status TEXT NOT NULL,
+      related_trade_id BIGINT REFERENCES asset_trade_ledger(id),
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+  await sql`ALTER TABLE asset_trade_ledger DROP CONSTRAINT IF EXISTS asset_trade_ledger_quote_id_key`;
+  await sql`ALTER TABLE asset_trade_ledger ADD COLUMN IF NOT EXISTS related_trade_id BIGINT REFERENCES asset_trade_ledger(id)`;
+  await sql`
+    CREATE INDEX IF NOT EXISTS asset_trade_ledger_player_asset_direction_idx
+    ON asset_trade_ledger (player_id, asset_id, direction, created_at DESC)
+  `;
+}
+
+async function ensureTradeBackPendingTable() {
+  await ensureAssetTradeQuotesTable();
+  await ensureAssetTradeLedgerTable();
+  const sql = getSql();
+  await sql`
+    CREATE TABLE IF NOT EXISTS asset_trade_back_pending (
+      id BIGSERIAL PRIMARY KEY,
+      player_id BIGINT NOT NULL REFERENCES players(id) ON DELETE CASCADE,
+      wallet_address TEXT NOT NULL,
+      asset_id TEXT NOT NULL,
+      trade_in_ledger_id BIGINT NOT NULL REFERENCES asset_trade_ledger(id),
+      quote_id TEXT NOT NULL REFERENCES asset_trade_quotes(id),
+      amount_raw NUMERIC(40, 0) NOT NULL,
+      mint TEXT NOT NULL,
+      payout_signature TEXT UNIQUE,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      UNIQUE (player_id, asset_id)
     )
   `;
 }
@@ -341,6 +382,231 @@ export async function finalizeLoogansTrade(input: {
   const result = rows[0] as { consumed?: number; ledger?: number; asset?: number } | undefined;
   if (!result || result.consumed !== 1 || result.ledger !== 1 || result.asset !== 1) {
     throw new Error("Trade could not be finalized atomically");
+  }
+
+  return getPlayerAssetIds(input.playerId);
+}
+
+function pendingFromRow(row: Record<string, unknown>): TradeBackPendingRecord {
+  return {
+    id: String(row.id),
+    playerId: String(row.playerId),
+    walletAddress: String(row.walletAddress),
+    assetId: String(row.assetId),
+    tradeInLedgerId: String(row.tradeInLedgerId),
+    quoteId: String(row.quoteId),
+    amountRaw: String(row.amountRaw),
+    mint: String(row.mint),
+    payoutSignature: row.payoutSignature ? String(row.payoutSignature) : null,
+    createdAt: String(row.createdAt),
+  };
+}
+
+export async function getTradeBackPending(playerId: string, assetId: string): Promise<TradeBackPendingRecord | null> {
+  await ensureTradeBackPendingTable();
+  const sql = getSql();
+  const rows = await sql`
+    SELECT
+      id::text AS id,
+      player_id::text AS "playerId",
+      wallet_address AS "walletAddress",
+      asset_id AS "assetId",
+      trade_in_ledger_id::text AS "tradeInLedgerId",
+      quote_id AS "quoteId",
+      amount_raw::text AS "amountRaw",
+      mint,
+      payout_signature AS "payoutSignature",
+      created_at::text AS "createdAt"
+    FROM asset_trade_back_pending
+    WHERE player_id = ${playerId} AND asset_id = ${assetId}
+    LIMIT 1
+  `;
+  return rows[0] ? pendingFromRow(rows[0] as Record<string, unknown>) : null;
+}
+
+export async function acquireTradeBackLock(input: {
+  playerId: string;
+  walletAddress: string;
+  assetId: string;
+}): Promise<TradeBackPendingRecord | null> {
+  await ensurePlayerAssetsTable();
+  await ensureTradeBackPendingTable();
+  const sql = getSql();
+  const rows = await sql`
+    WITH eligible AS (
+      SELECT
+        l.id AS trade_in_ledger_id,
+        l.quote_id,
+        l.amount_raw,
+        l.mint
+      FROM player_assets pa
+      JOIN asset_trade_ledger l
+        ON l.player_id = pa.player_id
+       AND l.asset_id = pa.asset_id
+       AND l.direction = 'trade_in'
+       AND l.status = 'confirmed'
+      WHERE pa.player_id = ${input.playerId}
+        AND pa.asset_id = ${input.assetId}
+        AND pa.source = 'loogans_trade'
+        AND l.wallet_address = ${input.walletAddress}
+        AND NOT EXISTS (
+          SELECT 1
+          FROM asset_trade_ledger back
+          WHERE back.direction = 'trade_back'
+            AND back.status = 'confirmed'
+            AND back.related_trade_id = l.id
+        )
+      ORDER BY l.created_at DESC, l.id DESC
+      LIMIT 1
+    ), locked AS (
+      INSERT INTO asset_trade_back_pending (
+        player_id,
+        wallet_address,
+        asset_id,
+        trade_in_ledger_id,
+        quote_id,
+        amount_raw,
+        mint
+      )
+      SELECT
+        ${input.playerId},
+        ${input.walletAddress},
+        ${input.assetId},
+        trade_in_ledger_id,
+        quote_id,
+        amount_raw,
+        mint
+      FROM eligible
+      ON CONFLICT (player_id, asset_id) DO NOTHING
+      RETURNING
+        id,
+        player_id,
+        wallet_address,
+        asset_id,
+        trade_in_ledger_id,
+        quote_id,
+        amount_raw,
+        mint,
+        payout_signature,
+        created_at
+    )
+    SELECT
+      id::text AS id,
+      player_id::text AS "playerId",
+      wallet_address AS "walletAddress",
+      asset_id AS "assetId",
+      trade_in_ledger_id::text AS "tradeInLedgerId",
+      quote_id AS "quoteId",
+      amount_raw::text AS "amountRaw",
+      mint,
+      payout_signature AS "payoutSignature",
+      created_at::text AS "createdAt"
+    FROM locked
+  `;
+  return rows[0] ? pendingFromRow(rows[0] as Record<string, unknown>) : null;
+}
+
+export async function setTradeBackPayoutSignature(pendingId: string, signature: string): Promise<boolean> {
+  await ensureTradeBackPendingTable();
+  const sql = getSql();
+  const rows = await sql`
+    UPDATE asset_trade_back_pending
+    SET payout_signature = ${signature}
+    WHERE id = ${pendingId} AND payout_signature IS NULL
+    RETURNING id
+  `;
+  return rows.length === 1;
+}
+
+export async function releaseTradeBackLock(pendingId: string): Promise<void> {
+  await ensureTradeBackPendingTable();
+  const sql = getSql();
+  await sql`
+    DELETE FROM asset_trade_back_pending
+    WHERE id = ${pendingId} AND payout_signature IS NULL
+  `;
+}
+
+export async function finalizeTradeBack(input: {
+  pendingId: string;
+  playerId: string;
+  walletAddress: string;
+  assetId: string;
+  signature: string;
+}): Promise<string[]> {
+  await ensurePlayerAssetsTable();
+  await ensureTradeBackPendingTable();
+  const sql = getSql();
+  const rows = await sql`
+    WITH pending AS (
+      SELECT *
+      FROM asset_trade_back_pending
+      WHERE id = ${input.pendingId}
+        AND player_id = ${input.playerId}
+        AND wallet_address = ${input.walletAddress}
+        AND asset_id = ${input.assetId}
+        AND payout_signature = ${input.signature}
+    ), asset_delete AS (
+      DELETE FROM player_assets pa
+      USING pending p
+      WHERE pa.player_id = p.player_id
+        AND pa.asset_id = p.asset_id
+        AND pa.source = 'loogans_trade'
+      RETURNING pa.player_id, pa.asset_id
+    ), ledger_write AS (
+      INSERT INTO asset_trade_ledger (
+        player_id,
+        wallet_address,
+        asset_id,
+        quote_id,
+        amount_raw,
+        mint,
+        tx_signature,
+        direction,
+        status,
+        related_trade_id
+      )
+      SELECT
+        p.player_id,
+        p.wallet_address,
+        p.asset_id,
+        p.quote_id,
+        p.amount_raw,
+        p.mint,
+        p.payout_signature,
+        'trade_back',
+        'confirmed',
+        p.trade_in_ledger_id
+      FROM pending p
+      WHERE EXISTS (SELECT 1 FROM asset_delete)
+      RETURNING id
+    ), pending_delete AS (
+      DELETE FROM asset_trade_back_pending p
+      WHERE p.id = ${input.pendingId}
+        AND EXISTS (SELECT 1 FROM ledger_write)
+      RETURNING p.id
+    )
+    SELECT
+      (SELECT COUNT(*)::int FROM pending) AS pending_count,
+      (SELECT COUNT(*)::int FROM asset_delete) AS asset_count,
+      (SELECT COUNT(*)::int FROM ledger_write) AS ledger_count,
+      (SELECT COUNT(*)::int FROM pending_delete) AS lock_count
+  `;
+
+  const result = rows[0] as {
+    pending_count?: number;
+    asset_count?: number;
+    ledger_count?: number;
+    lock_count?: number;
+  } | undefined;
+  if (
+    !result ||
+    result.pending_count !== 1 ||
+    result.asset_count !== 1 ||
+    result.ledger_count !== 1 ||
+    result.lock_count !== 1
+  ) {
+    throw new Error("TRADE BACK could not be finalized atomically");
   }
 
   return getPlayerAssetIds(input.playerId);
