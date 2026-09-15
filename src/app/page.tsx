@@ -16,6 +16,7 @@ import MobileControls from "@/components/ui/MobileControls";
 import ProximityPrompt from "@/components/ui/ProximityPrompt";
 import TownDirectory from "@/components/ui/TownDirectory";
 import LegalLinks from "@/components/ui/LegalLinks";
+import EconomyFooter from "@/components/ui/EconomyFooter";
 import WalletChrome from "@/components/ui/WalletChrome";
 
 const TownCanvas = dynamic(() => import("@/components/scene/TownCanvas"), {
@@ -79,6 +80,7 @@ export default function HomePage() {
       <MobileControls />
       <ProximityPrompt />
       {mode !== "interior" ? <BuildingPanel /> : null}
+      <EconomyFooter />
       <LegalLinks />
       <ModeFade />
     </main>
