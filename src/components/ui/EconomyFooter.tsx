@@ -41,7 +41,7 @@ export default function EconomyFooter() {
   }, []);
 
   return (
-    <div className="pointer-events-none fixed bottom-6 left-1/2 z-40 flex -translate-x-1/2 flex-col items-center gap-0.5 whitespace-nowrap text-[10px] font-semibold text-slate-300 sm:bottom-1 sm:left-3 sm:translate-x-0 sm:flex-row sm:gap-4">
+    <div className="pointer-events-none fixed bottom-6 left-1/2 z-40 flex -translate-x-1/2 flex-col items-center gap-0.5 whitespace-nowrap text-[10px] font-semibold text-slate-300 sm:bottom-0 sm:left-3 sm:translate-x-0 sm:flex-row sm:gap-4">
       <span>PLAYER-OWNED ASSETS: {stats?.ownedCount ?? "—"}</span>
       <span>
         TREASURY: {stats ? (stats.treasuryLoogansUi ? `${formatLoogans(stats.treasuryLoogansUi)} $LOOGANS` : "UNAVAILABLE") : "—"}
