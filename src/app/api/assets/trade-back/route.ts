@@ -22,6 +22,7 @@ export const runtime = "nodejs";
 
 const BARBER_ASSET_ID = "LB-BARBER-001";
 const LOCKED_TREASURY_WALLET = "4QaA5ESqNzmCyA5wEanGxSVKxodqb7XHjwkVq5zY66ZC";
+const UNSIGNED_PENDING_STALE_MS = 15_000;
 
 function lookupPending(message: string) {
   return (
@@ -124,7 +125,33 @@ export async function POST(request: NextRequest) {
   }
 
   if (pending) {
-    return NextResponse.json({ error: "TRADE BACK is already pending" }, { status: 409 });
+    const pendingAge = Date.now() - new Date(pending.createdAt).getTime();
+    if (Number.isFinite(pendingAge) && pendingAge >= UNSIGNED_PENDING_STALE_MS) {
+      await releaseTradeBackLock(pending.id);
+      pending = null;
+    } else {
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      const refreshed = await getTradeBackPending(player.id, BARBER_ASSET_ID);
+      if (refreshed?.payoutSignature) {
+        try {
+          const result = await verifyAndFinalize({
+            pending: refreshed,
+            playerId: player.id,
+            walletAddress: session.address,
+            treasuryWallet,
+            mint: loogansMint,
+          });
+          return NextResponse.json(result);
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "TRADE BACK payout could not be verified";
+          return NextResponse.json(
+            { error: lookupPending(message) ? "PAYOUT_PENDING_CONFIRMATION" : message },
+            { status: lookupPending(message) ? 502 : 409 },
+          );
+        }
+      }
+      return NextResponse.json({ error: "TRADE BACK is already pending" }, { status: 409 });
+    }
   }
 
   pending = await acquireTradeBackLock({
