@@ -7,6 +7,22 @@ export type PlayerRecord = {
   lastLoginAt: string;
 };
 
+export type AssetTradeQuoteRecord = {
+  id: string;
+  playerId: string;
+  walletAddress: string;
+  assetId: string;
+  usdCents: number;
+  mint: string;
+  mintDecimals: number;
+  loogansAmountRaw: string;
+  priceUsdPerToken: string;
+  priceSource: string;
+  status: string;
+  createdAt: string;
+  expiresAt: string;
+};
+
 function getDatabaseUrl() {
   const databaseUrl = process.env.DATABASE_URL ?? process.env.POSTGRES_URL;
   if (!databaseUrl) {
@@ -30,6 +46,31 @@ async function ensurePlayerAssetsTable() {
       source TEXT NOT NULL DEFAULT 'demo',
       UNIQUE (player_id, asset_id)
     )
+  `;
+}
+
+async function ensureAssetTradeQuotesTable() {
+  const sql = getSql();
+  await sql`
+    CREATE TABLE IF NOT EXISTS asset_trade_quotes (
+      id TEXT PRIMARY KEY,
+      player_id BIGINT NOT NULL REFERENCES players(id) ON DELETE CASCADE,
+      wallet_address TEXT NOT NULL,
+      asset_id TEXT NOT NULL,
+      usd_cents INTEGER NOT NULL,
+      mint TEXT NOT NULL,
+      mint_decimals SMALLINT NOT NULL,
+      loogans_amount_raw NUMERIC(40, 0) NOT NULL,
+      price_usd_per_token TEXT NOT NULL,
+      price_source TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'open',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      expires_at TIMESTAMPTZ NOT NULL
+    )
+  `;
+  await sql`
+    CREATE INDEX IF NOT EXISTS asset_trade_quotes_player_asset_created_idx
+    ON asset_trade_quotes (player_id, asset_id, created_at DESC)
   `;
 }
 
@@ -99,4 +140,67 @@ export async function collectPlayerAsset(playerId: string, assetId: string): Pro
     ON CONFLICT (player_id, asset_id) DO NOTHING
   `;
   return getPlayerAssetIds(playerId);
+}
+
+export async function createAssetTradeQuote(input: {
+  id: string;
+  playerId: string;
+  walletAddress: string;
+  assetId: string;
+  usdCents: number;
+  mint: string;
+  mintDecimals: number;
+  loogansAmountRaw: string;
+  priceUsdPerToken: string;
+  priceSource: string;
+  expiresAt: Date;
+}): Promise<AssetTradeQuoteRecord> {
+  await ensureAssetTradeQuotesTable();
+  const sql = getSql();
+  const rows = await sql`
+    INSERT INTO asset_trade_quotes (
+      id,
+      player_id,
+      wallet_address,
+      asset_id,
+      usd_cents,
+      mint,
+      mint_decimals,
+      loogans_amount_raw,
+      price_usd_per_token,
+      price_source,
+      expires_at
+    )
+    VALUES (
+      ${input.id},
+      ${input.playerId},
+      ${input.walletAddress},
+      ${input.assetId},
+      ${input.usdCents},
+      ${input.mint},
+      ${input.mintDecimals},
+      ${input.loogansAmountRaw},
+      ${input.priceUsdPerToken},
+      ${input.priceSource},
+      ${input.expiresAt.toISOString()}
+    )
+    RETURNING
+      id,
+      player_id::text AS "playerId",
+      wallet_address AS "walletAddress",
+      asset_id AS "assetId",
+      usd_cents AS "usdCents",
+      mint,
+      mint_decimals AS "mintDecimals",
+      loogans_amount_raw::text AS "loogansAmountRaw",
+      price_usd_per_token AS "priceUsdPerToken",
+      price_source AS "priceSource",
+      status,
+      created_at::text AS "createdAt",
+      expires_at::text AS "expiresAt"
+  `;
+
+  const quote = rows[0] as AssetTradeQuoteRecord | undefined;
+  if (!quote) throw new Error("Failed to create asset trade quote");
+  return quote;
 }

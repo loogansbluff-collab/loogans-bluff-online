@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { propertyAssetCatalog } from "@/data/propertyAssetCatalog";
 import { shortWallet } from "@/lib/phantom";
 
@@ -18,13 +18,50 @@ type PlayerDashboardProps = {
   onClose: () => void;
 };
 
+type BarberQuote = {
+  quoteId: string;
+  assetId: string;
+  usd: string;
+  mint: string;
+  decimals: number;
+  loogansAmountRaw: string;
+  loogansAmountUi: string;
+  priceUsdPerToken: string;
+  priceSource: string;
+  createdAt: string;
+  expiresAt: string;
+  expiresInSeconds: number;
+};
+
+const BARBER_ASSET_ID = "LB-BARBER-001";
+
 export default function PlayerDashboard({ player, onClose }: PlayerDashboardProps) {
   const [collectedAssetIds, setCollectedAssetIds] = useState(() => new Set(player.collectedAssetIds));
   const [collectingAssetId, setCollectingAssetId] = useState<string | null>(null);
   const [collectError, setCollectError] = useState<string | null>(null);
+  const [barberQuote, setBarberQuote] = useState<BarberQuote | null>(null);
+  const [barberQuoteLoading, setBarberQuoteLoading] = useState(false);
+  const [barberQuoteError, setBarberQuoteError] = useState<string | null>(null);
+  const [barberSecondsLeft, setBarberSecondsLeft] = useState(0);
   const collectedCount = collectedAssetIds.size;
 
   const collectedIdsArray = useMemo(() => Array.from(collectedAssetIds), [collectedAssetIds]);
+
+  useEffect(() => {
+    if (!barberQuote) {
+      setBarberSecondsLeft(0);
+      return;
+    }
+
+    const updateCountdown = () => {
+      const seconds = Math.max(0, Math.ceil((new Date(barberQuote.expiresAt).getTime() - Date.now()) / 1000));
+      setBarberSecondsLeft(seconds);
+    };
+
+    updateCountdown();
+    const timer = window.setInterval(updateCountdown, 250);
+    return () => window.clearInterval(timer);
+  }, [barberQuote]);
 
   const collectDemo = async (assetId: string) => {
     if (collectedAssetIds.has(assetId) || collectingAssetId) return;
@@ -44,6 +81,30 @@ export default function PlayerDashboard({ player, onClose }: PlayerDashboardProp
       setCollectError(error instanceof Error ? error.message : "Could not collect Property Asset");
     } finally {
       setCollectingAssetId(null);
+    }
+  };
+
+  const getBarberQuote = async () => {
+    if (barberQuoteLoading) return;
+    setBarberQuoteLoading(true);
+    setBarberQuoteError(null);
+    setBarberQuote(null);
+    try {
+      const response = await fetch("/api/assets/quote", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ assetId: BARBER_ASSET_ID }),
+      });
+      const payload = (await response.json().catch(() => null)) as (BarberQuote & { error?: string; message?: string }) | null;
+      if (!response.ok || !payload?.quoteId) {
+        throw new Error(payload?.message ?? payload?.error ?? "TRADE UNAVAILABLE");
+      }
+      setBarberQuote(payload);
+    } catch (error) {
+      setBarberQuoteError(error instanceof Error ? error.message : "TRADE UNAVAILABLE");
+    } finally {
+      setBarberQuoteLoading(false);
     }
   };
 
@@ -76,20 +137,55 @@ export default function PlayerDashboard({ player, onClose }: PlayerDashboardProp
           <div className="min-h-0 flex-1 overflow-y-auto rounded-xl border border-white/10 bg-slate-900/55">
             {propertyAssetCatalog.map((asset) => {
               const collected = collectedAssetIds.has(asset.id);
+              const isBarber = asset.id === BARBER_ASSET_ID;
+              const barberQuoteLive = Boolean(barberQuote && barberSecondsLeft > 0);
               return (
                 <div key={asset.id} className="flex items-center gap-3 border-b border-white/5 px-4 py-3 last:border-b-0">
                   <span aria-hidden="true" className={collected ? "text-xl text-emerald-300" : "text-xl text-slate-500"}>{collected ? "✅" : "□"}</span>
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-semibold">{asset.name}</p>
                     <p className="truncate text-xs text-slate-400">{asset.id}</p>
+                    {isBarber && !collected && barberQuoteLive && barberQuote ? (
+                      <div className="mt-1 text-xs">
+                        <p className="font-semibold text-amber-300">{barberQuote.loogansAmountUi} $LOOGANS</p>
+                        <p className="text-slate-400">$1.00 USD quote · {barberSecondsLeft}s left</p>
+                        <p className="font-mono text-[10px] text-slate-500">Quote {barberQuote.quoteId}</p>
+                      </div>
+                    ) : null}
+                    {isBarber && !collected && barberQuoteError ? (
+                      <p className="mt-1 text-xs font-semibold text-red-300">TRADE UNAVAILABLE</p>
+                    ) : null}
                   </div>
                   <div className="hidden text-right text-xs text-slate-400 sm:block">
                     <p>{asset.width} × {asset.height} × {asset.depth}</p>
                     <p>Volume {asset.volume.toFixed(1)}</p>
-                    <p className="font-semibold text-amber-300">{asset.governmentPriceSol.toFixed(2)} SOL</p>
+                    {isBarber ? (
+                      <p className="font-semibold text-amber-300">$1.00 USD in $LOOGANS</p>
+                    ) : (
+                      <p className="font-semibold text-amber-300">{asset.governmentPriceSol.toFixed(2)} SOL</p>
+                    )}
                   </div>
                   {collected ? (
                     <span className="text-xs font-semibold uppercase tracking-wider text-emerald-300">Collected</span>
+                  ) : isBarber ? (
+                    <div className="flex flex-col items-end gap-1">
+                      <button
+                        type="button"
+                        onClick={() => void getBarberQuote()}
+                        disabled={barberQuoteLoading}
+                        className="rounded bg-amber-600 px-2 py-1 text-xs font-semibold hover:bg-amber-500 disabled:cursor-wait disabled:opacity-60"
+                      >
+                        {barberQuoteLoading ? "QUOTING..." : barberQuoteLive ? "REFRESH QUOTE" : "GET QUOTE"}
+                      </button>
+                      <button
+                        type="button"
+                        disabled
+                        className="rounded bg-emerald-800 px-2 py-1 text-xs font-semibold opacity-50"
+                        title="Phantom trade comes in the next build slice"
+                      >
+                        TRADE
+                      </button>
+                    </div>
                   ) : (
                     <button
                       type="button"
