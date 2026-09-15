@@ -96,6 +96,7 @@ export default function PlayerDashboard({ player, onClose }: PlayerDashboardProp
                     <div className="hidden text-right text-xs text-slate-400 sm:block">
                       <p>{asset.width} × {asset.height} × {asset.depth}</p>
                       <p>Volume {asset.volume.toFixed(1)}</p>
+                      <p className="font-semibold text-amber-300">{asset.governmentPriceSol.toFixed(2)} SOL</p>
                     </div>
                     {collected ? (
                       <span className="text-xs font-semibold uppercase tracking-wider text-emerald-300">Collected</span>
