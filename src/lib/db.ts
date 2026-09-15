@@ -35,6 +35,7 @@ export type TradeBackPendingRecord = {
   mint: string;
   payoutSignature: string | null;
   createdAt: string;
+  ageSeconds: number;
 };
 
 function getDatabaseUrl() {
@@ -399,6 +400,7 @@ function pendingFromRow(row: Record<string, unknown>): TradeBackPendingRecord {
     mint: String(row.mint),
     payoutSignature: row.payoutSignature ? String(row.payoutSignature) : null,
     createdAt: String(row.createdAt),
+    ageSeconds: Number(row.ageSeconds ?? 0),
   };
 }
 
@@ -416,7 +418,8 @@ export async function getTradeBackPending(playerId: string, assetId: string): Pr
       amount_raw::text AS "amountRaw",
       mint,
       payout_signature AS "payoutSignature",
-      created_at::text AS "createdAt"
+      created_at::text AS "createdAt",
+      EXTRACT(EPOCH FROM (NOW() - created_at))::float8 AS "ageSeconds"
     FROM asset_trade_back_pending
     WHERE player_id = ${playerId} AND asset_id = ${assetId}
     LIMIT 1
@@ -500,7 +503,8 @@ export async function acquireTradeBackLock(input: {
       amount_raw::text AS "amountRaw",
       mint,
       payout_signature AS "payoutSignature",
-      created_at::text AS "createdAt"
+      created_at::text AS "createdAt",
+      0::float8 AS "ageSeconds"
     FROM locked
   `;
   return rows[0] ? pendingFromRow(rows[0] as Record<string, unknown>) : null;
@@ -518,13 +522,29 @@ export async function setTradeBackPayoutSignature(pendingId: string, signature: 
   return rows.length === 1;
 }
 
-export async function releaseTradeBackLock(pendingId: string): Promise<void> {
+export async function releaseStaleUnsignedTradeBackLock(playerId: string, assetId: string): Promise<string | null> {
   await ensureTradeBackPendingTable();
   const sql = getSql();
-  await sql`
+  const rows = await sql`
+    DELETE FROM asset_trade_back_pending
+    WHERE player_id = ${playerId}
+      AND asset_id = ${assetId}
+      AND payout_signature IS NULL
+      AND created_at <= NOW() - INTERVAL '15 seconds'
+    RETURNING id::text AS id
+  `;
+  return rows[0]?.id ? String(rows[0].id) : null;
+}
+
+export async function releaseTradeBackLock(pendingId: string): Promise<boolean> {
+  await ensureTradeBackPendingTable();
+  const sql = getSql();
+  const rows = await sql`
     DELETE FROM asset_trade_back_pending
     WHERE id = ${pendingId} AND payout_signature IS NULL
+    RETURNING id
   `;
+  return rows.length === 1;
 }
 
 export async function finalizeTradeBack(input: {

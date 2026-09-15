@@ -5,6 +5,7 @@ import {
   finalizeTradeBack,
   getPlayerByWallet,
   getTradeBackPending,
+  releaseStaleUnsignedTradeBackLock,
   releaseTradeBackLock,
   setTradeBackPayoutSignature,
   type TradeBackPendingRecord,
@@ -22,7 +23,6 @@ export const runtime = "nodejs";
 
 const BARBER_ASSET_ID = "LB-BARBER-001";
 const LOCKED_TREASURY_WALLET = "4QaA5ESqNzmCyA5wEanGxSVKxodqb7XHjwkVq5zY66ZC";
-const UNSIGNED_PENDING_STALE_MS = 15_000;
 
 function lookupPending(message: string) {
   return (
@@ -97,11 +97,11 @@ export async function POST(request: NextRequest) {
   if (!player) return NextResponse.json({ error: "Player not found" }, { status: 404 });
 
   let pending = await getTradeBackPending(player.id, BARBER_ASSET_ID);
-  if (pending && pending.walletAddress !== session.address) {
-    return NextResponse.json({ error: "TRADE BACK is already pending" }, { status: 409 });
-  }
 
   if (pending?.payoutSignature) {
+    if (pending.walletAddress !== session.address) {
+      return NextResponse.json({ error: "TRADE BACK is already pending" }, { status: 409 });
+    }
     if (pending.mint !== loogansMint) {
       return NextResponse.json({ error: "Pending TRADE BACK mint does not match configuration" }, { status: 409 });
     }
@@ -125,32 +125,20 @@ export async function POST(request: NextRequest) {
   }
 
   if (pending) {
-    const pendingAge = Date.now() - new Date(pending.createdAt).getTime();
-    if (Number.isFinite(pendingAge) && pendingAge >= UNSIGNED_PENDING_STALE_MS) {
-      await releaseTradeBackLock(pending.id);
+    const releasedId = await releaseStaleUnsignedTradeBackLock(player.id, BARBER_ASSET_ID);
+    if (releasedId) {
       pending = null;
     } else {
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      const refreshed = await getTradeBackPending(player.id, BARBER_ASSET_ID);
-      if (refreshed?.payoutSignature) {
-        try {
-          const result = await verifyAndFinalize({
-            pending: refreshed,
-            playerId: player.id,
-            walletAddress: session.address,
-            treasuryWallet,
-            mint: loogansMint,
-          });
-          return NextResponse.json(result);
-        } catch (error) {
-          const message = error instanceof Error ? error.message : "TRADE BACK payout could not be verified";
-          return NextResponse.json(
-            { error: lookupPending(message) ? "PAYOUT_PENDING_CONFIRMATION" : message },
-            { status: lookupPending(message) ? 502 : 409 },
-          );
-        }
-      }
-      return NextResponse.json({ error: "TRADE BACK is already pending" }, { status: 409 });
+      return NextResponse.json(
+        {
+          error: "TRADE BACK is already pending",
+          pendingId: pending.id,
+          createdAt: pending.createdAt,
+          ageSeconds: pending.ageSeconds,
+          hasSignature: false,
+        },
+        { status: 409 },
+      );
     }
   }
 
