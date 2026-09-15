@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
   if (!player) return NextResponse.json({ error: "Player not found" }, { status: 404 });
 
   let pending = await getTradeBackPending(player.id, BARBER_ASSET_ID);
-  if (pending?.walletAddress !== session.address) {
+  if (pending && pending.walletAddress !== session.address) {
     return NextResponse.json({ error: "TRADE BACK is already pending" }, { status: 409 });
   }
 
