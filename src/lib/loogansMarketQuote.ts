@@ -29,19 +29,19 @@ function decimalStringToFraction(value: string): { numerator: bigint; denominato
   const normalized = value.trim();
   if (!/^\d+(?:\.\d+)?$/.test(normalized)) throw new Error("Invalid decimal price");
   const [whole, fraction = ""] = normalized.split(".");
-  const denominator = 10n ** BigInt(fraction.length);
+  const denominator = BigInt(10) ** BigInt(fraction.length);
   const numerator = BigInt(`${whole}${fraction}`);
-  if (numerator <= 0n) throw new Error("Price must be positive");
+  if (numerator <= BigInt(0)) throw new Error("Price must be positive");
   return { numerator, denominator };
 }
 
 function ceilDiv(numerator: bigint, denominator: bigint) {
-  return (numerator + denominator - 1n) / denominator;
+  return (numerator + denominator - BigInt(1)) / denominator;
 }
 
 function rawToUi(raw: bigint, decimals: number) {
   if (decimals === 0) return raw.toString();
-  const base = 10n ** BigInt(decimals);
+  const base = BigInt(10) ** BigInt(decimals);
   const whole = raw / base;
   const fraction = (raw % base).toString().padStart(decimals, "0").replace(/0+$/, "");
   return fraction ? `${whole}.${fraction}` : whole.toString();
@@ -141,11 +141,11 @@ export async function quoteLoogansForUsdCents(usdCents: number): Promise<Loogans
   ]);
   const selected = choosePrice(dexscreener, gecko);
   const { numerator: priceNumerator, denominator: priceDenominator } = decimalStringToFraction(selected.priceUsd);
-  const tokenBase = 10n ** BigInt(decimals);
+  const tokenBase = BigInt(10) ** BigInt(decimals);
   const rawNumerator = BigInt(usdCents) * priceDenominator * tokenBase;
-  const rawDenominator = 100n * priceNumerator;
+  const rawDenominator = BigInt(100) * priceNumerator;
   const raw = ceilDiv(rawNumerator, rawDenominator);
-  if (raw <= 0n) throw new Error("Calculated LOOGANS amount is invalid");
+  if (raw <= BigInt(0)) throw new Error("Calculated LOOGANS amount is invalid");
   return {
     mint,
     decimals,
