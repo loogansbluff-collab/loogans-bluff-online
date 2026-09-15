@@ -1,8 +1,16 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { PublicKey, Transaction } from "@solana/web3.js";
+import {
+  TOKEN_2022_PROGRAM_ID,
+  TOKEN_PROGRAM_ID,
+  createAssociatedTokenAccountIdempotentInstruction,
+  createTransferCheckedInstruction,
+  getAssociatedTokenAddressSync,
+} from "@solana/spl-token";
 import { propertyAssetCatalog } from "@/data/propertyAssetCatalog";
-import { shortWallet } from "@/lib/phantom";
+import { getPhantomProvider, shortWallet } from "@/lib/phantom";
 
 export type DashboardPlayer = {
   id: string;
@@ -31,9 +39,26 @@ type BarberQuote = {
   createdAt: string;
   expiresAt: string;
   expiresInSeconds: number;
+  treasuryWallet: string;
+  tokenProgram: string;
+  recentBlockhash: string;
+  lastValidBlockHeight: number;
+};
+
+type TradeResponse = {
+  error?: string;
+  assetId?: string;
+  collectedAssetIds?: string[];
+  propertyAssetsCollected?: number;
 };
 
 const BARBER_ASSET_ID = "LB-BARBER-001";
+
+function walletErrorMessage(error: unknown) {
+  if (error instanceof Error) return error.message;
+  if (typeof error === "string") return error;
+  return "TRADE failed";
+}
 
 export default function PlayerDashboard({ player, onClose }: PlayerDashboardProps) {
   const [collectedAssetIds, setCollectedAssetIds] = useState(() => new Set(player.collectedAssetIds));
@@ -43,6 +68,8 @@ export default function PlayerDashboard({ player, onClose }: PlayerDashboardProp
   const [barberQuoteLoading, setBarberQuoteLoading] = useState(false);
   const [barberQuoteError, setBarberQuoteError] = useState<string | null>(null);
   const [barberSecondsLeft, setBarberSecondsLeft] = useState(0);
+  const [barberTrading, setBarberTrading] = useState(false);
+  const [barberTradeError, setBarberTradeError] = useState<string | null>(null);
   const collectedCount = collectedAssetIds.size;
 
   const collectedIdsArray = useMemo(() => Array.from(collectedAssetIds), [collectedAssetIds]);
@@ -85,9 +112,10 @@ export default function PlayerDashboard({ player, onClose }: PlayerDashboardProp
   };
 
   const getBarberQuote = async () => {
-    if (barberQuoteLoading) return;
+    if (barberQuoteLoading || barberTrading || collectedAssetIds.has(BARBER_ASSET_ID)) return;
     setBarberQuoteLoading(true);
     setBarberQuoteError(null);
+    setBarberTradeError(null);
     setBarberQuote(null);
     try {
       const response = await fetch("/api/assets/quote", {
@@ -105,6 +133,94 @@ export default function PlayerDashboard({ player, onClose }: PlayerDashboardProp
       setBarberQuoteError(error instanceof Error ? error.message : "TRADE UNAVAILABLE");
     } finally {
       setBarberQuoteLoading(false);
+    }
+  };
+
+  const tradeBarbershop = async () => {
+    if (
+      barberTrading ||
+      !barberQuote ||
+      barberSecondsLeft <= 0 ||
+      collectedAssetIds.has(BARBER_ASSET_ID)
+    ) {
+      return;
+    }
+
+    setBarberTrading(true);
+    setBarberTradeError(null);
+
+    try {
+      const provider = getPhantomProvider();
+      if (!provider?.signAndSendTransaction) {
+        throw new Error("Phantom transaction signing is unavailable");
+      }
+
+      const connected = provider.publicKey ?? (await provider.connect()).publicKey;
+      if (connected.toString() !== player.walletAddress) {
+        throw new Error("Connected Phantom wallet does not match the signed-in player");
+      }
+
+      const payer = new PublicKey(player.walletAddress);
+      const mint = new PublicKey(barberQuote.mint);
+      const treasury = new PublicKey(barberQuote.treasuryWallet);
+      const tokenProgram = new PublicKey(barberQuote.tokenProgram);
+      if (!tokenProgram.equals(TOKEN_PROGRAM_ID) && !tokenProgram.equals(TOKEN_2022_PROGRAM_ID)) {
+        throw new Error("Unsupported $LOOGANS token program");
+      }
+
+      const sourceAta = getAssociatedTokenAddressSync(mint, payer, false, tokenProgram);
+      const treasuryAta = getAssociatedTokenAddressSync(mint, treasury, false, tokenProgram);
+      const amountRaw = BigInt(barberQuote.loogansAmountRaw);
+      if (amountRaw <= BigInt(0)) throw new Error("Invalid quoted $LOOGANS amount");
+
+      const transaction = new Transaction({
+        feePayer: payer,
+        recentBlockhash: barberQuote.recentBlockhash,
+      });
+      transaction.add(
+        createAssociatedTokenAccountIdempotentInstruction(
+          payer,
+          treasuryAta,
+          treasury,
+          mint,
+          tokenProgram,
+        ),
+      );
+      transaction.add(
+        createTransferCheckedInstruction(
+          sourceAta,
+          mint,
+          treasuryAta,
+          payer,
+          amountRaw,
+          barberQuote.decimals,
+          [],
+          tokenProgram,
+        ),
+      );
+
+      const sent = await provider.signAndSendTransaction(transaction);
+      if (!sent?.signature) throw new Error("Phantom did not return a transaction signature");
+
+      const response = await fetch("/api/assets/trade", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ quoteId: barberQuote.quoteId, signature: sent.signature }),
+      });
+      const payload = (await response.json().catch(() => null)) as TradeResponse | null;
+      if (!response.ok || !payload?.collectedAssetIds) {
+        throw new Error(payload?.error ?? "TRADE payment could not be verified");
+      }
+
+      setCollectedAssetIds(new Set(payload.collectedAssetIds));
+      setBarberQuote(null);
+      setBarberQuoteError(null);
+      setBarberTradeError(null);
+    } catch (error) {
+      setBarberTradeError(walletErrorMessage(error));
+    } finally {
+      setBarberTrading(false);
     }
   };
 
@@ -153,7 +269,10 @@ export default function PlayerDashboard({ player, onClose }: PlayerDashboardProp
                       </div>
                     ) : null}
                     {isBarber && !collected && barberQuoteError ? (
-                      <p className="mt-1 text-xs font-semibold text-red-300">TRADE UNAVAILABLE</p>
+                      <p className="mt-1 text-xs font-semibold text-red-300">{barberQuoteError}</p>
+                    ) : null}
+                    {isBarber && !collected && barberTradeError ? (
+                      <p className="mt-1 text-xs font-semibold text-red-300">{barberTradeError}</p>
                     ) : null}
                   </div>
                   <div className="hidden text-right text-xs text-slate-400 sm:block">
@@ -166,24 +285,24 @@ export default function PlayerDashboard({ player, onClose }: PlayerDashboardProp
                     )}
                   </div>
                   {collected ? (
-                    <span className="text-xs font-semibold uppercase tracking-wider text-emerald-300">Collected</span>
+                    <span className="text-xs font-semibold uppercase tracking-wider text-emerald-300">{isBarber ? "OWNED" : "Collected"}</span>
                   ) : isBarber ? (
                     <div className="flex flex-col items-end gap-1">
                       <button
                         type="button"
                         onClick={() => void getBarberQuote()}
-                        disabled={barberQuoteLoading}
+                        disabled={barberQuoteLoading || barberTrading}
                         className="rounded bg-amber-600 px-2 py-1 text-xs font-semibold hover:bg-amber-500 disabled:cursor-wait disabled:opacity-60"
                       >
                         {barberQuoteLoading ? "QUOTING..." : barberQuoteLive ? "REFRESH QUOTE" : "GET QUOTE"}
                       </button>
                       <button
                         type="button"
-                        disabled
-                        className="rounded bg-emerald-800 px-2 py-1 text-xs font-semibold opacity-50"
-                        title="Phantom trade comes in the next build slice"
+                        onClick={() => void tradeBarbershop()}
+                        disabled={!barberQuoteLive || barberTrading}
+                        className="rounded bg-emerald-700 px-2 py-1 text-xs font-semibold hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-50"
                       >
-                        TRADE
+                        {barberTrading ? "TRADING..." : "TRADE"}
                       </button>
                     </div>
                   ) : (
