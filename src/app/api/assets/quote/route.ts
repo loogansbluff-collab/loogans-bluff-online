@@ -9,14 +9,13 @@ export const runtime = "nodejs";
 const BARBER_ASSET_ID = "LB-BARBER-001";
 const BARBER_USD_CENTS = 100;
 const QUOTE_TTL_MS = 60_000;
+const LOCKED_TREASURY_WALLET = "4QaA5ESqNzmCyA5wEanGxSVKxodqb7XHjwkVq5zY66ZC";
 
 export async function POST(request: NextRequest) {
   try {
     const sessionToken = request.cookies.get(SESSION_COOKIE)?.value;
     const session = verifyToken<SessionTokenPayload>(sessionToken);
-    if (!session || isExpired(session.exp)) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    if (!session || isExpired(session.exp)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const body = (await request.json().catch(() => null)) as { assetId?: string } | null;
     if (body?.assetId !== BARBER_ASSET_ID) {
@@ -24,8 +23,11 @@ export async function POST(request: NextRequest) {
     }
 
     const player = await getPlayerByWallet(session.address);
-    if (!player) {
-      return NextResponse.json({ error: "Player not found" }, { status: 404 });
+    if (!player) return NextResponse.json({ error: "Player not found" }, { status: 404 });
+
+    const treasuryWallet = process.env.TREASURY_WALLET?.trim();
+    if (treasuryWallet !== LOCKED_TREASURY_WALLET) {
+      return NextResponse.json({ error: "TRADE_UNAVAILABLE", message: "Treasury configuration is unavailable." }, { status: 503 });
     }
 
     const marketQuote = await quoteLoogansForUsdCents(BARBER_USD_CENTS);
@@ -57,6 +59,7 @@ export async function POST(request: NextRequest) {
       createdAt: quote.createdAt,
       expiresAt: quote.expiresAt,
       expiresInSeconds: 60,
+      treasuryWallet,
     });
   } catch (error) {
     console.error("Failed to create Barbershop trade quote", error);
