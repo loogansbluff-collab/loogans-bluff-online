@@ -1,3 +1,6 @@
+const TOKEN_PROGRAM_ID = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
+const TOKEN_2022_PROGRAM_ID = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb";
+
 type RpcTokenBalance = {
   mint?: string;
   owner?: string;
@@ -31,27 +34,50 @@ async function rpcCall<T>(method: string, params: unknown[]): Promise<T> {
     body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
   });
   if (!response.ok) throw new Error(`Solana RPC HTTP ${response.status}`);
-  const payload = await response.json() as { result?: T; error?: { message?: string } };
+  const payload = (await response.json()) as { result?: T; error?: { message?: string } };
   if (payload.error) throw new Error(payload.error.message ?? "Solana RPC error");
   if (payload.result === undefined) throw new Error("Solana RPC returned no result");
   return payload.result;
 }
 
 export async function getLatestSolanaBlockhash() {
-  const result = await rpcCall<{ value?: { blockhash?: string; lastValidBlockHeight?: number } }>("getLatestBlockhash", [{ commitment: "confirmed" }]);
+  const result = await rpcCall<{ value?: { blockhash?: string; lastValidBlockHeight?: number } }>(
+    "getLatestBlockhash",
+    [{ commitment: "confirmed" }],
+  );
   const blockhash = result.value?.blockhash;
   const lastValidBlockHeight = result.value?.lastValidBlockHeight;
-  if (!blockhash || !Number.isInteger(lastValidBlockHeight)) throw new Error("Could not get latest Solana blockhash");
-  return { blockhash, lastValidBlockHeight: lastValidBlockHeight! };
+  if (!blockhash || !Number.isInteger(lastValidBlockHeight)) {
+    throw new Error("Could not get latest Solana blockhash");
+  }
+  return { blockhash, lastValidBlockHeight: lastValidBlockHeight as number };
 }
 
-function sumOwnerMintBalance(balances: RpcTokenBalance[] | undefined, owner: string, mint: string, decimals: number) {
+export async function getMintTokenProgram(mint: string) {
+  const result = await rpcCall<{ value?: { owner?: string } | null }>("getAccountInfo", [
+    mint,
+    { encoding: "base64", commitment: "confirmed" },
+  ]);
+  const owner = result.value?.owner;
+  if (owner !== TOKEN_PROGRAM_ID && owner !== TOKEN_2022_PROGRAM_ID) {
+    throw new Error("LOOGANS mint is not owned by a supported SPL token program");
+  }
+  return owner;
+}
+
+function sumOwnerMintBalance(
+  balances: RpcTokenBalance[] | undefined,
+  owner: string,
+  mint: string,
+  decimals: number,
+) {
   return (balances ?? []).reduce((total, balance) => {
     if (balance.owner !== owner || balance.mint !== mint) return total;
-    if (balance.uiTokenAmount?.decimals !== decimals || !/^\d+$/.test(balance.uiTokenAmount?.amount ?? "")) {
+    const amount = balance.uiTokenAmount?.amount;
+    if (balance.uiTokenAmount?.decimals !== decimals || !amount || !/^\d+$/.test(amount)) {
       throw new Error("Ambiguous token balance data");
     }
-    return total + BigInt(balance.uiTokenAmount!.amount!);
+    return total + BigInt(amount);
   }, BigInt(0));
 }
 
@@ -63,13 +89,13 @@ function walletSignedTransaction(tx: ParsedTransaction, wallet: string) {
 }
 
 async function getParsedTransaction(signature: string): Promise<ParsedTransaction> {
-  for (let attempt = 0; attempt < 4; attempt += 1) {
+  for (let attempt = 0; attempt < 5; attempt += 1) {
     const tx = await rpcCall<ParsedTransaction | null>("getTransaction", [
       signature,
       { encoding: "jsonParsed", commitment: "confirmed", maxSupportedTransactionVersion: 0 },
     ]);
     if (tx) return tx;
-    if (attempt < 3) await new Promise((resolve) => setTimeout(resolve, 650));
+    if (attempt < 4) await new Promise((resolve) => setTimeout(resolve, 700));
   }
   throw new Error("Confirmed transaction not found");
 }
@@ -82,17 +108,46 @@ export async function verifyLoogansTradeTransfer(input: {
   decimals: number;
   amountRaw: string;
 }) {
-  if (!/^\d+$/.test(input.amountRaw) || BigInt(input.amountRaw) <= BigInt(0)) throw new Error("Invalid quoted amount");
+  if (!/^\d+$/.test(input.amountRaw) || BigInt(input.amountRaw) <= BigInt(0)) {
+    throw new Error("Invalid quoted amount");
+  }
+
   const tx = await getParsedTransaction(input.signature);
   if (!tx.meta || tx.meta.err) throw new Error("Solana transaction failed");
-  if (!walletSignedTransaction(tx, input.playerWallet)) throw new Error("Signed-in wallet did not sign transaction");
+  if (!walletSignedTransaction(tx, input.playerWallet)) {
+    throw new Error("Signed-in wallet did not sign transaction");
+  }
 
-  const prePlayer = sumOwnerMintBalance(tx.meta.preTokenBalances, input.playerWallet, input.mint, input.decimals);
-  const postPlayer = sumOwnerMintBalance(tx.meta.postTokenBalances, input.playerWallet, input.mint, input.decimals);
-  const preTreasury = sumOwnerMintBalance(tx.meta.preTokenBalances, input.treasuryWallet, input.mint, input.decimals);
-  const postTreasury = sumOwnerMintBalance(tx.meta.postTokenBalances, input.treasuryWallet, input.mint, input.decimals);
+  const prePlayer = sumOwnerMintBalance(
+    tx.meta.preTokenBalances,
+    input.playerWallet,
+    input.mint,
+    input.decimals,
+  );
+  const postPlayer = sumOwnerMintBalance(
+    tx.meta.postTokenBalances,
+    input.playerWallet,
+    input.mint,
+    input.decimals,
+  );
+  const preTreasury = sumOwnerMintBalance(
+    tx.meta.preTokenBalances,
+    input.treasuryWallet,
+    input.mint,
+    input.decimals,
+  );
+  const postTreasury = sumOwnerMintBalance(
+    tx.meta.postTokenBalances,
+    input.treasuryWallet,
+    input.mint,
+    input.decimals,
+  );
   const expected = BigInt(input.amountRaw);
 
-  if (prePlayer - postPlayer !== expected) throw new Error("Player LOOGANS debit does not match stored quote");
-  if (postTreasury - preTreasury !== expected) throw new Error("Treasury LOOGANS credit does not match stored quote");
+  if (prePlayer - postPlayer !== expected) {
+    throw new Error("Player LOOGANS debit does not match stored quote");
+  }
+  if (postTreasury - preTreasury !== expected) {
+    throw new Error("Treasury LOOGANS credit does not match stored quote");
+  }
 }
