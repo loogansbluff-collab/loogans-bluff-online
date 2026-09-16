@@ -53,10 +53,12 @@ const priceByVolume = new Map<number, number>(
   }),
 );
 
-export const propertyAssetCatalog: PropertyAssetCatalogItem[] = baseCatalog.map((asset) => ({
-  ...asset,
-  governmentPriceSol: priceByVolume.get(asset.volume) ?? PRICE_BANDS[0],
-}));
+export const propertyAssetCatalog: PropertyAssetCatalogItem[] = baseCatalog
+  .map((asset) => ({
+    ...asset,
+    governmentPriceSol: priceByVolume.get(asset.volume) ?? PRICE_BANDS[0],
+  }))
+  .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
 
 if (propertyAssetCatalog.some((asset) => CITY_HELD_IDS.has(asset.id))) {
   throw new Error("Property Asset catalog contains a city-held building");
