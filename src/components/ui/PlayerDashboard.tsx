@@ -260,7 +260,17 @@ export default function PlayerDashboard({ player, onClose }: PlayerDashboardProp
         <div className="flex items-start justify-between gap-4 border-b border-white/10 px-5 py-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300">Player Dashboard</p>
-            <h2 className="mt-1 text-2xl font-bold">Player #{player.id}</h2>
+            <div className="mt-1 flex items-center gap-3">
+              <h2 className="text-2xl font-bold">Player #{player.id}</h2>
+              <a
+                href="https://pump.fun/coin/4zJg1qPJ8JRYHdXJSm1tYdmDiinwSPcyMdJ4DPMnpump"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm font-semibold text-emerald-300 hover:text-emerald-200"
+              >
+                Buy $LOOGANS
+              </a>
+            </div>
             <p className="mt-1 font-mono text-sm text-slate-300">{shortWallet(player.walletAddress)}</p>
           </div>
           <button type="button" onClick={onClose} className="rounded-lg border border-white/15 bg-slate-800 px-3 py-2 text-sm font-semibold hover:bg-slate-700">CLOSE</button>
