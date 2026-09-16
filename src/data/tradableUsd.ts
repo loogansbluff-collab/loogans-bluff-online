@@ -5,6 +5,7 @@ export const TRADABLE_USD_CENTS = {
   "LB-AUTOPARTS-001": 400,
   "LB-BAKERY-001": 350,
   "LB-BARBER-001": 100,
+  "LB-BINGO-001": 400,
 } as const;
 
 export type TradableAssetId = keyof typeof TRADABLE_USD_CENTS;
