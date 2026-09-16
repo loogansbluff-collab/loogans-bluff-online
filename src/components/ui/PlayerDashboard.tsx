@@ -61,6 +61,8 @@ type TradeBackResponse = {
   amountRaw?: string;
 };
 
+const TRADE_BACK_REQUEST_TIMEOUT_MS = 30000;
+
 function walletErrorMessage(error: unknown) {
   if (error instanceof Error) return error.message;
   if (typeof error === "string") return error;
@@ -232,12 +234,17 @@ export default function PlayerDashboard({ player, onClose }: PlayerDashboardProp
     setTradeBackAssetId(assetId);
     setTradeBackError(null);
     setTradeError(null);
+
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), TRADE_BACK_REQUEST_TIMEOUT_MS);
+
     try {
       const response = await fetch("/api/assets/trade-back", {
         method: "POST",
         credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ assetId }),
+        signal: controller.signal,
       });
       const payload = (await response.json().catch(() => null)) as TradeBackResponse | null;
       if (!response.ok || !payload?.collectedAssetIds || payload.assetId !== assetId) {
@@ -248,11 +255,17 @@ export default function PlayerDashboard({ player, onClose }: PlayerDashboardProp
       setQuoteError(null);
       setTradeBackError(null);
     } catch (error) {
+      const timedOut = error instanceof DOMException && error.name === "AbortError";
       setTradeBackError({
         assetId,
-        message: error instanceof Error ? error.message : "TRADE BACK failed",
+        message: timedOut
+          ? "PAYOUT_PENDING_CONFIRMATION"
+          : error instanceof Error
+            ? error.message
+            : "TRADE BACK failed",
       });
     } finally {
+      window.clearTimeout(timeout);
       setTradeBackAssetId(null);
     }
   };
