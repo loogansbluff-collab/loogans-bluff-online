@@ -1,5 +1,6 @@
 import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
+import { usdCentsForAsset } from "@/data/tradableUsd";
 import { isExpired, SESSION_COOKIE, verifyToken, type SessionTokenPayload } from "@/lib/auth";
 import { createAssetTradeQuote, getPlayerByWallet } from "@/lib/db";
 import { quoteLoogansForUsdCents } from "@/lib/loogansMarketQuote";
@@ -7,8 +8,6 @@ import { getLatestSolanaBlockhash, getMintTokenProgram } from "@/lib/solanaTrade
 
 export const runtime = "nodejs";
 
-const BARBER_ASSET_ID = "LB-BARBER-001";
-const BARBER_USD_CENTS = 100;
 const QUOTE_TTL_MS = 60_000;
 const LOCKED_TREASURY_WALLET = "4QaA5ESqNzmCyA5wEanGxSVKxodqb7XHjwkVq5zY66ZC";
 
@@ -21,8 +20,10 @@ export async function POST(request: NextRequest) {
     }
 
     const body = (await request.json().catch(() => null)) as { assetId?: string } | null;
-    if (body?.assetId !== BARBER_ASSET_ID) {
-      return NextResponse.json({ error: "Trade quote is only available for the Barbershop test" }, { status: 400 });
+    const assetId = body?.assetId?.trim() ?? "";
+    const usdCents = usdCentsForAsset(assetId);
+    if (!assetId || usdCents === null) {
+      return NextResponse.json({ error: "Trade quote is not available for this asset" }, { status: 400 });
     }
 
     const player = await getPlayerByWallet(session.address);
@@ -38,7 +39,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const marketQuote = await quoteLoogansForUsdCents(BARBER_USD_CENTS);
+    const marketQuote = await quoteLoogansForUsdCents(usdCents);
     const [tokenProgram, blockhashInfo] = await Promise.all([
       getMintTokenProgram(marketQuote.mint),
       getLatestSolanaBlockhash(),
@@ -48,8 +49,8 @@ export async function POST(request: NextRequest) {
       id: randomUUID(),
       playerId: player.id,
       walletAddress: session.address,
-      assetId: BARBER_ASSET_ID,
-      usdCents: BARBER_USD_CENTS,
+      assetId,
+      usdCents,
       mint: marketQuote.mint,
       mintDecimals: marketQuote.decimals,
       loogansAmountRaw: marketQuote.loogansAmountRaw,
@@ -77,7 +78,7 @@ export async function POST(request: NextRequest) {
       lastValidBlockHeight: blockhashInfo.lastValidBlockHeight,
     });
   } catch (error) {
-    console.error("Failed to create Barbershop trade quote", error);
+    console.error("Failed to create Property Asset trade quote", error);
     return NextResponse.json(
       { error: "TRADE_UNAVAILABLE", message: "A trustworthy live $LOOGANS quote is not available right now." },
       { status: 503 },

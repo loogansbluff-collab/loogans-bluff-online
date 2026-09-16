@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { isTradableAssetId } from "@/data/tradableUsd";
 import { isExpired, SESSION_COOKIE, verifyToken, type SessionTokenPayload } from "@/lib/auth";
 import {
   acquireTradeBackLock,
@@ -21,7 +22,6 @@ import {
 
 export const runtime = "nodejs";
 
-const BARBER_ASSET_ID = "LB-BARBER-001";
 const LOCKED_TREASURY_WALLET = "4QaA5ESqNzmCyA5wEanGxSVKxodqb7XHjwkVq5zY66ZC";
 
 function lookupPending(message: string) {
@@ -39,6 +39,7 @@ async function verifyAndFinalize(input: {
   walletAddress: string;
   treasuryWallet: string;
   mint: string;
+  assetId: string;
 }) {
   const signature = input.pending.payoutSignature;
   if (!signature) throw new Error("TRADE BACK payout has no signature");
@@ -56,12 +57,12 @@ async function verifyAndFinalize(input: {
     pendingId: input.pending.id,
     playerId: input.playerId,
     walletAddress: input.walletAddress,
-    assetId: BARBER_ASSET_ID,
+    assetId: input.assetId,
     signature,
   });
 
   return {
-    assetId: BARBER_ASSET_ID,
+    assetId: input.assetId,
     collectedAssetIds,
     payoutSignature: signature,
     amountRaw: input.pending.amountRaw,
@@ -76,8 +77,9 @@ export async function POST(request: NextRequest) {
   }
 
   const body = (await request.json().catch(() => null)) as { assetId?: string } | null;
-  if (body?.assetId !== BARBER_ASSET_ID) {
-    return NextResponse.json({ error: "TRADE BACK is only available for the Barbershop" }, { status: 400 });
+  const assetId = body?.assetId?.trim() ?? "";
+  if (!assetId || !isTradableAssetId(assetId)) {
+    return NextResponse.json({ error: "TRADE BACK is not available for this asset" }, { status: 400 });
   }
 
   const treasuryWallet = process.env.TREASURY_WALLET?.trim();
@@ -96,7 +98,7 @@ export async function POST(request: NextRequest) {
   const player = await getPlayerByWallet(session.address);
   if (!player) return NextResponse.json({ error: "Player not found" }, { status: 404 });
 
-  let pending = await getTradeBackPending(player.id, BARBER_ASSET_ID);
+  let pending = await getTradeBackPending(player.id, assetId);
 
   if (pending?.payoutSignature) {
     if (pending.walletAddress !== session.address) {
@@ -112,6 +114,7 @@ export async function POST(request: NextRequest) {
         walletAddress: session.address,
         treasuryWallet,
         mint: loogansMint,
+        assetId,
       });
       return NextResponse.json(result);
     } catch (error) {
@@ -125,7 +128,7 @@ export async function POST(request: NextRequest) {
   }
 
   if (pending) {
-    const releasedId = await releaseStaleUnsignedTradeBackLock(player.id, BARBER_ASSET_ID);
+    const releasedId = await releaseStaleUnsignedTradeBackLock(player.id, assetId);
     if (releasedId) {
       pending = null;
     } else {
@@ -145,11 +148,11 @@ export async function POST(request: NextRequest) {
   pending = await acquireTradeBackLock({
     playerId: player.id,
     walletAddress: session.address,
-    assetId: BARBER_ASSET_ID,
+    assetId,
   });
   if (!pending) {
     return NextResponse.json(
-      { error: "Barbershop is not eligible for TRADE BACK" },
+      { error: "Property Asset is not eligible for TRADE BACK" },
       { status: 409 },
     );
   }
@@ -201,6 +204,7 @@ export async function POST(request: NextRequest) {
       walletAddress: session.address,
       treasuryWallet,
       mint: loogansMint,
+      assetId,
     });
     return NextResponse.json(result);
   } catch (error) {

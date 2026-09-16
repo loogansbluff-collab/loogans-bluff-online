@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { usdCentsForAsset } from "@/data/tradableUsd";
 import { isExpired, SESSION_COOKIE, verifyToken, type SessionTokenPayload } from "@/lib/auth";
 import {
   finalizeLoogansTrade,
@@ -11,8 +12,6 @@ import { verifyLoogansTradeTransfer } from "@/lib/solanaTradeVerify";
 
 export const runtime = "nodejs";
 
-const BARBER_ASSET_ID = "LB-BARBER-001";
-const BARBER_USD_CENTS = 100;
 const LOCKED_TREASURY_WALLET = "4QaA5ESqNzmCyA5wEanGxSVKxodqb7XHjwkVq5zY66ZC";
 const SOLANA_SIGNATURE_PATTERN = /^[1-9A-HJ-NP-Za-km-z]{64,128}$/;
 
@@ -53,12 +52,13 @@ export async function POST(request: NextRequest) {
   }
 
   const quote = await getAssetTradeQuoteById(quoteId);
+  const expectedUsdCents = quote ? usdCentsForAsset(quote.assetId) : null;
   if (
     !quote ||
+    expectedUsdCents === null ||
     quote.playerId !== player.id ||
     quote.walletAddress !== session.address ||
-    quote.assetId !== BARBER_ASSET_ID ||
-    quote.usdCents !== BARBER_USD_CENTS ||
+    quote.usdCents !== expectedUsdCents ||
     quote.status !== "open" ||
     quote.mint !== loogansMint ||
     new Date(quote.expiresAt).getTime() <= Date.now()
@@ -70,8 +70,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Transaction signature has already been used" }, { status: 409 });
   }
 
-  if (await playerOwnsAsset(player.id, BARBER_ASSET_ID)) {
-    return NextResponse.json({ error: "Barbershop is already owned" }, { status: 409 });
+  if (await playerOwnsAsset(player.id, quote.assetId)) {
+    return NextResponse.json({ error: "Property Asset is already owned" }, { status: 409 });
   }
 
   try {
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Could not verify Solana transaction";
-    console.error("Barbershop trade verification failed", error);
+    console.error("Property Asset trade verification failed", error);
     return NextResponse.json(
       { error: message },
       { status: transactionLookupFailed(message) ? 502 : 400 },
@@ -97,17 +97,17 @@ export async function POST(request: NextRequest) {
       quoteId: quote.id,
       playerId: player.id,
       walletAddress: session.address,
-      assetId: BARBER_ASSET_ID,
+      assetId: quote.assetId,
       signature,
     });
 
     return NextResponse.json({
-      assetId: BARBER_ASSET_ID,
+      assetId: quote.assetId,
       collectedAssetIds,
       propertyAssetsCollected: collectedAssetIds.length,
     });
   } catch (error) {
-    console.error("Barbershop trade finalization failed", error);
+    console.error("Property Asset trade finalization failed", error);
     return NextResponse.json(
       { error: "Trade was verified but could not be recorded. The quote remains unconsumed." },
       { status: 409 },

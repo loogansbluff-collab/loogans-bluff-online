@@ -10,6 +10,7 @@ import {
   getAssociatedTokenAddressSync,
 } from "@solana/spl-token";
 import { propertyAssetCatalog } from "@/data/propertyAssetCatalog";
+import { isTradableAssetId, usdCentsForAsset } from "@/data/tradableUsd";
 import { getPhantomProvider, shortWallet } from "@/lib/phantom";
 
 export type DashboardPlayer = {
@@ -26,7 +27,7 @@ type PlayerDashboardProps = {
   onClose: () => void;
 };
 
-type BarberQuote = {
+type AssetQuote = {
   quoteId: string;
   assetId: string;
   usd: string;
@@ -60,45 +61,47 @@ type TradeBackResponse = {
   amountRaw?: string;
 };
 
-const BARBER_ASSET_ID = "LB-BARBER-001";
-
 function walletErrorMessage(error: unknown) {
   if (error instanceof Error) return error.message;
   if (typeof error === "string") return error;
   return "TRADE failed";
 }
 
+function usdLabel(cents: number) {
+  return `$${(cents / 100).toFixed(2)} USD`;
+}
+
 export default function PlayerDashboard({ player, onClose }: PlayerDashboardProps) {
   const [collectedAssetIds, setCollectedAssetIds] = useState(() => new Set(player.collectedAssetIds));
   const [collectingAssetId, setCollectingAssetId] = useState<string | null>(null);
   const [collectError, setCollectError] = useState<string | null>(null);
-  const [barberQuote, setBarberQuote] = useState<BarberQuote | null>(null);
-  const [barberQuoteLoading, setBarberQuoteLoading] = useState(false);
-  const [barberQuoteError, setBarberQuoteError] = useState<string | null>(null);
-  const [barberSecondsLeft, setBarberSecondsLeft] = useState(0);
-  const [barberTrading, setBarberTrading] = useState(false);
-  const [barberTradeError, setBarberTradeError] = useState<string | null>(null);
-  const [barberTradeBackLoading, setBarberTradeBackLoading] = useState(false);
-  const [barberTradeBackError, setBarberTradeBackError] = useState<string | null>(null);
+  const [activeQuote, setActiveQuote] = useState<AssetQuote | null>(null);
+  const [quoteLoadingAssetId, setQuoteLoadingAssetId] = useState<string | null>(null);
+  const [quoteError, setQuoteError] = useState<string | null>(null);
+  const [secondsLeft, setSecondsLeft] = useState(0);
+  const [tradingAssetId, setTradingAssetId] = useState<string | null>(null);
+  const [tradeError, setTradeError] = useState<string | null>(null);
+  const [tradeBackAssetId, setTradeBackAssetId] = useState<string | null>(null);
+  const [tradeBackError, setTradeBackError] = useState<string | null>(null);
   const collectedCount = collectedAssetIds.size;
 
   const collectedIdsArray = useMemo(() => Array.from(collectedAssetIds), [collectedAssetIds]);
 
   useEffect(() => {
-    if (!barberQuote) {
-      setBarberSecondsLeft(0);
+    if (!activeQuote) {
+      setSecondsLeft(0);
       return;
     }
 
     const updateCountdown = () => {
-      const seconds = Math.max(0, Math.ceil((new Date(barberQuote.expiresAt).getTime() - Date.now()) / 1000));
-      setBarberSecondsLeft(seconds);
+      const seconds = Math.max(0, Math.ceil((new Date(activeQuote.expiresAt).getTime() - Date.now()) / 1000));
+      setSecondsLeft(seconds);
     };
 
     updateCountdown();
     const timer = window.setInterval(updateCountdown, 250);
     return () => window.clearInterval(timer);
-  }, [barberQuote]);
+  }, [activeQuote]);
 
   const collectDemo = async (assetId: string) => {
     if (collectedAssetIds.has(assetId) || collectingAssetId) return;
@@ -121,46 +124,56 @@ export default function PlayerDashboard({ player, onClose }: PlayerDashboardProp
     }
   };
 
-  const getBarberQuote = async () => {
-    if (barberQuoteLoading || barberTrading || barberTradeBackLoading || collectedAssetIds.has(BARBER_ASSET_ID)) return;
-    setBarberQuoteLoading(true);
-    setBarberQuoteError(null);
-    setBarberTradeError(null);
-    setBarberTradeBackError(null);
-    setBarberQuote(null);
+  const getTradeQuote = async (assetId: string) => {
+    if (
+      !isTradableAssetId(assetId) ||
+      quoteLoadingAssetId ||
+      tradingAssetId ||
+      tradeBackAssetId ||
+      collectedAssetIds.has(assetId)
+    ) {
+      return;
+    }
+    setQuoteLoadingAssetId(assetId);
+    setQuoteError(null);
+    setTradeError(null);
+    setTradeBackError(null);
+    setActiveQuote(null);
     try {
       const response = await fetch("/api/assets/quote", {
         method: "POST",
         credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ assetId: BARBER_ASSET_ID }),
+        body: JSON.stringify({ assetId }),
       });
-      const payload = (await response.json().catch(() => null)) as (BarberQuote & { error?: string; message?: string }) | null;
-      if (!response.ok || !payload?.quoteId) {
+      const payload = (await response.json().catch(() => null)) as (AssetQuote & { error?: string; message?: string }) | null;
+      if (!response.ok || !payload?.quoteId || payload.assetId !== assetId) {
         throw new Error(payload?.message ?? payload?.error ?? "TRADE UNAVAILABLE");
       }
-      setBarberQuote(payload);
+      setActiveQuote(payload);
     } catch (error) {
-      setBarberQuoteError(error instanceof Error ? error.message : "TRADE UNAVAILABLE");
+      setQuoteError(error instanceof Error ? error.message : "TRADE UNAVAILABLE");
     } finally {
-      setBarberQuoteLoading(false);
+      setQuoteLoadingAssetId(null);
     }
   };
 
-  const tradeBarbershop = async () => {
+  const tradeAsset = async (assetId: string) => {
     if (
-      barberTrading ||
-      barberTradeBackLoading ||
-      !barberQuote ||
-      barberSecondsLeft <= 0 ||
-      collectedAssetIds.has(BARBER_ASSET_ID)
+      !isTradableAssetId(assetId) ||
+      tradingAssetId ||
+      tradeBackAssetId ||
+      !activeQuote ||
+      activeQuote.assetId !== assetId ||
+      secondsLeft <= 0 ||
+      collectedAssetIds.has(assetId)
     ) {
       return;
     }
 
-    setBarberTrading(true);
-    setBarberTradeError(null);
-    setBarberTradeBackError(null);
+    setTradingAssetId(assetId);
+    setTradeError(null);
+    setTradeBackError(null);
 
     try {
       const provider = getPhantomProvider();
@@ -174,21 +187,21 @@ export default function PlayerDashboard({ player, onClose }: PlayerDashboardProp
       }
 
       const payer = new PublicKey(player.walletAddress);
-      const mint = new PublicKey(barberQuote.mint);
-      const treasury = new PublicKey(barberQuote.treasuryWallet);
-      const tokenProgram = new PublicKey(barberQuote.tokenProgram);
+      const mint = new PublicKey(activeQuote.mint);
+      const treasury = new PublicKey(activeQuote.treasuryWallet);
+      const tokenProgram = new PublicKey(activeQuote.tokenProgram);
       if (!tokenProgram.equals(TOKEN_PROGRAM_ID) && !tokenProgram.equals(TOKEN_2022_PROGRAM_ID)) {
         throw new Error("Unsupported $LOOGANS token program");
       }
 
       const sourceAta = getAssociatedTokenAddressSync(mint, payer, false, tokenProgram);
       const treasuryAta = getAssociatedTokenAddressSync(mint, treasury, false, tokenProgram);
-      const amountRaw = BigInt(barberQuote.loogansAmountRaw);
+      const amountRaw = BigInt(activeQuote.loogansAmountRaw);
       if (amountRaw <= BigInt(0)) throw new Error("Invalid quoted $LOOGANS amount");
 
       const transaction = new Transaction({
         feePayer: payer,
-        recentBlockhash: barberQuote.recentBlockhash,
+        recentBlockhash: activeQuote.recentBlockhash,
       });
       transaction.add(
         createAssociatedTokenAccountIdempotentInstruction(
@@ -206,7 +219,7 @@ export default function PlayerDashboard({ player, onClose }: PlayerDashboardProp
           treasuryAta,
           payer,
           amountRaw,
-          barberQuote.decimals,
+          activeQuote.decimals,
           [],
           tokenProgram,
         ),
@@ -219,48 +232,48 @@ export default function PlayerDashboard({ player, onClose }: PlayerDashboardProp
         method: "POST",
         credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ quoteId: barberQuote.quoteId, signature: sent.signature }),
+        body: JSON.stringify({ quoteId: activeQuote.quoteId, signature: sent.signature }),
       });
       const payload = (await response.json().catch(() => null)) as TradeResponse | null;
-      if (!response.ok || !payload?.collectedAssetIds) {
+      if (!response.ok || !payload?.collectedAssetIds || payload.assetId !== assetId) {
         throw new Error(payload?.error ?? "TRADE payment could not be verified");
       }
 
       setCollectedAssetIds(new Set(payload.collectedAssetIds));
-      setBarberQuote(null);
-      setBarberQuoteError(null);
-      setBarberTradeError(null);
+      setActiveQuote(null);
+      setQuoteError(null);
+      setTradeError(null);
     } catch (error) {
-      setBarberTradeError(walletErrorMessage(error));
+      setTradeError(walletErrorMessage(error));
     } finally {
-      setBarberTrading(false);
+      setTradingAssetId(null);
     }
   };
 
-  const tradeBackBarbershop = async () => {
-    if (barberTradeBackLoading || !collectedAssetIds.has(BARBER_ASSET_ID)) return;
-    setBarberTradeBackLoading(true);
-    setBarberTradeBackError(null);
-    setBarberTradeError(null);
+  const tradeBackAsset = async (assetId: string) => {
+    if (!isTradableAssetId(assetId) || tradeBackAssetId || !collectedAssetIds.has(assetId)) return;
+    setTradeBackAssetId(assetId);
+    setTradeBackError(null);
+    setTradeError(null);
     try {
       const response = await fetch("/api/assets/trade-back", {
         method: "POST",
         credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ assetId: BARBER_ASSET_ID }),
+        body: JSON.stringify({ assetId }),
       });
       const payload = (await response.json().catch(() => null)) as TradeBackResponse | null;
-      if (!response.ok || !payload?.collectedAssetIds) {
+      if (!response.ok || !payload?.collectedAssetIds || payload.assetId !== assetId) {
         throw new Error(payload?.error ?? "TRADE BACK failed");
       }
       setCollectedAssetIds(new Set(payload.collectedAssetIds));
-      setBarberQuote(null);
-      setBarberQuoteError(null);
-      setBarberTradeBackError(null);
+      if (activeQuote?.assetId === assetId) setActiveQuote(null);
+      setQuoteError(null);
+      setTradeBackError(null);
     } catch (error) {
-      setBarberTradeBackError(error instanceof Error ? error.message : "TRADE BACK failed");
+      setTradeBackError(error instanceof Error ? error.message : "TRADE BACK failed");
     } finally {
-      setBarberTradeBackLoading(false);
+      setTradeBackAssetId(null);
     }
   };
 
@@ -293,73 +306,75 @@ export default function PlayerDashboard({ player, onClose }: PlayerDashboardProp
           <div className="min-h-0 flex-1 overflow-y-auto rounded-xl border border-white/10 bg-slate-900/55">
             {propertyAssetCatalog.map((asset) => {
               const collected = collectedAssetIds.has(asset.id);
-              const isBarber = asset.id === BARBER_ASSET_ID;
-              const barberQuoteLive = Boolean(barberQuote && barberSecondsLeft > 0);
+              const tradable = isTradableAssetId(asset.id);
+              const usdCents = usdCentsForAsset(asset.id);
+              const quoteForAsset = activeQuote?.assetId === asset.id ? activeQuote : null;
+              const quoteLive = Boolean(quoteForAsset && secondsLeft > 0);
               return (
                 <div key={asset.id} className="flex items-center gap-3 border-b border-white/5 px-4 py-3 last:border-b-0">
                   <span aria-hidden="true" className={collected ? "text-xl text-emerald-300" : "text-xl text-slate-500"}>{collected ? "✅" : "□"}</span>
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-semibold">{asset.name}</p>
                     <p className="truncate text-xs text-slate-400">{asset.id}</p>
-                    {isBarber && !collected && barberQuoteLive && barberQuote ? (
+                    {tradable && !collected && quoteLive && quoteForAsset ? (
                       <div className="mt-1 text-xs">
-                        <p className="font-semibold text-amber-300">{barberQuote.loogansAmountUi} $LOOGANS</p>
-                        <p className="text-slate-400">$1.00 USD quote · {barberSecondsLeft}s left</p>
-                        <p className="font-mono text-[10px] text-slate-500">Quote {barberQuote.quoteId}</p>
+                        <p className="font-semibold text-amber-300">{quoteForAsset.loogansAmountUi} $LOOGANS</p>
+                        <p className="text-slate-400">{usdLabel(usdCents ?? 0)} quote · {secondsLeft}s left</p>
+                        <p className="font-mono text-[10px] text-slate-500">Quote {quoteForAsset.quoteId}</p>
                       </div>
                     ) : null}
-                    {isBarber && !collected && barberQuoteError ? (
-                      <p className="mt-1 text-xs font-semibold text-red-300">{barberQuoteError}</p>
+                    {tradable && !collected && quoteError && (quoteLoadingAssetId === asset.id || !activeQuote) ? (
+                      <p className="mt-1 text-xs font-semibold text-red-300">{quoteError}</p>
                     ) : null}
-                    {isBarber && !collected && barberTradeError ? (
-                      <p className="mt-1 text-xs font-semibold text-red-300">{barberTradeError}</p>
+                    {tradable && !collected && tradeError && (tradingAssetId === asset.id || !activeQuote || activeQuote.assetId === asset.id) ? (
+                      <p className="mt-1 text-xs font-semibold text-red-300">{tradeError}</p>
                     ) : null}
-                    {isBarber && collected && barberTradeBackError ? (
-                      <p className="mt-1 text-xs font-semibold text-red-300">{barberTradeBackError}</p>
+                    {tradable && collected && tradeBackError ? (
+                      <p className="mt-1 text-xs font-semibold text-red-300">{tradeBackError}</p>
                     ) : null}
                   </div>
                   <div className="hidden text-right text-xs text-slate-400 sm:block">
                     <p>{asset.width} × {asset.height} × {asset.depth}</p>
                     <p>Volume {asset.volume.toFixed(1)}</p>
-                    {isBarber ? (
-                      <p className="font-semibold text-amber-300">$1.00 USD in $LOOGANS</p>
+                    {tradable && usdCents !== null ? (
+                      <p className="font-semibold text-amber-300">{usdLabel(usdCents)} in $LOOGANS</p>
                     ) : (
                       <p className="font-semibold text-amber-300">{asset.governmentPriceSol.toFixed(2)} SOL</p>
                     )}
                   </div>
                   {collected ? (
-                    isBarber ? (
+                    tradable ? (
                       <div className="flex flex-col items-end gap-1">
                         <span className="text-xs font-semibold uppercase tracking-wider text-emerald-300">OWNED</span>
                         <button
                           type="button"
-                          onClick={() => void tradeBackBarbershop()}
-                          disabled={barberTradeBackLoading}
+                          onClick={() => void tradeBackAsset(asset.id)}
+                          disabled={tradeBackAssetId !== null}
                           className="rounded bg-amber-700 px-2 py-1 text-xs font-semibold hover:bg-amber-600 disabled:cursor-wait disabled:opacity-60"
                         >
-                          {barberTradeBackLoading ? "TRADING BACK..." : "TRADE BACK"}
+                          {tradeBackAssetId === asset.id ? "TRADING BACK..." : "TRADE BACK"}
                         </button>
                       </div>
                     ) : (
                       <span className="text-xs font-semibold uppercase tracking-wider text-emerald-300">Collected</span>
                     )
-                  ) : isBarber ? (
+                  ) : tradable ? (
                     <div className="flex flex-col items-end gap-1">
                       <button
                         type="button"
-                        onClick={() => void getBarberQuote()}
-                        disabled={barberQuoteLoading || barberTrading || barberTradeBackLoading}
+                        onClick={() => void getTradeQuote(asset.id)}
+                        disabled={quoteLoadingAssetId !== null || tradingAssetId !== null || tradeBackAssetId !== null}
                         className="rounded bg-amber-600 px-2 py-1 text-xs font-semibold hover:bg-amber-500 disabled:cursor-wait disabled:opacity-60"
                       >
-                        {barberQuoteLoading ? "QUOTING..." : barberQuoteLive ? "REFRESH QUOTE" : "GET QUOTE"}
+                        {quoteLoadingAssetId === asset.id ? "QUOTING..." : quoteLive ? "REFRESH QUOTE" : "GET QUOTE"}
                       </button>
                       <button
                         type="button"
-                        onClick={() => void tradeBarbershop()}
-                        disabled={!barberQuoteLive || barberTrading || barberTradeBackLoading}
+                        onClick={() => void tradeAsset(asset.id)}
+                        disabled={!quoteLive || tradingAssetId !== null || tradeBackAssetId !== null}
                         className="rounded bg-emerald-700 px-2 py-1 text-xs font-semibold hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-50"
                       >
-                        {barberTrading ? "TRADING..." : "TRADE"}
+                        {tradingAssetId === asset.id ? "TRADING..." : "TRADE"}
                       </button>
                     </div>
                   ) : (
