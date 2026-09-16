@@ -1,3 +1,4 @@
+import { neon } from "@neondatabase/serverless";
 import { NextRequest, NextResponse } from "next/server";
 import { isTradableAssetId } from "@/data/tradableUsd";
 import { isExpired, SESSION_COOKIE, verifyToken, type SessionTokenPayload } from "@/lib/auth";
@@ -23,6 +24,12 @@ import {
 export const runtime = "nodejs";
 
 const LOCKED_TREASURY_WALLET = "4QaA5ESqNzmCyA5wEanGxSVKxodqb7XHjwkVq5zY66ZC";
+const STALE_SIGNED_PAYOUT_SECONDS = 180;
+
+type SignatureStatus = {
+  err?: unknown;
+  confirmationStatus?: "processed" | "confirmed" | "finalized" | null;
+};
 
 function lookupPending(message: string) {
   return (
@@ -31,6 +38,59 @@ function lookupPending(message: string) {
     message.includes("Solana RPC error") ||
     message.includes("SOLANA_RPC_URL")
   );
+}
+
+function getDatabaseUrl() {
+  const value = process.env.DATABASE_URL ?? process.env.POSTGRES_URL;
+  if (!value) throw new Error("DATABASE_URL or POSTGRES_URL must be configured");
+  return value;
+}
+
+function getRpcUrl() {
+  const value = process.env.SOLANA_RPC_URL?.trim();
+  if (!value) throw new Error("SOLANA_RPC_URL must be configured");
+  return value;
+}
+
+async function getSignatureStatus(signature: string): Promise<SignatureStatus | null> {
+  const response = await fetch(getRpcUrl(), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    cache: "no-store",
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      id: 1,
+      method: "getSignatureStatuses",
+      params: [[signature], { searchTransactionHistory: true }],
+    }),
+  });
+  if (!response.ok) throw new Error(`Solana RPC HTTP ${response.status}`);
+  const payload = (await response.json()) as {
+    result?: { value?: Array<SignatureStatus | null> };
+    error?: { message?: string };
+  };
+  if (payload.error) throw new Error(payload.error.message ?? "Solana RPC error");
+  return payload.result?.value?.[0] ?? null;
+}
+
+async function releaseStaleSignedTradeBackLock(pending: TradeBackPendingRecord) {
+  const signature = pending.payoutSignature;
+  if (!signature || pending.ageSeconds < STALE_SIGNED_PAYOUT_SECONDS) return false;
+
+  const status = await getSignatureStatus(signature);
+  if (status !== null) return false;
+
+  const sql = neon(getDatabaseUrl());
+  const rows = await sql`
+    DELETE FROM asset_trade_back_pending
+    WHERE id = ${pending.id}
+      AND player_id = ${pending.playerId}
+      AND asset_id = ${pending.assetId}
+      AND payout_signature = ${signature}
+      AND created_at <= NOW() - INTERVAL '180 seconds'
+    RETURNING id
+  `;
+  return rows.length === 1;
 }
 
 async function verifyAndFinalize(input: {
@@ -120,10 +180,32 @@ export async function POST(request: NextRequest) {
     } catch (error) {
       const message = error instanceof Error ? error.message : "TRADE BACK payout could not be verified";
       console.error("TRADE BACK retry verification/finalization failed", message);
-      return NextResponse.json(
-        { error: lookupPending(message) ? "PAYOUT_PENDING_CONFIRMATION" : message },
-        { status: lookupPending(message) ? 502 : 409 },
-      );
+
+      if (message.includes("Confirmed transaction not found") && pending.ageSeconds >= STALE_SIGNED_PAYOUT_SECONDS) {
+        try {
+          const released = await releaseStaleSignedTradeBackLock(pending);
+          if (released) {
+            console.warn("Released stale signed TRADE BACK payout that never landed", {
+              assetId,
+              pendingId: pending.id,
+              ageSeconds: pending.ageSeconds,
+            });
+            pending = null;
+          }
+        } catch (recoveryError) {
+          console.error(
+            "TRADE BACK stale payout recovery check failed",
+            recoveryError instanceof Error ? recoveryError.message : "recovery error",
+          );
+        }
+      }
+
+      if (pending) {
+        return NextResponse.json(
+          { error: lookupPending(message) ? "PAYOUT_PENDING_CONFIRMATION" : message },
+          { status: lookupPending(message) ? 502 : 409 },
+        );
+      }
     }
   }
 
