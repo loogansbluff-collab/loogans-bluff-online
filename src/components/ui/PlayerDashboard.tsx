@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { PublicKey, Transaction } from "@solana/web3.js";
 import {
   TOKEN_2022_PROGRAM_ID,
@@ -73,8 +73,6 @@ function usdLabel(cents: number) {
 
 export default function PlayerDashboard({ player, onClose }: PlayerDashboardProps) {
   const [collectedAssetIds, setCollectedAssetIds] = useState(() => new Set(player.collectedAssetIds));
-  const [collectingAssetId, setCollectingAssetId] = useState<string | null>(null);
-  const [collectError, setCollectError] = useState<string | null>(null);
   const [activeQuote, setActiveQuote] = useState<AssetQuote | null>(null);
   const [quoteLoadingAssetId, setQuoteLoadingAssetId] = useState<string | null>(null);
   const [quoteError, setQuoteError] = useState<string | null>(null);
@@ -83,9 +81,9 @@ export default function PlayerDashboard({ player, onClose }: PlayerDashboardProp
   const [tradeError, setTradeError] = useState<string | null>(null);
   const [tradeBackAssetId, setTradeBackAssetId] = useState<string | null>(null);
   const [tradeBackError, setTradeBackError] = useState<string | null>(null);
-  const collectedCount = collectedAssetIds.size;
 
-  const collectedIdsArray = useMemo(() => Array.from(collectedAssetIds), [collectedAssetIds]);
+  const tradableAssets = propertyAssetCatalog.filter((asset) => isTradableAssetId(asset.id));
+  const ownedTradableCount = tradableAssets.filter((asset) => collectedAssetIds.has(asset.id)).length;
 
   useEffect(() => {
     if (!activeQuote) {
@@ -102,27 +100,6 @@ export default function PlayerDashboard({ player, onClose }: PlayerDashboardProp
     const timer = window.setInterval(updateCountdown, 250);
     return () => window.clearInterval(timer);
   }, [activeQuote]);
-
-  const collectDemo = async (assetId: string) => {
-    if (collectedAssetIds.has(assetId) || collectingAssetId) return;
-    setCollectingAssetId(assetId);
-    setCollectError(null);
-    try {
-      const response = await fetch("/api/assets/collect", {
-        method: "POST",
-        credentials: "same-origin",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ assetId }),
-      });
-      const payload = (await response.json().catch(() => null)) as { error?: string; collectedAssetIds?: string[] } | null;
-      if (!response.ok) throw new Error(payload?.error ?? "Could not collect Property Asset");
-      setCollectedAssetIds(new Set(payload?.collectedAssetIds ?? [...collectedIdsArray, assetId]));
-    } catch (error) {
-      setCollectError(error instanceof Error ? error.message : "Could not collect Property Asset");
-    } finally {
-      setCollectingAssetId(null);
-    }
-  };
 
   const getTradeQuote = async (assetId: string) => {
     if (
@@ -296,17 +273,14 @@ export default function PlayerDashboard({ player, onClose }: PlayerDashboardProp
               <p className="mt-1 text-sm text-slate-300">Collectible assets tied to shared town locations.</p>
             </div>
             <div className="text-right">
-              <p className="text-2xl font-bold text-emerald-300">{collectedCount} / {propertyAssetCatalog.length}</p>
-              <p className="text-xs uppercase tracking-wider text-slate-400">collected</p>
+              <p className="text-2xl font-bold text-emerald-300">{ownedTradableCount} / {tradableAssets.length}</p>
+              <p className="text-xs uppercase tracking-wider text-slate-400">owned</p>
             </div>
           </div>
 
-          {collectError ? <p className="mb-3 rounded bg-red-950/80 px-3 py-2 text-sm text-red-200">{collectError}</p> : null}
-
           <div className="min-h-0 flex-1 overflow-y-auto rounded-xl border border-white/10 bg-slate-900/55">
-            {propertyAssetCatalog.map((asset) => {
+            {tradableAssets.map((asset) => {
               const collected = collectedAssetIds.has(asset.id);
-              const tradable = isTradableAssetId(asset.id);
               const usdCents = usdCentsForAsset(asset.id);
               const quoteForAsset = activeQuote?.assetId === asset.id ? activeQuote : null;
               const quoteLive = Boolean(quoteForAsset && secondsLeft > 0);
@@ -316,49 +290,43 @@ export default function PlayerDashboard({ player, onClose }: PlayerDashboardProp
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-semibold">{asset.name}</p>
                     <p className="truncate text-xs text-slate-400">{asset.id}</p>
-                    {tradable && !collected && quoteLive && quoteForAsset ? (
+                    {!collected && quoteLive && quoteForAsset ? (
                       <div className="mt-1 text-xs">
                         <p className="font-semibold text-amber-300">{quoteForAsset.loogansAmountUi} $LOOGANS</p>
                         <p className="text-slate-400">{usdLabel(usdCents ?? 0)} quote · {secondsLeft}s left</p>
                         <p className="font-mono text-[10px] text-slate-500">Quote {quoteForAsset.quoteId}</p>
                       </div>
                     ) : null}
-                    {tradable && !collected && quoteError && (quoteLoadingAssetId === asset.id || !activeQuote) ? (
+                    {!collected && quoteError && (quoteLoadingAssetId === asset.id || !activeQuote) ? (
                       <p className="mt-1 text-xs font-semibold text-red-300">{quoteError}</p>
                     ) : null}
-                    {tradable && !collected && tradeError && (tradingAssetId === asset.id || !activeQuote || activeQuote.assetId === asset.id) ? (
+                    {!collected && tradeError && (tradingAssetId === asset.id || !activeQuote || activeQuote.assetId === asset.id) ? (
                       <p className="mt-1 text-xs font-semibold text-red-300">{tradeError}</p>
                     ) : null}
-                    {tradable && collected && tradeBackError ? (
+                    {collected && tradeBackError ? (
                       <p className="mt-1 text-xs font-semibold text-red-300">{tradeBackError}</p>
                     ) : null}
                   </div>
                   <div className="hidden text-right text-xs text-slate-400 sm:block">
                     <p>{asset.width} × {asset.height} × {asset.depth}</p>
                     <p>Volume {asset.volume.toFixed(1)}</p>
-                    {tradable && usdCents !== null ? (
+                    {usdCents !== null ? (
                       <p className="font-semibold text-amber-300">{usdLabel(usdCents)} in $LOOGANS</p>
-                    ) : (
-                      <p className="font-semibold text-amber-300">{asset.governmentPriceSol.toFixed(2)} SOL</p>
-                    )}
+                    ) : null}
                   </div>
                   {collected ? (
-                    tradable ? (
-                      <div className="flex flex-col items-end gap-1">
-                        <span className="text-xs font-semibold uppercase tracking-wider text-emerald-300">OWNED</span>
-                        <button
-                          type="button"
-                          onClick={() => void tradeBackAsset(asset.id)}
-                          disabled={tradeBackAssetId !== null}
-                          className="rounded bg-amber-700 px-2 py-1 text-xs font-semibold hover:bg-amber-600 disabled:cursor-wait disabled:opacity-60"
-                        >
-                          {tradeBackAssetId === asset.id ? "TRADING BACK..." : "TRADE BACK"}
-                        </button>
-                      </div>
-                    ) : (
-                      <span className="text-xs font-semibold uppercase tracking-wider text-emerald-300">Collected</span>
-                    )
-                  ) : tradable ? (
+                    <div className="flex flex-col items-end gap-1">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-emerald-300">OWNED</span>
+                      <button
+                        type="button"
+                        onClick={() => void tradeBackAsset(asset.id)}
+                        disabled={tradeBackAssetId !== null}
+                        className="rounded bg-amber-700 px-2 py-1 text-xs font-semibold hover:bg-amber-600 disabled:cursor-wait disabled:opacity-60"
+                      >
+                        {tradeBackAssetId === asset.id ? "TRADING BACK..." : "TRADE BACK"}
+                      </button>
+                    </div>
+                  ) : (
                     <div className="flex flex-col items-end gap-1">
                       <button
                         type="button"
@@ -377,15 +345,6 @@ export default function PlayerDashboard({ player, onClose }: PlayerDashboardProp
                         {tradingAssetId === asset.id ? "TRADING..." : "TRADE"}
                       </button>
                     </div>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => void collectDemo(asset.id)}
-                      disabled={collectingAssetId !== null}
-                      className="rounded bg-slate-700 px-2 py-1 text-xs font-semibold hover:bg-slate-600 disabled:cursor-wait disabled:opacity-60"
-                    >
-                      {collectingAssetId === asset.id ? "COLLECTING..." : "Collect (demo)"}
-                    </button>
                   )}
                 </div>
               );
