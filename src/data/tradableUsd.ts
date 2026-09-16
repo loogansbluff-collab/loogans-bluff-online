@@ -1,5 +1,6 @@
 export const TRADABLE_USD_CENTS = {
   "LB-ACCOUNTANT-001": 400,
+  "LB-APPLIANCE-001": 550,
   "LB-BARBER-001": 100,
 } as const;
 
