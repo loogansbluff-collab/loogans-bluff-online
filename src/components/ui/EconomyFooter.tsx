@@ -46,6 +46,14 @@ export default function EconomyFooter() {
       <span>
         TREASURY: {stats ? (stats.treasuryLoogansUi ? `${formatLoogans(stats.treasuryLoogansUi)} $LOOGANS` : "UNAVAILABLE") : "—"}
       </span>
+      <a
+        className="pointer-events-auto hover:text-white"
+        href="https://pump.fun/coin/4zJg1qPJ8JRYHdXJSm1tYdmDiinwSPcyMdJ4DPMnpump"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        BUY LOOGANS
+      </a>
     </div>
   );
 }
