@@ -32,6 +32,7 @@ export const TRADABLE_USD_CENTS = {
   "LB-HOME-001": 100,
   "LB-HOME-003": 100,
   "LB-HOTEL-001": 550,
+  "LB-ICECREAM-001": 250,
   "LB-REPAIR-001": 500,
 } as const;
 
