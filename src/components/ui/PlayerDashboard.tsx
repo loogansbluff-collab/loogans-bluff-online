@@ -80,7 +80,7 @@ export default function PlayerDashboard({ player, onClose }: PlayerDashboardProp
   const [tradingAssetId, setTradingAssetId] = useState<string | null>(null);
   const [tradeError, setTradeError] = useState<string | null>(null);
   const [tradeBackAssetId, setTradeBackAssetId] = useState<string | null>(null);
-  const [tradeBackError, setTradeBackError] = useState<string | null>(null);
+  const [tradeBackError, setTradeBackError] = useState<{ assetId: string; message: string } | null>(null);
 
   const tradableAssets = propertyAssetCatalog.filter((asset) => isTradableAssetId(asset.id));
   const ownedTradableCount = tradableAssets.filter((asset) => collectedAssetIds.has(asset.id)).length;
@@ -248,7 +248,10 @@ export default function PlayerDashboard({ player, onClose }: PlayerDashboardProp
       setQuoteError(null);
       setTradeBackError(null);
     } catch (error) {
-      setTradeBackError(error instanceof Error ? error.message : "TRADE BACK failed");
+      setTradeBackError({
+        assetId,
+        message: error instanceof Error ? error.message : "TRADE BACK failed",
+      });
     } finally {
       setTradeBackAssetId(null);
     }
@@ -313,8 +316,8 @@ export default function PlayerDashboard({ player, onClose }: PlayerDashboardProp
                     {!collected && tradeError && (tradingAssetId === asset.id || !activeQuote || activeQuote.assetId === asset.id) ? (
                       <p className="mt-1 text-xs font-semibold text-red-300">{tradeError}</p>
                     ) : null}
-                    {collected && tradeBackError ? (
-                      <p className="mt-1 text-xs font-semibold text-red-300">{tradeBackError}</p>
+                    {collected && tradeBackError?.assetId === asset.id ? (
+                      <p className="mt-1 text-xs font-semibold text-red-300">{tradeBackError.message}</p>
                     ) : null}
                   </div>
                   <div className="hidden text-right text-xs text-slate-400 sm:block">
