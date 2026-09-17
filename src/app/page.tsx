@@ -17,7 +17,6 @@ import ProximityPrompt from "@/components/ui/ProximityPrompt";
 import TownDirectory from "@/components/ui/TownDirectory";
 import LegalLinks from "@/components/ui/LegalLinks";
 import EconomyFooter from "@/components/ui/EconomyFooter";
-import WalletChrome from "@/components/ui/WalletChrome";
 
 const TownCanvas = dynamic(() => import("@/components/scene/TownCanvas"), {
   ssr: false,
@@ -73,7 +72,6 @@ export default function HomePage() {
     <main className="h-screen w-screen overflow-hidden bg-slate-950">
       {mode === "interior" ? <InteriorCanvas /> : <TownCanvas />}
       <TitleChrome />
-      <WalletChrome />
       <TopHud />
       {mode !== "interior" ? <TownDirectory /> : null}
       <ControlsLegend />
